@@ -143,27 +143,35 @@ class FeedIndex:
         return self.built
 
     # ---- lookup ------------------------------------------------------------------------------------------
-    def candidates(self, legal_name: str) -> list[dict]:
+    def candidates(self, legal_name: str, also: Optional[list] = None) -> list[dict]:
         """Active ads that could belong to this company, for the organisation-number gate to decide.
 
-        A NAV employer name is usually the establishment, not the legal entity ("PARENT AS AVD OSLO"), so the
-        legal name is matched as a substring. A single generic token is never enough on its own: "C FRISØR AS"
-        would otherwise pull in every hairdresser in Norway and waste the request budget on certain rejections.
+        A NAV employer name is usually the establishment, not the legal entity ("PARENT AS AVD OSLO"), so each
+        name is matched as a substring. ``also`` carries the registry's own subunit names, because an
+        establishment often trades under a name the parent's does not contain ("KVÆRNERBYEN FUS BARNEHAGE" under
+        a differently named operator). A single generic token is never enough on its own: "C FRISØR AS" would
+        otherwise pull in every hairdresser in Norway and waste the budget on certain rejections.
         """
-        want = name_tokens(legal_name)
-        if not want:
-            return []
-        target = fold(legal_name)
-        stripped = " ".join(t for t in target.split() if t not in LEGAL_FORMS)
         out: list[dict] = []
-        for bname, uuids in self.by_name.items():
-            if not bname:
+        seen: set[str] = set()
+        for raw in [legal_name] + list(also or []):
+            want = name_tokens(raw)
+            if not want:
                 continue
-            hit = (bname == target or bname == stripped
-                   or (len(stripped) >= 6 and stripped in bname)
-                   or (len(want) >= 2 and set(want) <= set(bname.split())))
-            if hit:
-                out.extend(self.ads[u] for u in uuids)
+            target = fold(raw)
+            stripped = " ".join(t for t in target.split() if t not in LEGAL_FORMS)
+            for bname, uuids in self.by_name.items():
+                if not bname:
+                    continue
+                hit = (bname == target or bname == stripped
+                       or (len(stripped) >= 6 and stripped in bname)
+                       or (len(stripped) >= 6 and bname in stripped)
+                       or (len(want) >= 2 and set(want) <= set(bname.split())))
+                if hit:
+                    for u in uuids:
+                        if u not in seen:
+                            seen.add(u)
+                            out.append(self.ads[u])
         out.sort(key=lambda a: a["seen"], reverse=True)
         return out[:MAX_CANDIDATES]
 
@@ -200,7 +208,7 @@ def fetch(profile: dict, session, index: FeedIndex, subunits: Optional[dict] = N
                                 note="NAV feed scan failed this run: " + "; ".join(index.errors[:2])))
         errors.append(new_error("jobs_feed", "; ".join(index.errors[:2]) or "feed not built", st, FEED_URL))
         return {"claims": claims, "evidence": evidence, "errors": errors}
-    cands = index.candidates(name)
+    cands = index.candidates(name, also=[v for v in subunits.values() if v])
     accepted = 0
     unchecked = 0
     rejected: list[str] = []

@@ -28,7 +28,7 @@ once inactive; contact details fall under GDPR). Documentation: `https://navikt.
 | Source class | Endpoint | Rule |
 |---|---|---|
 | `official_job_board` | `https://pam-stilling-feed.nav.no/api/v1/feed` with `If-Modified-Since` = now minus `--nav-days` (60), then `next_url` pages of 1,000 events; bearer token | one scan per run (about 20-40 requests), fetched as three time-window chains; the latest event per ad is kept and active ads are indexed by employer name |
-| `official_job_board` | `https://pam-stilling-feed.nav.no/api/v1/feedentry/<uuid>` | fetched only for ads whose employer name matches the legal name (at most 8 per company); an ad is published only when `ad_content.employer.orgnr` equals the organisation number |
+| `official_job_board` | `https://pam-stilling-feed.nav.no/api/v1/feedentry/<uuid>` | fetched only for ads whose employer name matches the legal name (at most 8 per company); an ad is published only when `ad_content.employer.orgnr` equals the organisation number, or equals a subunit number the official registry lists under this entity (Norwegian ads are posted by the establishment, not the legal entity) |
 
 Token: `NAV_FEED_TOKEN` (a private consumer token from NAV, requested by email to nav.team.arbeidsplassen@nav.no) or,
 when unset, the public experimentation token published at `https://pam-stilling-feed.nav.no/api/publicToken`

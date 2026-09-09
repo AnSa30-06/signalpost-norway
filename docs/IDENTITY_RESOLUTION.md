@@ -91,3 +91,17 @@ namesake would slip through.
 
 Conditions, all required: at least two name tokens before generic-word stripping, a compacted name of at least
 seven characters, and the first hostname label (after dropping `www`) equal to the compacted name.
+
+## Job ads: the establishment, not the legal entity
+
+A Norwegian job ad names the establishment that is hiring, so NAV's `employer.orgnr` is usually a subunit
+(underenhet) number rather than the parent's. NORDICNEUROLAB AS is organisation number 891043082 and its NAV ad
+carries 991095802, the subunit the official registry lists under it. Gating on the parent number alone silently
+dropped those ads: a first 1,000-company run published zero jobs, which is impossible against roughly 9,600 active
+national ads.
+
+An ad is therefore accepted when its `employer.orgnr` equals the entity's own number **or** a subunit number
+returned by the official subunit endpoint for that entity in the same run. The link is proved by the registry, not
+by name similarity, so this is still exact-entity attribution; the claim records which subunit posted it. Sister
+companies with near-identical names stay rejected: PREG BARNEHAGER AS matched four ads by name and published none,
+because "Preg Barnehager Askøy AS" and its siblings are separate legal entities, not its subunits.
