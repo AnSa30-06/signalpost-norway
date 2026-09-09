@@ -18,7 +18,15 @@ RUN_ID="${SIGNALPOST_RUN_ID:-$(basename "$OUT")}"
 WORKERS="${SIGNALPOST_WORKERS:-8}"
 
 if [ ! -f "$INPUT" ]; then echo "input not found: $INPUT" >&2; exit 2; fi
-if [ ! -f "$UNIVERSE" ]; then echo "universe file not found: $UNIVERSE (set SIGNALPOST_UNIVERSE)" >&2; exit 2; fi
+
+# The universe file is an optional seed, not a dependency: it pre-fills legal name, form, municipality and
+# industry before the first request. Without it the agent reads all of that from the live registry instead.
+# Missing it must never stop the run, because a fresh clone does not carry the 12 MB archive.
+if [ ! -f "$UNIVERSE" ]; then
+  echo "note: universe file not found at $UNIVERSE; continuing without it (values come from the live registry)." >&2
+  echo "      to use it: curl -LO https://builderr.ai/signalpost-company-universe-2025.jsonl.gz  (or set SIGNALPOST_UNIVERSE)" >&2
+  UNIVERSE=""
+fi
 
 # Number of non-empty input lines = number of envelopes the run must produce.
 COUNT="$(grep -c . "$INPUT")"
