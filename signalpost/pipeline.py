@@ -118,48 +118,60 @@ def process_company(org: str, row: Optional[dict], session: Session, run_id: str
     except Exception as exc:
         cands = []
         errors.append(new_error("discovery", f"{type(exc).__name__}: {exc}", FAILED))
-    for cand in cands[:MAX_SITE_CANDIDATES]:
-        if session.remaining(org) < 3:
-            errors.append(new_error("website", "request budget exhausted before all candidates were probed", NOT_AVAILABLE, cand["url"]))
-            break
-        page = session.get(cand["url"], company=org, kind="html")
-        if not page.ok and page.error and "SSL" in page.error and cand["url"].startswith("https://") and session.remaining(org) > 3:
-            page = session.get("http://" + cand["url"][len("https://"):], company=org, kind="html")  # broken TLS: plain-http fallback, still identity-gated
-        entry = {"url": cand["url"], "origin": cand["origin"], "status": page.status, "error": page.error}
-        if not page.ok or ("html" not in (page.content_type or "").lower() and "<html" not in page.text[:2000].lower()):
-            err = page.error or ""
-            if page.blocked:
-                entry["verdict"] = "blocked"
-            elif "dns failure" in err or page.status in (404, 410) or "malformed host" in err:
-                entry["verdict"] = "no_site"          # the guessed domain does not exist or serves nothing: not a failure
-            else:
-                entry["verdict"] = "unreachable"      # resolved but timed out / reset / broken TLS
-            probed.append(entry)
-            continue
-        try:
-            ident = identity.assess(profile, page)
-        except Exception as exc:
-            errors.append(new_error("identity", f"{type(exc).__name__}: {exc}", FAILED, cand["url"]))
-            probed.append({**entry, "verdict": "identity_error"})
-            continue
-        entry.update({"verdict": ident.get("status"), "score": ident.get("score"), "reasons": ident.get("reasons")})
-        probed.append(entry)
-        if ident.get("status") == "exact":
-            identity_result = ident
+    def probe_candidates(cand_list):
+        """Fetch each candidate and gate it. Returns True as soon as one proves the entity."""
+        nonlocal web_state, best_review, identity_result
+        for cand in cand_list[:MAX_SITE_CANDIDATES]:
+            if session.remaining(org) < 3:
+                errors.append(new_error("website", "request budget exhausted before all candidates were probed", NOT_AVAILABLE, cand["url"]))
+                return False
+            page = session.get(cand["url"], company=org, kind="html")
+            if not page.ok and page.error and "tls" in page.error and cand["url"].startswith("https://") and session.remaining(org) > 3:
+                page = session.get("http://" + cand["url"][len("https://"):], company=org, kind="html")  # broken TLS: plain-http fallback, still identity-gated
+            entry = {"url": cand["url"], "origin": cand["origin"], "status": page.status, "error": page.error}
+            if not page.ok or ("html" not in (page.content_type or "").lower() and "<html" not in page.text[:2000].lower()):
+                err = page.error or ""
+                if page.blocked:
+                    entry["verdict"] = "blocked"
+                elif "dns failure" in err or page.status in (404, 410) or "malformed host" in err:
+                    entry["verdict"] = "no_site"          # the guessed domain does not exist or serves nothing: not a failure
+                else:
+                    entry["verdict"] = "unreachable"      # resolved but timed out / reset / broken TLS
+                probed.append(entry)
+                continue
             try:
-                _merge(claims, evidence, errors, site.crawl(profile, session, page, ident, page_budget=SITE_PAGE_BUDGET))
-                web_state = AVAILABLE
+                ident = identity.assess(profile, page)
             except Exception as exc:
-                errors.append(new_error("site", f"{type(exc).__name__}: {exc}", FAILED, cand["url"]))
-                traceback.print_exc()
-                ev = new_evidence(ids, page, "company_owned", ident.get("claim_span") or "", "identity_gate")
-                evidence.append(ev)
-                claims.append(new_claim(ids, "web", "official_website", page.final_url, AVAILABLE, [ev["id"]], ident.get("score", 0.9),
-                                        note="site verified; deeper crawl failed"))
+                errors.append(new_error("identity", f"{type(exc).__name__}: {exc}", FAILED, cand["url"]))
+                probed.append({**entry, "verdict": "identity_error"})
+                continue
+            entry.update({"verdict": ident.get("status"), "score": ident.get("score"), "reasons": ident.get("reasons")})
+            probed.append(entry)
+            if ident.get("status") == "exact":
+                identity_result = ident
+                try:
+                    _merge(claims, evidence, errors, site.crawl(profile, session, page, ident, page_budget=SITE_PAGE_BUDGET))
+                except Exception as exc:
+                    errors.append(new_error("site", f"{type(exc).__name__}: {exc}", FAILED, cand["url"]))
+                    ev = new_evidence(ids, page, "company_owned", ident.get("claim_span") or "", "identity_gate")
+                    evidence.append(ev)
+                    claims.append(new_claim(ids, "web", "official_website", page.final_url, AVAILABLE, [ev["id"]], ident.get("score", 0.9),
+                                            note="site verified; deeper crawl failed"))
                 web_state = AVAILABLE
-            break
-        if ident.get("status") == "review" and best_review is None and len(identity.name_tokens(legal_name)) >= 2:
-            best_review = (cand, page, ident)
+                return True
+            if ident.get("status") == "review" and best_review is None and len(identity.name_tokens(legal_name)) >= 2:
+                best_review = (cand, page, ident)
+        return False
+
+    if not probe_candidates(cands) and legal_name and discovery.brave_enabled() and session.remaining(org) >= 4:
+        # Only now is a paid search query worth spending: the registry field and the domain guesses have failed.
+        try:
+            extra = discovery.brave_candidates(profile, session)
+            known = {p["url"] for p in probed}
+            probe_candidates([c for c in extra if c["url"] not in known])
+        except Exception as exc:
+            errors.append(new_error("discovery_search", f"{type(exc).__name__}: {exc}", FAILED))
+
     if web_state != AVAILABLE:
         if best_review is not None:
             cand, page, ident = best_review

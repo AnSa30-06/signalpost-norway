@@ -84,6 +84,27 @@ def _brave(profile: dict, session) -> list[dict]:
     return out
 
 
+def brave_enabled() -> bool:
+    return bool(os.environ.get("BRAVE_API_KEY"))
+
+
+def brave_candidates(profile: dict, session) -> list[dict]:
+    """Search candidates, queried only after the free routes have failed.
+
+    Brave's free tier allows one query per second, so asking for every company would add about seventeen minutes
+    to a thousand-company run and spend a query on the ~14% that the registry or a domain guess already answers.
+    The pipeline calls this only when no deterministic candidate proved the entity.
+    """
+    seen: set[str] = set()
+    out: list[dict] = []
+    for c in _brave(profile, session):
+        d = registered_domain(c["url"])
+        if d and d not in seen:
+            seen.add(d)
+            out.append(c)
+    return out
+
+
 def candidates(profile: dict, session) -> list[dict]:
     found: list[dict] = []
     reg = profile.get("registry") or {}
@@ -92,7 +113,6 @@ def candidates(profile: dict, session) -> list[dict]:
         found.append({"url": home, "origin": "registry", "note": "hjemmeside field in Enhetsregisteret"})
     for u in domain_guesses(profile.get("name") or ""):
         found.append({"url": u, "origin": "domain_guess", "note": "derived from legal name"})
-    found.extend(_brave(profile, session))
     seen, out = set(), []
     for c in found:
         key = registered_domain(c["url"])

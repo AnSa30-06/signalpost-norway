@@ -64,8 +64,8 @@ def classify_tls_error(message: str) -> Optional[str]:
 
 EXT_FOR_KIND = {"html": "html", "json": "json", "xml": "xml", "text": "txt", "pdf": "pdf"}
 PRIVATE_HOST_SUFFIXES = (".local", ".internal", ".localhost", ".lan", ".home")
-HOST_CONCURRENCY = {"data.brreg.no": 8, "arbeidsplassen.nav.no": 1}
-HOST_MIN_INTERVAL = {"arbeidsplassen.nav.no": 3.0}   # seconds between request starts on that host (NAV blocks bursts for a long time)
+HOST_CONCURRENCY = {"data.brreg.no": 8, "arbeidsplassen.nav.no": 1, "api.search.brave.com": 1}
+HOST_MIN_INTERVAL = {"arbeidsplassen.nav.no": 3.0, "api.search.brave.com": 1.1}   # seconds between request starts on that host (NAV blocks bursts for a long time)
 RATE_LIMIT_TRIP = 3                                   # consecutive 429s before a host is put on cooldown
 RATE_LIMIT_COOLDOWN = 90.0                            # seconds; requests during cooldown are not sent (and not charged)
 
