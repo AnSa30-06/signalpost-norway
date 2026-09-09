@@ -15,7 +15,7 @@ body to `snapshots/<sha256>.<ext>`, and logs every attempt to `requests.jsonl`.
 | redirects | at most 5 hops, each counted, each re-checked by the public-URL guard | |
 | retries | 429: up to 3 attempts with 3 s, 6 s waits, and after 3 consecutive 429s from one host that host is put on a 90 s cooldown during which it is not contacted (and nothing is charged); 500/502/503/504: one retry after 0.8 s; timeout or reset: one retry after 0.5 s; only if budget remains | |
 | cache | same URL inside one run is served from memory and costs nothing | |
-| concurrency | `--workers 8` companies in parallel; per host 4 connections (8 for data.brreg.no, 1 for arbeidsplassen.nav.no with at least 1.5 s between request starts) | |
+| concurrency | `--workers 8` companies in parallel; per host 4 connections (8 for data.brreg.no, 1 for arbeidsplassen.nav.no with at least 3 s between request starts) | |
 | user agent | `signalpost-norway-agent/1.0 (+https://github.com/AnSa30-06/signalpost-norway; research crawler; contact via repo)` | |
 | Accept-Language | `nb-NO,nb;q=0.9,no;q=0.8,en;q=0.6` | |
 

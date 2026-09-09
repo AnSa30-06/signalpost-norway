@@ -26,7 +26,7 @@ COUNT="$(grep -c . "$INPUT")"
 uv sync --frozen
 
 ARGS=(--input "$INPUT" --universe "$UNIVERSE" --out "$OUT" --run-id "$RUN_ID"
-      --workers "$WORKERS" --max-requests 1950 --per-company-cap 22 --expected-count "$COUNT")
+      --workers "$WORKERS" --max-requests 1950 --per-company-cap 26 --expected-count "$COUNT")
 if [ -n "$PREV" ]; then
   if [ ! -f "$PREV" ]; then echo "previous envelopes not found: $PREV" >&2; exit 2; fi
   ARGS+=(--previous "$PREV")

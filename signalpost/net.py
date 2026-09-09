@@ -28,7 +28,7 @@ DEFAULT_UA = "signalpost-norway-agent/1.0 (+https://github.com/AnSa30-06/signalp
 EXT_FOR_KIND = {"html": "html", "json": "json", "xml": "xml", "text": "txt", "pdf": "pdf"}
 PRIVATE_HOST_SUFFIXES = (".local", ".internal", ".localhost", ".lan", ".home")
 HOST_CONCURRENCY = {"data.brreg.no": 8, "arbeidsplassen.nav.no": 1}
-HOST_MIN_INTERVAL = {"arbeidsplassen.nav.no": 1.5}   # seconds between request starts on that host
+HOST_MIN_INTERVAL = {"arbeidsplassen.nav.no": 3.0}   # seconds between request starts on that host (NAV blocks bursts for a long time)
 RATE_LIMIT_TRIP = 3                                   # consecutive 429s before a host is put on cooldown
 RATE_LIMIT_COOLDOWN = 90.0                            # seconds; requests during cooldown are not sent (and not charged)
 

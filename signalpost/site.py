@@ -44,9 +44,12 @@ NOT_AVAILABLE_NOTES = {
     ("activity", "news_item"): "no dated news items found (feed, JSON-LD or news page)",
     ("hiring", "job_posting"): "no machine-readable job postings found on the site",
 }
-TITLE_RE = re.compile(r"(daglig leder|administrerende|\bCEO\b|\bCFO\b|\bCTO\b|\bCOO\b|\bCMO\b|styreleder|leder\b|"
-                      r"sjef\b|direkt[øo]r\b|\bmanager\b|\bdirector\b|\bpartner\b|\bfounder\b|gr[üu]nder|"
-                      r"\bhead of\b|\bchief\b)", re.I)
+# Leadership titles only. Bare "leder"/"manager" are excluded on purpose: they match prosjektleder, anleggsleder,
+# teamleder and project manager, which are staff roles, and a wrong site_leader costs exact-claim precision.
+TITLE_RE = re.compile(r"(daglig leder|administrerende|\bCEO\b|\bCFO\b|\bCTO\b|\bCOO\b|\bCMO\b|\bCCO\b|styreleder|"
+                      r"styrets leder|avdelingsleder|leder for\b|konsernsjef|sjef\b|direkt[øo]r\b|managing director|"
+                      r"general manager|country manager|\bdirector\b|\bpartner\b|\bfounder\b|gr[üu]nder|\beier\b|"
+                      r"\bowner\b|\bhead of\b|\bchief\b)", re.I)
 NAME_RE = re.compile(r"^[A-ZÆØÅ][a-zæøåé]+(?:[ \-][A-ZÆØÅ][a-zæøåé]+){1,2}$")
 NAME_TITLE_RE = re.compile(r"^([A-ZÆØÅ][a-zæøåé]+(?:[ \-][A-ZÆØÅ][a-zæøåé]+){1,2})\s*[,–\-|:/]\s*(.{2,80})$")
 HIRING_CUES = ("ledige stillinger", "open positions", "vacancies", "vi soker", "we are hiring", "join our team")

@@ -26,7 +26,7 @@ Listed on data.norge.no as public access. No key.
 
 | Source class | Endpoint | Rule |
 |---|---|---|
-| `official_job_board` | `https://arbeidsplassen.nav.no/stillinger/api/search?q=<legal name>&size=25` | one search per company, paced at one request per 1.5 s (NAV answers HTTP 429 to bursts); a hit is accepted only when the employer name, folded, equals the legal name exactly, or the legal name minus its legal-form suffix |
+| `official_job_board` | `https://arbeidsplassen.nav.no/stillinger/api/search?q=<legal name>&size=25` | one search per company, paced at one request per 3 s (NAV answers HTTP 429 to bursts); a hit is accepted only when the employer name, folded, equals the legal name exactly, or the legal name minus its legal-form suffix |
 
 Sister companies, parents and franchises with similar names are rejected. A successful search with zero accepted
 ads gives `active_job_count` = 0 with the note "checked NAV, no ads matched exact legal name". A failed search gives `failed`.
@@ -43,7 +43,7 @@ Access rules, all enforced in `signalpost/net.py`:
 - 12 second timeout, 2 MB per response, at most 5 redirect hops, one retry on 5xx or timeout, a 90 s host cooldown after three consecutive 429s.
 - About 10 pages per site: homepage, sitemap, up to 7 targeted pages (about, contact, team, careers, news, press), RSS.
 - Only the registered domain of the verified site. No off-domain links are followed.
-- Per-host concurrency limit (4 by default; 8 for data.brreg.no; 1 for arbeidsplassen.nav.no, paced at one request per 1.5 s).
+- Per-host concurrency limit (4 by default; 8 for data.brreg.no; 1 for arbeidsplassen.nav.no, paced at one request per 3 s).
 
 Social or video profile URLs (LinkedIn, Facebook, Instagram, YouTube, X, TikTok) are recorded only when the
 verified site links to them through `sameAs` in JSON-LD or an anchor. They are labelled `company_owned`,

@@ -188,7 +188,8 @@ def test_crawl_extracts_everything(crawled):
     assert news[ORIGIN + "/nyheter/2026/07/03/sommer/"] == "2026-07-03"    # date in URL
     assert ORIGIN + "/nyheter/udatert/" not in news and ORIGIN + "/nyheter/uten-dato/" not in news
     leaders = {c["value"]["name"]: c["value"]["title"] for c in by_field(res, "site_leader")}
-    assert leaders == {"Ola Nordmann": "Daglig leder", "Kari Hansen": "Prosjektleder", "Per Olsen": "Styreleder"}
+    # "Prosjektleder" (Kari Hansen) is a staff role, not leadership: it must NOT be published as site_leader.
+    assert leaders == {"Ola Nordmann": "Daglig leder", "Per Olsen": "Styreleder"}
     assert by_field(res, "sitemap_lastmod")[0]["value"] == "2026-09-05"
     assert [c["value"] for c in by_field(res, "contact_email")] == ["post@sandneselektriske.no"]
     assert [c["value"] for c in by_field(res, "contact_phone")] == ["+4751123456"]
