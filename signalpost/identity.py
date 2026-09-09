@@ -201,7 +201,10 @@ def assess(profile: dict, page, extra_text: str = "") -> dict:
     span = re.sub(r"\s+", " ", best_part).strip()[:300]
     if want and len(present) == len(want):
         corr = _corroborators(profile, folded_all)
-        if corr:
+        # A one-word name ("Semaphore", "Vitamat") plus a city name is not proof: cities appear on many pages.
+        # Single-token names need a postcode or street match; multi-token names may use any corroborator.
+        strong = [c for c in corr if c.startswith(("postcode:", "street:"))]
+        if corr and (len(want) >= 2 or strong):
             result.update(score=0.95, reasons=["name_and_address", *corr], claim_span=span)
         else:
             result.update(score=0.8, reasons=["name_only"], claim_span=span)
