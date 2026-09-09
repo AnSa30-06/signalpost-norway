@@ -9,7 +9,7 @@ out/
 work/
 
 # the rendered site is rebuilt from envelopes; the committed artifact lives in submission/
-site/
+/site/
 
 # the 12 MB public universe file is downloaded, not committed
 signalpost-company-universe-2025.jsonl.gz

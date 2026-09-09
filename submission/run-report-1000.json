@@ -1,0 +1,108 @@
+{
+  "run_id": "2026-09-09-submission-1000-refresh",
+  "started_at": "2026-09-09T13:04:06Z",
+  "completed_at": "2026-09-09T13:15:00Z",
+  "agent_version": "1.0.0+25d1398",
+  "inputs": 1000,
+  "envelopes": 1000,
+  "terminal_status_counts": {
+    "completed_with_errors": 904,
+    "completed": 96
+  },
+  "section_state_counts": {
+    "identity": {
+      "available": 1000
+    },
+    "accounts": {
+      "available": 999,
+      "failed": 1
+    },
+    "leadership": {
+      "available": 999,
+      "not_available": 1
+    },
+    "workplaces": {
+      "available": 1000
+    },
+    "web": {
+      "not_available": 788,
+      "ambiguous": 102,
+      "available": 96,
+      "failed": 8,
+      "blocked": 6
+    },
+    "hiring": {
+      "failed": 904,
+      "not_available": 84,
+      "available": 12
+    },
+    "activity": {
+      "available": 1000
+    }
+  },
+  "available_claims_by_field": {
+    "legal_name": 1000,
+    "legal_form": 1000,
+    "business_address": 996,
+    "registered_address": 209,
+    "municipality": 1000,
+    "industry_code": 998,
+    "industry_label": 998,
+    "registration_date": 999,
+    "founded": 991,
+    "vat_registered": 1000,
+    "status_flags": 1000,
+    "latest_submitted_accounts_year": 999,
+    "stated_purpose": 971,
+    "revenue": 794,
+    "operating_result": 990,
+    "profit_before_tax": 975,
+    "annual_result": 999,
+    "total_assets": 999,
+    "equity": 995,
+    "total_debt": 963,
+    "currency": 999,
+    "reporting_period": 999,
+    "accounts_type": 999,
+    "accounts_history": 999,
+    "role": 4020,
+    "role_count": 999,
+    "workplace": 797,
+    "workplace_count": 1000,
+    "registry_update": 13897,
+    "registry_employees": 149,
+    "registry_mobile": 201,
+    "former_names": 251,
+    "registry_email": 208,
+    "official_website": 96,
+    "public_brand": 95,
+    "website_title": 96,
+    "social_profile": 120,
+    "contact_email": 141,
+    "contact_phone": 137,
+    "website_description": 65,
+    "sitemap_lastmod": 65,
+    "site_location": 16,
+    "registry_phone": 167,
+    "registry_website": 104,
+    "careers_page": 15,
+    "news_item": 148,
+    "site_leader": 32
+  },
+  "requests": 8541,
+  "bytes": 132257116,
+  "third_party_cost_usd": 0.0,
+  "runtime_ms": 654604,
+  "p50_ms": 13763,
+  "p95_ms": 52010,
+  "budget_exhausted_companies": [
+    "918412344"
+  ],
+  "previous_run_id": "2026-09-09-submission-1000",
+  "changes_by_type": {
+    "new_website": 1,
+    "new_location": 1,
+    "availability_changed": 7
+  },
+  "validation_problems": 0
+}

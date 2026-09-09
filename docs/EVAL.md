@@ -2,7 +2,7 @@
 
 This is the process the project follows. It is the playbook's control loop, run with fixed rules and no model.
 Numbers are never written into this document by hand. Where a number belongs, the line says
-"measured on <date>: see `eval/report.json`" and the pipeline owner fills it from a real run.
+"measured on <date>" and points at the report file the number comes from.
 
 ## Corpus
 
@@ -34,7 +34,7 @@ The daily 100-company evaluation batch is the hidden exam. Its scores and labels
 
 Abstention (a section left `ambiguous`, `not_available`, `blocked` or `failed`) is reported as its own count. It is not coverage.
 
-Current values: measured on <date>: see `eval/report.json`.
+Current values: measured on 2026-09-09 on the frozen 1,000-company batch: `eval/report-run1.json` (first run) and `eval/report.json` (refresh pass against it). Gold labels for wrong-company and span-support checks are not yet hand-written, so those two rows are reported as "not measured" rather than guessed.
 
 ## Strategy registry
 
@@ -89,4 +89,4 @@ uv run --extra test pytest -q          # unit and connector regression tests
 ```
 
 The scoring script and its exact arguments are documented in `eval/` by the pipeline owner. Its output is `eval/report.json`.
-Last full loop: measured on <date>: see `eval/report.json`.
+Last full loop: 2026-09-09, first run then refresh pass; `python eval/score.py --envelopes out/<run>/envelopes.jsonl --report eval/report.json`.

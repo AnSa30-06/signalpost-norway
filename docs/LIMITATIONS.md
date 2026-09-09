@@ -76,3 +76,13 @@ it cannot map to a field gets "The evidence does not establish this".
 - Company websites: fetched with an identified user agent, within robots.txt, at low volume. Raw snapshots are kept as private evidence for verification. The published site shows at most 300 characters of a page (`claim_span`), never a page copy.
 - People: leader names come from the official roles register and from the company's own pages. No other personal data is collected, and no third-party people profiles are fetched.
 - Brave Search API: used under Brave's API terms, for candidates only; results are not stored.
+
+## NAV rate limiting (measured 2026-09-09)
+
+`arbeidsplassen.nav.no` answered HTTP 429 to every request from the build machine for more than ninety minutes after
+three small back-to-back smoke runs. The session therefore paces that host at one request per 3 s with concurrency 1,
+retries a 429 twice with 3 s and 6 s waits, and after three consecutive 429s stops contacting the host for 90 s.
+During a cooldown the hiring section is `failed` with the note "rate_limited_cooldown"; nothing is invented and the
+previous run's job claims are kept in the change record. The submitted 1,000-profile artifact was produced while that
+block was active, so most of its `hiring` sections are `failed`. A 100-company batch at one NAV request per 3 s takes
+five minutes of NAV time and stays far below the burst that triggered the block.

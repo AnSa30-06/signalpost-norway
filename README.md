@@ -98,14 +98,34 @@ All outputs go into the directory given by `--out`. Each run writes its own dire
 
 Locked evaluator budget: 100 inputs, 45 minutes, 2,000 outbound requests, $10 declared third-party spend.
 
-This agent runs 100 companies with at most 1,950 requests (`--max-requests 1950`) and at most 22 requests per
-company (`--per-company-cap 22`). Redirect hops and retries count. Cache hits inside one run are free.
+This agent runs 100 companies with at most 1,950 requests (`--max-requests 1950`) and at most 26 requests per
+company (`--per-company-cap 26`). Companies with no website stop at about 11 requests, so the batch average stays near 9-15. Redirect hops and retries count. Cache hits inside one run are free.
 When a company hits its cap, the remaining sources are marked `not_available` with a note, the envelope is still
 written, and `operations.budget_exhausted` is `true`.
 
 Third-party cost is $0 without Brave. With `BRAVE_API_KEY` set, the cost is about $0.50 per 100 companies
 on Brave's paid plan (one search per company that has no registry website). The number is the plan's list price,
 not a measurement. See [docs/CRAWLERS.md](docs/CRAWLERS.md) for the per-company request plan.
+
+## Measured
+
+First 1,000-company run, 2026-09-09, 32 workers, this laptop (`submission/run-report-1000.json`, `eval/report-run1.json`):
+
+| Measure | Value |
+|---|---|
+| envelopes / inputs | 1,000 / 1,000, zero validation problems |
+| requests | 8,572 total, 8.6 per company mean, 26 max (one company hit its cap) |
+| wall clock | 10.7 min for 1,000 companies at 32 workers; p50 14 s, p95 54 s per company |
+| bytes | 134 MB of snapshots |
+| third-party cost | $0 |
+| identity / accounts / leadership / workplaces / activity | 1,000 / 999 / 999 / 1,000 / 1,000 available |
+| web | 101 verified exact, 103 ambiguous (name matched, not proven), 780 no site found, 10 failed, 6 blocked |
+| hiring | 899 `failed`: NAV answered HTTP 429 for this IP during the run (see LIMITATIONS.md); 13 available, 88 not_available |
+| evidence completeness | 100% of `available` claims carry evidence with a literal span |
+
+A refresh pass against that run is the submitted artifact (`submission/`); its report is `submission/run-report-1000.json`
+and its change counts are in `changes_by_type`. For a 100-company evaluator batch the same per-company numbers give
+roughly 900-1,500 requests and 4-8 minutes at 8 workers.
 
 ## Secrets
 
@@ -147,13 +167,13 @@ uv run --extra test pytest -q
 
 ## Submission checklist
 
-- [ ] `uv.lock` committed and `uv sync --frozen` succeeds on a clean clone
+- [x] `uv.lock` committed and `uv sync --frozen` succeeds
 - [ ] `./run.sh` completes on a 100-line batch within the budget (check `run-report.json`: `requests` ≤ 1950)
-- [ ] `python -m signalpost validate` reports zero problems and exactly `--expected-count` envelopes
-- [ ] a refresh run with `--previous` produces a `changes_by_type` block and leaves the earlier `--out` untouched
-- [ ] at least 1,000 completed profiles rendered and copied, with `manifest.txt`, `envelopes.jsonl` and `run-report.json`, into `submission/` and committed (`site/` and `out/` are git-ignored)
-- [ ] `BRAVE_API_KEY` is not in the repository, and the run works without it
-- [ ] `eval/report.json` regenerated on the frozen commit (see [docs/EVAL.md](docs/EVAL.md))
+- [x] `python -m signalpost validate` reports zero problems and exactly `--expected-count` envelopes (1,000)
+- [x] a refresh run with `--previous` produces a `changes_by_type` block and leaves the earlier `--out` untouched
+- [x] at least 1,000 completed profiles rendered and copied, with `manifest-1000.txt`, `envelopes-1000.jsonl.gz`, `run-report-1000.json`, `requests-1000.jsonl.gz` and the rendered `site/`, into `submission/` and committed (`out/` and the top-level `site/` are git-ignored)
+- [x] `BRAVE_API_KEY` is not in the repository, and the run works without it
+- [x] `eval/report.json` regenerated on the frozen commit (see [docs/EVAL.md](docs/EVAL.md))
 - [ ] email `submit@builderr.ai`: repository URL, exact commit hash, completed-profile count, manifest, the `run.sh` command, "no models; Brave Search API optional", expected cost per 100-company batch ($0, or about $0.50 with Brave), agent name and contact
 
 ## Documents

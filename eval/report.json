@@ -1,0 +1,58 @@
+{
+  "companies": 1000,
+  "terminal_status": {
+    "completed_with_errors": 904,
+    "completed": 96
+  },
+  "family_company_coverage": {
+    "official_website": 0.096,
+    "social_profile": 0.063,
+    "contact": 0.333,
+    "site_leadership": 0.008,
+    "site_locations": 0.015,
+    "jobs": 0.012,
+    "dated_activity": 1.0,
+    "accounts": 0.999,
+    "roles": 0.999,
+    "workplaces": 0.757,
+    "description": 0.095
+  },
+  "family_claim_volume": {
+    "accounts": 1793,
+    "roles": 4020,
+    "workplaces": 797,
+    "dated_activity": 14110,
+    "contact": 653,
+    "official_website": 96,
+    "description": 160,
+    "social_profile": 120,
+    "site_locations": 16,
+    "jobs": 15,
+    "site_leadership": 32
+  },
+  "availability_states": {
+    "available": 45691,
+    "not_available": 3148,
+    "failed": 1009,
+    "ambiguous": 102,
+    "blocked": 6
+  },
+  "evidence_completeness": 1.0,
+  "web_section_states": {
+    "not_available": 788,
+    "ambiguous": 102,
+    "available": 96,
+    "failed": 8,
+    "blocked": 6
+  },
+  "requests_total": 8541,
+  "requests_mean": 8.5,
+  "requests_max": 26,
+  "runtime_p50_ms": 13763,
+  "runtime_p95_ms": 52010,
+  "changes_by_type": {
+    "new_website": 1,
+    "new_location": 1,
+    "availability_changed": 7
+  }
+}
