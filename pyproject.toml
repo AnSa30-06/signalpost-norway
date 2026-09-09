@@ -1,0 +1,24 @@
+[project]
+name = "signalpost-norway"
+version = "1.0.0"
+description = "Turns Norwegian organisation numbers into evidence-backed, refreshable company profiles."
+requires-python = ">=3.12"
+dependencies = [
+  "beautifulsoup4==4.15.0",
+  "lxml==6.1.3",
+  "extruct==0.18.0",
+  "trafilatura==2.2.0",
+  "pydantic==2.13.5",
+  "tldextract==5.3.2",
+  "rapidfuzz==3.14.6",
+  "pypdf==6.18.0",
+]
+
+[project.optional-dependencies]
+test = ["pytest==9.1.1"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

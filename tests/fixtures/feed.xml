@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+<channel>
+<title>Sandnes Elektriske nyheter</title>
+<link>https://sandneselektriske.no/nyheter/</link>
+<item>
+  <title>Vi har flyttet til nye lokaler</title>
+  <link>https://sandneselektriske.no/nyheter/nye-lokaler/</link>
+  <pubDate>Fri, 05 Sep 2026 10:00:00 +0200</pubDate>
+</item>
+<item>
+  <title>Ny rammeavtale med Sandnes kommune</title>
+  <link>https://sandneselektriske.no/nyheter/ny-kontrakt/</link>
+  <pubDate>Wed, 12 Aug 2026 08:30:00 +0200</pubDate>
+</item>
+<item>
+  <title>Element uten dato</title>
+  <link>https://sandneselektriske.no/nyheter/udatert/</link>
+</item>
+</channel>
+</rss>
