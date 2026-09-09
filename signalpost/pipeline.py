@@ -93,7 +93,12 @@ def process_company(org: str, row: Optional[dict], session: Session, run_id: str
     if legal_name:
         try:
             if nav_index is not None and nav_index.built:
-                _merge(claims, evidence, errors, navfeed.fetch(profile, session, nav_index))   # official feed, orgnr-confirmed
+                # registered workplaces from this run's official subunit claims: a NAV ad usually carries the
+                # subunit's organisation number, and the registry link is what makes accepting it exact.
+                subunits = {str(c["value"]["organisation_number"]): c["value"].get("name")
+                            for c in claims if c["field"] == "workplace" and c["availability"] == AVAILABLE
+                            and isinstance(c.get("value"), dict) and c["value"].get("organisation_number")}
+                _merge(claims, evidence, errors, navfeed.fetch(profile, session, nav_index, subunits=subunits))
             else:
                 _merge(claims, evidence, errors, jobs.fetch(profile, session))                 # search-API fallback, exact-name gate
         except Exception as exc:

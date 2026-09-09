@@ -77,6 +77,33 @@ def test_exact_orgnr_confirmation_rejects_sister_company():
     assert "contactList" not in json.dumps(res["claims"])  # contacts are never published
 
 
+def test_subunit_orgnr_is_accepted_when_the_registry_lists_it():
+    """A NAV ad carries the establishment's number: NORDICNEUROLAB AS is 891043082, its ads carry subunit 991095802."""
+    s, ix = build_index({BASE + "/api/v1/feedentry/u5": (200, entry("u5", "NordicNeuroLab AS", "991095802", "Ingeniør")),
+                         navfeed.FEED_URL: (200, page([item("u5", "NordicNeuroLab AS", "Ingeniør")]))})
+    res = navfeed.fetch({"organisation_number": "891043082", "name": "NORDICNEUROLAB AS"}, s, ix,
+                        subunits={"991095802": "NORDICNEUROLAB AS AVD BERGEN"})
+    jobs = [c for c in res["claims"] if c["field"] == "job_posting"]
+    assert len(jobs) == 1 and jobs[0]["value"]["posted_by_subunit"]["organisation_number"] == "991095802"
+    assert "subunit" in jobs[0]["note"]
+    ev = {e["id"]: e for e in res["evidence"]}[jobs[0]["evidence_ids"][0]]
+    assert ev["extraction_method"] == "nav_feed_entry_subunit_orgnr_match"
+
+
+def test_unrelated_orgnr_still_rejected_even_with_a_matching_name():
+    s, ix = build_index({BASE + "/api/v1/feedentry/u5": (200, entry("u5", "NordicNeuroLab AS", "555555555", "Ingeniør")),
+                         navfeed.FEED_URL: (200, page([item("u5", "NordicNeuroLab AS", "Ingeniør")]))})
+    res = navfeed.fetch({"organisation_number": "891043082", "name": "NORDICNEUROLAB AS"}, s, ix,
+                        subunits={"991095802": "NORDICNEUROLAB AS AVD BERGEN"})
+    assert not [c for c in res["claims"] if c["field"] == "job_posting"]
+
+
+def test_single_generic_token_name_pulls_no_candidates():
+    """"C FRISØR AS" must not match every hairdresser in the feed."""
+    s, ix = build_index({navfeed.FEED_URL: (200, page([item("u9", "Lugn Frisør As", "Frisør")]))})
+    assert ix.candidates("C FRISØR AS") == []
+
+
 def test_zero_is_explicit_and_names_rejected_ads():
     s, ix = build_index()
     res = navfeed.fetch({"organisation_number": "111111111", "name": "AF GRUPPEN NORGE AS"}, s, ix)

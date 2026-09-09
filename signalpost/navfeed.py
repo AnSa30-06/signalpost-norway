@@ -144,7 +144,12 @@ class FeedIndex:
 
     # ---- lookup ------------------------------------------------------------------------------------------
     def candidates(self, legal_name: str) -> list[dict]:
-        """Active ads whose employer name equals the legal name or contains all its distinctive tokens."""
+        """Active ads that could belong to this company, for the organisation-number gate to decide.
+
+        A NAV employer name is usually the establishment, not the legal entity ("PARENT AS AVD OSLO"), so the
+        legal name is matched as a substring. A single generic token is never enough on its own: "C FRISØR AS"
+        would otherwise pull in every hairdresser in Norway and waste the request budget on certain rejections.
+        """
         want = name_tokens(legal_name)
         if not want:
             return []
@@ -154,7 +159,10 @@ class FeedIndex:
         for bname, uuids in self.by_name.items():
             if not bname:
                 continue
-            if bname == target or bname == stripped or set(want) <= set(bname.split()):
+            hit = (bname == target or bname == stripped
+                   or (len(stripped) >= 6 and stripped in bname)
+                   or (len(want) >= 2 and set(want) <= set(bname.split())))
+            if hit:
                 out.extend(self.ads[u] for u in uuids)
         out.sort(key=lambda a: a["seen"], reverse=True)
         return out[:MAX_CANDIDATES]
@@ -170,11 +178,19 @@ def _iso_epoch(s: str) -> float:
     return datetime.fromisoformat(s).timestamp()
 
 
-def fetch(profile: dict, session, index: FeedIndex) -> dict:
-    """Publish only ads whose detail record carries this exact organisation number."""
+def fetch(profile: dict, session, index: FeedIndex, subunits: Optional[dict] = None) -> dict:
+    """Publish only ads whose record carries this entity's organisation number, or that of one of its subunits.
+
+    Norwegian job ads are posted by the establishment (underenhet), so ``employer.orgnr`` is usually the subunit
+    number, not the parent's: NORDICNEUROLAB AS is org 891043082 and its ads carry 991095802, the subunit the
+    official registry lists under it. Accepting a subunit number is therefore still exact-entity attribution, and
+    the link is proved by the registry's own subunit endpoint rather than by name similarity. ``subunits`` maps
+    subunit organisation number -> subunit name, taken from this run's official workplace claims.
+    """
     ids = IdGen()
     org = str(profile.get("organisation_number") or "")
     name = profile.get("name") or ""
+    subunits = {str(k): v for k, v in (subunits or {}).items()}
     claims: list[dict] = []
     evidence: list[dict] = []
     errors: list[dict] = []
@@ -201,8 +217,10 @@ def fetch(profile: dict, session, index: FeedIndex) -> dict:
             continue
         ac = data.get("ad_content") or {}
         emp = ac.get("employer") or {}
-        if str(emp.get("orgnr") or "") != org:
-            rejected.append(f"{ad['businessName']} ({emp.get('orgnr') or 'no orgnr'})")
+        ad_org = str(emp.get("orgnr") or "")
+        via_subunit = ad_org in subunits and ad_org != org
+        if ad_org != org and not via_subunit:
+            rejected.append(f"{ad['businessName']} ({ad_org or 'no orgnr'})")
             continue
         if (data.get("status") or ad.get("status")) != "ACTIVE":
             rejected.append(f"{ad['businessName']} (inactive)")
@@ -211,14 +229,18 @@ def fetch(profile: dict, session, index: FeedIndex) -> dict:
         value = {"title": ac.get("title") or ad.get("title"), "url": ac.get("link") or f"https://arbeidsplassen.nav.no/stillinger/stilling/{ad['uuid']}",
                  "date_posted": (ac.get("published") or "")[:10] or None, "valid_through": (ac.get("expires") or "")[:10] or None,
                  "location": loc.get("city") or loc.get("municipal") or ad.get("municipal"), "source": "nav_feed",
-                 "employer_name": emp.get("name"), "employer_orgnr": emp.get("orgnr"), "extent": ac.get("extent"),
-                 "engagement_type": ac.get("engagementtype"), "positions": ac.get("positioncount")}
-        span = json.dumps({"employer": {"name": emp.get("name"), "orgnr": emp.get("orgnr")}, "title": ac.get("title"),
+                 "employer_name": emp.get("name"), "employer_orgnr": ad_org, "extent": ac.get("extent"),
+                 "engagement_type": ac.get("engagementtype"), "positions": ac.get("positioncount"),
+                 "posted_by_subunit": {"organisation_number": ad_org, "name": subunits.get(ad_org)} if via_subunit else None}
+        span = json.dumps({"employer": {"name": emp.get("name"), "orgnr": ad_org}, "title": ac.get("title"),
                            "published": ac.get("published"), "expires": ac.get("expires")}, ensure_ascii=False)
-        ev = new_evidence(ids, r, "official_job_board", span, "nav_feed_entry_orgnr_match", prefix="evj")
+        ev = new_evidence(ids, r, "official_job_board", span,
+                          "nav_feed_entry_subunit_orgnr_match" if via_subunit else "nav_feed_entry_orgnr_match", prefix="evj")
         evidence.append(ev)
         claims.append(new_claim(ids, "hiring", "job_posting", value, AVAILABLE, [ev["id"]], prefix="job",
-                                effective_date=value["date_posted"]))
+                                effective_date=value["date_posted"],
+                                note=(f"posted by {subunits.get(ad_org) or 'a registered workplace'} (organisation number {ad_org}), "
+                                      f"a subunit the official registry lists under this entity") if via_subunit else None))
         accepted += 1
     note = None
     count_state = AVAILABLE
