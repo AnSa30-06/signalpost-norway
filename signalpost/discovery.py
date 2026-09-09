@@ -8,6 +8,7 @@ from __future__ import annotations
 import os
 import re
 import urllib.parse
+from typing import Optional
 
 import tldextract
 
@@ -105,12 +106,43 @@ def brave_candidates(profile: dict, session) -> list[dict]:
     return out
 
 
+CONSUMER_MAIL_DOMAINS = {
+    "gmail.com", "gmail.no", "googlemail.com", "hotmail.com", "hotmail.no", "outlook.com", "outlook.no", "live.no",
+    "live.com", "msn.com", "yahoo.com", "yahoo.no", "icloud.com", "me.com", "mac.com", "protonmail.com", "proton.me",
+    "online.no", "start.no", "frisurf.no", "c2i.net", "broadpark.no", "getmail.no", "sf-nett.no", "hotmail.co.uk",
+}
+
+
+def email_domain_candidate(profile: dict) -> Optional[dict]:
+    """The domain of the e-mail address the company itself filed with the registry.
+
+    Enhetsregisteret's ``epostadresse`` is stated by the company, so its domain is an official-source pointer at a
+    domain the company uses. It is a candidate, not proof: 153 of 1,000 sampled companies filed an address on a
+    company-owned domain, and among them were an accountant's domain, a parent's domain and an ISP's. The
+    exact-entity gate still decides; this only puts the right door in front of it.
+    """
+    reg = profile.get("registry") or {}
+    email = str(reg.get("epostadresse") or profile.get("epostadresse") or "").strip().lower()
+    if "@" not in email:
+        return None
+    domain = email.rsplit("@", 1)[-1].strip(" .<>")
+    if not re.fullmatch(r"[a-z0-9][a-z0-9.-]*\.[a-z]{2,}", domain) or domain in CONSUMER_MAIL_DOMAINS:
+        return None
+    url = normalise_url("https://" + domain)
+    if not url or blocked_host(url):
+        return None
+    return {"url": url, "origin": "registry_email", "note": f"domain of the e-mail address filed with Enhetsregisteret ({email})"}
+
+
 def candidates(profile: dict, session) -> list[dict]:
     found: list[dict] = []
     reg = profile.get("registry") or {}
     home = normalise_url(reg.get("hjemmeside") or profile.get("hjemmeside") or "")
     if home and not blocked_host(home):
         found.append({"url": home, "origin": "registry", "note": "hjemmeside field in Enhetsregisteret"})
+    mail = email_domain_candidate(profile)
+    if mail:
+        found.append(mail)
     for u in domain_guesses(profile.get("name") or ""):
         found.append({"url": u, "origin": "domain_guess", "note": "derived from legal name"})
     seen, out = set(), []

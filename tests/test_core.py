@@ -197,3 +197,17 @@ def test_other_org_numbers_helper():
     assert other_org_numbers("Org.nummer: 993 075 558", "924351020") == ["993075558"]
     assert other_org_numbers("Org.nr 924 351 020", "924351020") == []
     assert other_org_numbers("Ring oss paa 993 075 558", "924351020") == []   # unlabelled digits are not an org number
+
+
+def test_registry_email_domain_becomes_a_candidate():
+    from signalpost.discovery import email_domain_candidate, candidates
+    prof = {"organisation_number": "851217932", "name": "HETA AS", "registry": {"epostadresse": "post@heta.no"}}
+    c = email_domain_candidate(prof)
+    assert c["url"] == "https://heta.no/" and c["origin"] == "registry_email"
+    assert any(x["origin"] == "registry_email" for x in candidates(prof, None))
+
+
+def test_consumer_mail_domains_are_not_candidates():
+    from signalpost.discovery import email_domain_candidate
+    for addr in ("ola@gmail.com", "kari@hotmail.no", "post@online.no", "notanemail"):
+        assert email_domain_candidate({"registry": {"epostadresse": addr}}) is None

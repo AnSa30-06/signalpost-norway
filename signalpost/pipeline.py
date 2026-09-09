@@ -18,7 +18,7 @@ from .registry import Official
 
 SCHEMA_VERSION = "1.0"
 SECTION_ORDER = ("identity", "accounts", "leadership", "workplaces", "web", "hiring", "activity")
-MAX_SITE_CANDIDATES = 3
+MAX_SITE_CANDIDATES = 4   # registry site, registry e-mail domain, and two name-derived guesses
 SITE_PAGE_BUDGET = 7
 
 
