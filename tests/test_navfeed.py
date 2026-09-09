@@ -31,7 +31,7 @@ class FakeSession:
         self.responses = responses
         self.calls = []
 
-    def get(self, url, company, kind="html", headers=None, robots=True, max_bytes=0):
+    def get(self, url, company, kind="html", headers=None, robots=True, max_bytes=0, **kw):
         self.calls.append(url)
         status, body = self.responses.get(url, (404, ""))
         r = FetchResult(url=url, final_url=url, status=status, body=body.encode(), text=body, retrieved_at="2026-09-09T10:00:00Z",

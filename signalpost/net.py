@@ -289,7 +289,8 @@ class Session:
 
     # ---- fetch ------------------------------------------------------------------------------------------
     def get(self, url: str, company: str, kind: str = "html", max_bytes: int = 2_000_000,
-            robots: bool = True, headers: Optional[dict] = None, max_redirects: int = 5) -> FetchResult:
+            robots: bool = True, headers: Optional[dict] = None, max_redirects: int = 5,
+            timeout: Optional[float] = None) -> FetchResult:
         url = url.strip()
         with self._lock:
             cached = self._cache.get(url)
@@ -337,7 +338,7 @@ class Session:
             status = None
             try:
                 with self._sem(host):
-                    with opener.open(req, timeout=self.timeout) as resp:
+                    with opener.open(req, timeout=(timeout or self.timeout)) as resp:
                         status = resp.status
                         res.content_type = resp.headers.get("Content-Type", "") or ""
                         body = resp.read(max_bytes + 1)

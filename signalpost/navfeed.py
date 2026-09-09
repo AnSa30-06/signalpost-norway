@@ -33,6 +33,7 @@ TOKEN_URL = BASE + "/api/publicToken"
 SHARED_KEY = "_navfeed"          # session budget key: exempt from the per-company cap, counted in the global cap
 MAX_PAGES = 150                  # hard stop per chain
 MAX_CANDIDATES = 8               # ad records fetched per company at most
+FEED_TIMEOUT = 40.0              # a feed page carries 1,000 events and can exceed a site-crawl timeout
 LEGAL_FORMS = {"as", "asa", "ans", "da", "enk", "nuf", "sa", "ba", "ks", "sti", "brl", "iks", "kf", "fli", "esek", "sam", "spa"}
 GENERIC = {"og", "and", "the", "group", "gruppen", "norge", "norway", "as", "avd", "avdeling", "enhet", "for"}
 
@@ -73,7 +74,7 @@ class FeedIndex:
     def _fetch_token(self) -> bool:
         if self.token:
             return True
-        r = self.s.get(TOKEN_URL, company=SHARED_KEY, kind="text", robots=False)
+        r = self.s.get(TOKEN_URL, company=SHARED_KEY, kind="text", robots=False, timeout=FEED_TIMEOUT)
         if not r.ok:
             self.errors.append(f"public token fetch failed: {r.error or r.status}")
             return False
@@ -90,7 +91,8 @@ class FeedIndex:
         headers = self._headers({"If-Modified-Since": email.utils.formatdate(start_epoch, usegmt=True)})
         pages = 0
         while url and pages < MAX_PAGES:
-            r = self.s.get(url, company=SHARED_KEY, kind="json", robots=False, headers=headers, max_bytes=4_000_000)
+            r = self.s.get(url, company=SHARED_KEY, kind="json", robots=False, headers=headers, max_bytes=4_000_000,
+                           timeout=FEED_TIMEOUT)
             headers = self._headers()
             if r.status == 304 or (r.ok and not r.body):
                 break
