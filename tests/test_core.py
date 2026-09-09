@@ -94,6 +94,41 @@ def test_registry_roles_skip_birthdates_and_resigned():
     assert "1970" not in json.dumps(o.claims) and "1970" not in json.dumps(o.evidence)
 
 
+def _page(url, html):
+    return FetchResult(url=url, final_url=url, status=200, body=html.encode(), text=html,
+                       retrieved_at="2026-09-09T10:00:00Z", sha256="ef" * 32, snapshot_path="snapshots/p.html",
+                       content_type="text/html; charset=utf-8")
+
+
+def test_domain_spelling_a_multiword_name_is_corroboration():
+    """afgruppen.no for "AF GRUPPEN ASA": the company registered a domain that spells out its legal name."""
+    from signalpost import identity
+    html = "<html><head><title>AF Gruppen</title></head><body><p>AF Gruppen bygger i Oslo.</p></body></html>"
+    profile = {"organisation_number": "938702675", "name": "AF GRUPPEN ASA", "municipality": "OSLO",
+               "registry": {"forretningsadresse": {"adresse": ["Standardveien 1"], "postnummer": "0581", "poststed": "OSLO", "kommune": "OSLO"}}}
+    res = identity.assess(profile, _page("https://www.afgruppen.no/", html))
+    assert res["status"] == "exact"
+    assert any(r.startswith("domain_is_legal_name:") for r in res["reasons"])
+
+
+def test_single_word_name_on_a_matching_domain_is_not_enough():
+    """vit.no for "VIT AS" could be any namesake: a one-word name still needs a postcode or street on the page."""
+    from signalpost import identity
+    html = "<html><head><title>VIT</title></head><body><p>VIT leverer tjenester i Oslo.</p></body></html>"
+    profile = {"organisation_number": "812686542", "name": "VIT AS", "municipality": "OSLO",
+               "registry": {"forretningsadresse": {"adresse": ["Kongens gate 2"], "postnummer": "0153", "poststed": "OSLO", "kommune": "OSLO"}}}
+    res = identity.assess(profile, _page("https://vit.no/", html))
+    assert res["status"] != "exact" and res["score"] < 0.9
+
+
+def test_tls_errors_are_named_not_lumped_into_network():
+    from signalpost.net import classify_tls_error
+    assert classify_tls_error("[SSL: CERTIFICATE_VERIFY_FAILED] self-signed certificate in certificate chain").startswith("tls_intercepted")
+    assert classify_tls_error("[SSL: CERTIFICATE_VERIFY_FAILED] unable to get local issuer certificate").startswith("tls_incomplete_chain")
+    assert classify_tls_error("hostname mismatch, certificate is not valid for 'x.no'").startswith("tls_hostname_mismatch")
+    assert classify_tls_error("connection reset by peer") is None
+
+
 def test_zero_subunits_is_explicit_zero():
     org = "938702675"
     s = FakeSession({f"https://data.brreg.no/enhetsregisteret/api/underenheter?overordnetEnhet={org}&size=200": (200, json.dumps({"page": {"totalElements": 0}}))})

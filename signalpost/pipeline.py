@@ -49,8 +49,8 @@ def _section_state(claims: list[dict], section: str, default: str) -> str:
 
 
 def process_company(org: str, row: Optional[dict], session: Session, run_id: str, previous: Optional[dict],
-                    started_run_at: str) -> dict:
-    from . import discovery, identity, jobs, refresh, site, synthesis, updates  # local import: modules built separately
+                    started_run_at: str, nav_index=None) -> dict:
+    from . import discovery, identity, jobs, navfeed, refresh, site, synthesis, updates  # local import: modules built separately
 
     t0 = time.monotonic()
     started = utc_now()
@@ -92,7 +92,10 @@ def process_company(org: str, row: Optional[dict], session: Session, run_id: str
     # 3. NAV jobs (1 request) --------------------------------------------------------------------------------
     if legal_name:
         try:
-            _merge(claims, evidence, errors, jobs.fetch(profile, session))
+            if nav_index is not None and nav_index.built:
+                _merge(claims, evidence, errors, navfeed.fetch(profile, session, nav_index))   # official feed, orgnr-confirmed
+            else:
+                _merge(claims, evidence, errors, jobs.fetch(profile, session))                 # search-API fallback, exact-name gate
         except Exception as exc:
             errors.append(new_error("jobs", f"{type(exc).__name__}: {exc}", FAILED))
             claims.append(new_claim(ids, "hiring", "active_job_count", None, FAILED, [], note=f"job connector crashed: {exc}"))
@@ -172,6 +175,9 @@ def process_company(org: str, row: Optional[dict], session: Session, run_id: str
                 web_state, web_note = FAILED, f"the registry-listed website could not be fetched ({registry_probe.get('error')}); tried: {tried}"
             elif registry_probe and registry_probe.get("verdict") in ("related_or_uncertain", "review"):
                 web_state, web_note = AMBIGUOUS, f"the registry-listed website did not prove this exact entity ({registry_probe.get('reasons')}); tried: {tried}"
+            elif probed and all(p.get("verdict") == "unreachable" for p in probed):
+                # every candidate resolved but could not be read: we do not know whether a site exists.
+                web_state, web_note = FAILED, f"every website candidate resolved but could not be fetched; tried: {tried}"
             else:
                 web_note = f"no website found: registry lists none and no domain guess proved the exact entity; tried: {tried}"
             claims.append(new_claim(ids, "web", "official_website", None, web_state, [], note=web_note[:600]))

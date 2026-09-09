@@ -76,6 +76,12 @@ def cmd_run(a: argparse.Namespace) -> int:
     session = Session(out, max_total_requests=a.max_requests, per_company_cap=a.per_company_cap, timeout=a.timeout)
     started = utc_now()
     t0 = time.monotonic()
+    nav_index = None
+    if not a.no_nav_feed:
+        from .navfeed import FeedIndex
+        nav_index = FeedIndex(session, days=a.nav_days)
+        ok = nav_index.build()
+        print(f"nav feed index: built={ok} {json.dumps(nav_index.summary())} requests={session.total_requests} elapsed={int(time.monotonic() - t0)}s", file=sys.stderr)
     checkpoint = out / "checkpoint.jsonl"
     done: dict[str, dict] = {}
     if a.resume and checkpoint.exists():
@@ -90,7 +96,7 @@ def cmd_run(a: argparse.Namespace) -> int:
     def work(org: str) -> dict:
         s = utc_now()
         try:
-            env = process_company(org, universe.get(org), session, a.run_id, previous.get(org), started)
+            env = process_company(org, universe.get(org), session, a.run_id, previous.get(org), started, nav_index=nav_index)
         except Exception as exc:  # pragma: no cover - last line of defence
             env = failed_envelope(org, a.run_id, s, f"{type(exc).__name__}: {exc}")
         with lock:
@@ -116,6 +122,7 @@ def cmd_run(a: argparse.Namespace) -> int:
     (out / "manifest.txt").write_text("\n".join(orgs) + "\n", encoding="utf-8")
     session.dump_log()
     report = build_report(envelopes, session, a.run_id, started, previous, t0)
+    report["nav_feed"] = nav_index.summary() if nav_index is not None else {"disabled": True}
     (out / "run-report.json").write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
     print(json.dumps({k: report[k] for k in ("inputs", "envelopes", "requests", "runtime_ms", "terminal_status_counts", "section_state_counts")}, ensure_ascii=False), file=sys.stderr)
     return 0 if report["envelopes"] == report["inputs"] else 1
@@ -188,6 +195,8 @@ def main(argv=None) -> None:
     r.add_argument("--timeout", type=float, default=12.0)
     r.add_argument("--expected-count", type=int, default=0)
     r.add_argument("--resume", action="store_true", help="reuse envelopes already in <out>/checkpoint.jsonl")
+    r.add_argument("--nav-days", type=int, default=60, help="how many days of the NAV job feed to scan for active ads")
+    r.add_argument("--no-nav-feed", action="store_true", help="skip the NAV feed scan and use the search-API fallback")
     r.set_defaults(fn=cmd_run)
     v = sub.add_parser("validate", help="validate an envelopes.jsonl against the contract")
     v.add_argument("--envelopes", required=True)

@@ -128,13 +128,15 @@ def diff(previous: dict | None, current: dict) -> list[dict]:
             for k in ck.keys() - pk.keys():
                 if f in ADDED:
                     record(f, ADDED[f], None, ck[k])
-            cur_sources = {(c.get("value") or {}).get("source") for c in ck.values() if isinstance(c.get("value"), dict)}
+            def _family(src):
+                return "nav" if src in ("nav", "nav_feed") else src  # both NAV routes are one source family
+            cur_sources = {_family((c.get("value") or {}).get("source")) for c in ck.values() if isinstance(c.get("value"), dict)}
             if f == "job_posting" and c_state.get("active_job_count") == AVAILABLE:
                 cur_sources.add("nav")
             for k in pk.keys() - ck.keys():
                 if f in REMOVED:
                     src = (pk[k].get("value") or {}).get("source") if isinstance(pk[k].get("value"), dict) else None
-                    if src and src not in cur_sources:
+                    if src and _family(src) not in cur_sources:
                         continue  # that source failed or was not read this run: keep the last supported value, no removal
                     record(f, REMOVED[f], pk[k], None)
         if ps is not None and ps != AVAILABLE and len(changes) == n_before:

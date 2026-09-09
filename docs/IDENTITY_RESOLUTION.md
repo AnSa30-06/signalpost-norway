@@ -76,3 +76,18 @@ page that links to it. The platform itself is never fetched, so followers, posts
 
 The playbook's leader bridge (verified registry role → public profile on a permitted source → back to the entity) is
 not implemented. It would need a permitted people-profile source, and none is used in this version.
+
+## The domain-spells-the-name corroborator
+
+A registered domain that spells out a **multi-word** legal name is treated as corroboration, on its own:
+`afgruppen.no` for AF GRUPPEN ASA, `sandneselektriske.no` for SANDNES ELEKTRISKE AS. The company had to register
+that domain, and a namesake collision on a full multi-word name is far less likely than on a single word.
+
+The rule deliberately excludes single-word names. `vit.no` for VIT AS, `skard.no` for SKARD AS or `tgs.com` for
+TGS ASA stay at `review` and are published as `ambiguous` with the candidate in the note, not as a verified
+website. This costs recall on a handful of real sites and is the intended trade: the hard gates are 95% external
+precision and no material wrong-company publication, and a one-word domain match is exactly the case where a
+namesake would slip through.
+
+Conditions, all required: at least two name tokens before generic-word stripping, a compacted name of at least
+seven characters, and the first hostname label (after dropping `www`) equal to the compacted name.

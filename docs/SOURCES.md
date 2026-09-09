@@ -19,18 +19,28 @@ Official data anchors identity. It does not, by itself, identify the public bran
 The universe file supplied by Builderr (`signalpost-company-universe-2025.jsonl.gz`) is the frozen registry snapshot
 used to seed each company before any request; live registry responses are still fetched and stored as evidence.
 
-## NAV arbeidsplassen.no (official job board)
+## NAV job vacancy feed (official job board)
 
-Provider: NAV, the Norwegian Labour and Welfare Administration. Public government site. `robots.txt` allows all.
-Listed on data.norge.no as public access. No key.
+Provider: NAV, the Norwegian Labour and Welfare Administration. Terms: `https://arbeidsplassen.nav.no/vilkar-api`
+("Alle kan bruke tenesta" - anyone may use the service; free; republishing ads is allowed; an ad must not be shown
+once inactive; contact details fall under GDPR). Documentation: `https://navikt.github.io/pam-stilling-feed/`.
 
 | Source class | Endpoint | Rule |
 |---|---|---|
-| `official_job_board` | `https://arbeidsplassen.nav.no/stillinger/api/search?q=<legal name>&size=25` | one search per company, paced at one request per 3 s (NAV answers HTTP 429 to bursts); a hit is accepted only when the employer name, folded, equals the legal name exactly, or the legal name minus its legal-form suffix |
+| `official_job_board` | `https://pam-stilling-feed.nav.no/api/v1/feed` with `If-Modified-Since` = now minus `--nav-days` (60), then `next_url` pages of 1,000 events; bearer token | one scan per run (about 20-40 requests), fetched as three time-window chains; the latest event per ad is kept and active ads are indexed by employer name |
+| `official_job_board` | `https://pam-stilling-feed.nav.no/api/v1/feedentry/<uuid>` | fetched only for ads whose employer name matches the legal name (at most 8 per company); an ad is published only when `ad_content.employer.orgnr` equals the organisation number |
 
-Sister companies, parents and franchises with similar names are rejected. A successful search with zero accepted
-ads gives `active_job_count` = 0 with the note "checked NAV, no ads matched exact legal name". A failed search gives `failed`.
-Each accepted ad is published with its `https://arbeidsplassen.nav.no/stillinger/stilling/<uuid>` URL.
+Token: `NAV_FEED_TOKEN` (a private consumer token from NAV, requested by email to nav.team.arbeidsplassen@nav.no) or,
+when unset, the public experimentation token published at `https://pam-stilling-feed.nav.no/api/publicToken`
+(fetched once per run; it rotates at irregular intervals). Published per ad: title, published date, expiry, work
+location city, extent, engagement type, position count and the public ad link. Never published: contact persons,
+phone numbers, e-mail addresses, application URLs, descriptions.
+
+Fallback when the feed cannot be scanned (`--no-nav-feed`, or token/feed failure): the site search API
+`https://arbeidsplassen.nav.no/stillinger/api/search?q=<legal name>&size=25`, paced at one request per 3 s
+(NAV answers HTTP 429 to bursts, and that block has lasted more than ninety minutes), accepting a hit only when the
+employer name, folded, equals the legal name exactly. The search API carries no organisation number, which is why
+the feed is the primary route.
 
 ## Company-owned websites
 

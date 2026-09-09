@@ -21,7 +21,7 @@ Seven sections, each with its own availability state:
 | `leadership` | official roles endpoint, verified company site | registered roles (daglig leder, board), leaders named on the site |
 | `workplaces` | official subunits, verified company site | registered subunits, locations named on the site |
 | `web` | company-owned site (identity-gated) | verified official website, title, description, contact details, linked social profiles |
-| `hiring` | NAV arbeidsplassen.no, verified company site | job ads matched to the exact legal name, active job count |
+| `hiring` | NAV job vacancy feed, verified company site | job ads confirmed by the employer's organisation number in NAV's record, active job count |
 | `activity` | Brreg oppdateringer, site news/RSS/sitemap | dated registry events, news items, newest sitemap date |
 
 Plus: claim-level evidence, typed changes since the previous run, errors, operations counters and a deterministic synthesis.
@@ -129,14 +129,15 @@ roughly 900-1,500 requests and 4-8 minutes at 8 workers.
 
 ## Secrets
 
-One optional environment variable: `BRAVE_API_KEY`. Without it the agent still runs and never calls Brave.
+Two optional environment variables. `NAV_FEED_TOKEN`: a private consumer token for NAV's job vacancy feed; without it
+the agent fetches NAV's public experimentation token once per run. `BRAVE_API_KEY`: without it the agent never calls Brave.
 Brave results are used only to propose website candidates. They are never stored as evidence.
 No other key, token or account is used. Nothing is written outside `--out` and `--out/../site` (or the `--out` you give to `site`).
 
 ## Source rights
 
 - Brønnøysundregistrene open data (Enhetsregisteret, Regnskapsregisteret, roles, subunits, oppdateringer): Norwegian Licence for Open Government Data (NLOD) 2.0.
-- NAV arbeidsplassen.no job search: public government site, `robots.txt` allows all, listed on data.norge.no as public access.
+- NAV job vacancy feed (pam-stilling-feed.nav.no): official API, bearer token, terms at arbeidsplassen.nav.no/vilkar-api (anyone may use it, free, republishing allowed, inactive ads must not be shown, contacts never published).
 - Company-owned websites: `robots.txt` respected (fail closed on 401/403), identified user agent, 12 s timeout, 2 MB per page, about 10 pages per site, registered domain only.
 - LinkedIn, Meta, Glassdoor, Indeed and Google are not crawled. A social profile URL is recorded only when the verified company site links to it.
 

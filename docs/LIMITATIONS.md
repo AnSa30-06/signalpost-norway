@@ -86,3 +86,27 @@ During a cooldown the hiring section is `failed` with the note "rate_limited_coo
 previous run's job claims are kept in the change record. The submitted 1,000-profile artifact was produced while that
 block was active, so most of its `hiring` sections are `failed`. A 100-company batch at one NAV request per 3 s takes
 five minutes of NAV time and stays far below the burst that triggered the block.
+
+## TLS on the build machine (measured 2026-09-09)
+
+The 1,000-company artifact in `submission/` was produced on a network that inspects HTTPS. Reading the
+certificate actually served showed the cause precisely: sites such as `vit.no` and `arktisk.no` were presented
+with a certificate re-signed by a **Fortinet** inspection appliance (issuer `organizationName=Fortinet`,
+`commonName=F2K60FTK23900226`), whose root is not installed on the machine. Those fetches cannot verify, and the
+agent records them as `tls_intercepted` rather than a plain network error, so the reader can tell a bad network
+from a bad site. They will not occur on a normal evaluator host. Set `SIGNALPOST_CA_BUNDLE` to a PEM file to add
+such a root where it is legitimately installed.
+
+A second, unrelated class was a real bug and is fixed. A valid site (`outdoor.no`, a current Let's Encrypt
+certificate) failed with `unable to get local issuer certificate` against Python's platform trust store, and
+verified against `certifi` on the same machine in the same second. The agent now uses the `certifi` bundle by
+default, so the failure does not depend on how complete the host's trust store happens to be.
+
+Three TLS states are now distinguished in a claim note: `tls_intercepted` (the network re-signed the certificate),
+`tls_incomplete_chain` (the site did not send its intermediate), `tls_hostname_mismatch` (the certificate does not
+cover the host, for example `galea.no` serving a certificate for `netzire.com`). Only the last is the company's
+own fault, and none of the three is ever published as a verified website.
+
+DNS on this machine also failed intermittently under 32 concurrent workers, including for hosts that plainly
+exist. `assert_public_url` now retries a temporary resolver failure once and caches only stable results, so a
+resolver hiccup is not recorded as "this domain does not exist".

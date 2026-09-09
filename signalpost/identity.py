@@ -204,6 +204,14 @@ def assess(profile: dict, page, extra_text: str = "") -> dict:
         # A one-word name ("Semaphore", "Vitamat") plus a city name is not proof: cities appear on many pages.
         # Single-token names need a postcode or street match; multi-token names may use any corroborator.
         strong = [c for c in corr if c.startswith(("postcode:", "street:"))]
+        # A domain that spells out a MULTI-WORD legal name ("afgruppen.no" for AF GRUPPEN ASA) is itself strong:
+        # the company registered it. Single-word names are excluded, because "vit.no" or "skard.no" could be anyone.
+        raw = [t for t in tokens(profile.get("name")) if t not in LEGAL_FORMS]
+        name_compact = "".join(raw)
+        labels = [l for l in fold(hostname).split(".") if l and l != "www"]
+        if len(raw) >= 2 and len(name_compact) >= 7 and labels and re.sub(r"[^a-z0-9]", "", labels[0]) == name_compact:
+            corr = sorted(set(corr) | {f"domain_is_legal_name:{labels[0]}"})
+            strong = strong or [f"domain_is_legal_name:{labels[0]}"]
         if corr and (len(want) >= 2 or strong):
             result.update(score=0.95, reasons=["name_and_address", *corr], claim_span=span)
         else:

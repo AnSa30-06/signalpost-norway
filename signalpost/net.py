@@ -10,8 +10,10 @@ import gzip
 import hashlib
 import ipaddress
 import json
+import os
 import re
 import socket
+import ssl
 import threading
 import time
 import urllib.error
@@ -25,6 +27,41 @@ from pathlib import Path
 from typing import Optional
 
 DEFAULT_UA = "signalpost-norway-agent/1.0 (+https://github.com/AnSa30-06/signalpost-norway; research crawler; contact via repo)"
+
+
+def _ssl_context() -> "ssl.SSLContext":
+    """TLS context with an explicit, current CA bundle.
+
+    Python's platform default store misses current chains on some machines: a site served by a valid Let's Encrypt
+    certificate failed with "unable to get local issuer certificate" against the Windows store and verified against
+    certifi on the same machine, same second. certifi is therefore the default. ``SIGNALPOST_CA_BUNDLE`` overrides
+    it with a PEM file, which is how to add a corporate TLS-inspection root on a network that re-signs HTTPS.
+    """
+    bundle = os.environ.get("SIGNALPOST_CA_BUNDLE")
+    if bundle and Path(bundle).is_file():
+        return ssl.create_default_context(cafile=bundle)
+    try:
+        import certifi
+        return ssl.create_default_context(cafile=certifi.where())
+    except ImportError:
+        return ssl.create_default_context()
+
+
+def classify_tls_error(message: str) -> Optional[str]:
+    """Name the TLS failure mode so a reader can tell a bad site from a bad network."""
+    m = message.lower()
+    if "self-signed certificate in certificate chain" in m:
+        return ("tls_intercepted: the network re-signed this site's certificate with a private root that this machine "
+                "does not trust (HTTPS inspection appliance); this is an environment fault, not the site")
+    if "unable to get local issuer" in m:
+        return "tls_incomplete_chain: the site did not send a complete certificate chain and no local issuer was found"
+    if "hostname mismatch" in m or "doesn't match" in m or "altnames" in m:
+        return "tls_hostname_mismatch: the certificate served does not cover this hostname"
+    if "certificate has expired" in m:
+        return "tls_expired: the site's certificate has expired"
+    return None
+
+
 EXT_FOR_KIND = {"html": "html", "json": "json", "xml": "xml", "text": "txt", "pdf": "pdf"}
 PRIVATE_HOST_SUFFIXES = (".local", ".internal", ".localhost", ".lan", ".home")
 HOST_CONCURRENCY = {"data.brreg.no": 8, "arbeidsplassen.nav.no": 1}
@@ -35,6 +72,9 @@ RATE_LIMIT_COOLDOWN = 90.0                            # seconds; requests during
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+_SSL_CTX = _ssl_context()
 
 
 class UnsafeURL(ValueError):
@@ -60,15 +100,44 @@ def assert_public_url(url: str) -> str:
         pass
     if not re.fullmatch(r"[a-z0-9.-]+", host) or "." not in host:
         raise UnsafeURL(f"malformed host: {host!r}")
-    try:
-        infos = socket.getaddrinfo(host, None)
-    except socket.gaierror as exc:
-        raise UnsafeURL(f"dns failure for {host}: {exc}") from exc
+    with _DNS_LOCK:
+        cached = _DNS_CACHE.get(host)
+    if cached is not None:
+        if cached is True:
+            return url
+        raise UnsafeURL(cached)
+    infos = None
+    err = None
+    for attempt in range(2):
+        try:
+            infos = socket.getaddrinfo(host, None)
+            break
+        except socket.gaierror as exc:
+            err = exc
+            if getattr(exc, "errno", None) in (socket.EAI_AGAIN, 11002) and attempt == 0:  # temporary resolver failure: retry once
+                time.sleep(0.5)
+                continue
+            break
+    if infos is None:
+        msg = f"dns failure for {host}: {err}"
+        if getattr(err, "errno", None) not in (socket.EAI_AGAIN, 11002):  # NXDOMAIN is stable; a temporary failure is not cached
+            with _DNS_LOCK:
+                _DNS_CACHE[host] = msg
+        raise UnsafeURL(msg)
     for info in infos:
         ip = ipaddress.ip_address(info[4][0])
         if not ip.is_global:
-            raise UnsafeURL(f"{host} resolves to non-global address {ip}")
+            msg = f"{host} resolves to non-global address {ip}"
+            with _DNS_LOCK:
+                _DNS_CACHE[host] = msg
+            raise UnsafeURL(msg)
+    with _DNS_LOCK:
+        _DNS_CACHE[host] = True
     return url
+
+
+_DNS_CACHE: dict[str, object] = {}
+_DNS_LOCK = threading.Lock()
 
 
 @dataclass
@@ -156,7 +225,8 @@ class Session:
 
     def _charge(self, company: str) -> bool:
         with self._lock:
-            if self.total_requests >= self.max_total or self._per_company.get(company, 0) >= self.per_company_cap:
+            shared = company.startswith("_")  # run-wide scans (e.g. the NAV feed) are exempt from the per-company cap
+            if self.total_requests >= self.max_total or (not shared and self._per_company.get(company, 0) >= self.per_company_cap):
                 return False
             self.total_requests += 1
             self._per_company[company] = self._per_company.get(company, 0) + 1
@@ -263,7 +333,7 @@ class Session:
                 "Accept-Encoding": "gzip, deflate, identity",
                 **(headers or {}),
             })
-            opener = urllib.request.build_opener(_NoRedirect)
+            opener = urllib.request.build_opener(_NoRedirect, urllib.request.HTTPSHandler(context=_SSL_CTX))
             status = None
             try:
                 with self._sem(host):
@@ -335,7 +405,8 @@ class Session:
                 if res.attempts < 2 and self.remaining(company) > 0 and ("timed out" in msg.lower() or "reset" in msg.lower()):
                     time.sleep(0.5)
                     continue
-                res.error = f"network: {msg}"
+                tls = classify_tls_error(msg)
+                res.error = tls if tls else f"network: {msg}"
                 break
             except Exception as exc:  # pragma: no cover - defensive
                 res.error = f"unexpected: {type(exc).__name__}: {str(exc)[:150]}"

@@ -38,13 +38,16 @@ Official APIs (data.brreg.no, arbeidsplassen.nav.no) are fetched with the robots
 | website candidates | `discovery.py` | 0 (Brave: 1, optional) | registry field, domain guesses, Brave | json | Brave error → skip Brave, no cost |
 | candidate probes | `identity.py` | up to 3 pages, plus robots.txt per new host; a candidate whose TLS is broken is retried once over plain http | homepage of each candidate | html | probe error → next candidate |
 | site crawl | `site.py` | sitemap 1-2, targeted pages up to 7, RSS 1 | verified site only | html/xml | page error → that page's claims are skipped; section state from the pages that worked |
-| NAV jobs | `jobs.py` | 1 | `arbeidsplassen.nav.no/stillinger/api/search?q=<legal name>&size=25` | json | `failed` |
+| NAV feed scan (once per run) | `navfeed.py` | about 20-40 for the whole batch, charged to the shared key `_navfeed` (exempt from the per-company cap, counted in the global cap) | `pam-stilling-feed.nav.no/api/v1/feed` + `next_url` pages | json | scan failure → search-API fallback |
+| NAV ad confirmation | `navfeed.py` | 0-8 per company | `pam-stilling-feed.nav.no/api/v1/feedentry/<uuid>` | json | a record that cannot be fetched makes the count `failed` (unknown), never zero |
+| NAV search fallback | `jobs.py` | 1 | `arbeidsplassen.nav.no/stillinger/api/search?q=<legal name>&size=25` | json | `failed` |
 
 Per-company plan under the 26-request cap:
 
 ```
-5 official  +  1 NAV search  +  up to 3 candidate probes (each with its robots.txt)  +  1-2 sitemap
-+  up to 7 targeted pages  +  1 RSS   =  up to 24, leaving room for redirects and retries
+5 official  +  0-8 NAV ad confirmations (usually 0-1)  +  up to 3 candidate probes (each with its robots.txt)
++  1-2 sitemap  +  up to 7 targeted pages  +  1 RSS   =  up to 24 in the common case; plus 20-40 requests per
+batch for the shared NAV feed scan
 ```
 
 Measured on the 1,000-company submission run (2026-09-09): see `submission/run-report-1000.json` for the mean
