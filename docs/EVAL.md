@@ -90,3 +90,49 @@ uv run --extra test pytest -q          # unit and connector regression tests
 
 The scoring script and its exact arguments are documented in `eval/` by the pipeline owner. Its output is `eval/report.json`.
 Last full loop: 2026-09-09, first run then refresh pass; `python eval/score.py --envelopes out/<run>/envelopes.jsonl --report eval/report.json`.
+
+## Hand-verified precision audit, 2026-09-10
+
+Thirty published websites were checked by hand. Each page was fetched over a network path outside this machine's
+inspected LAN and read for four things: our organisation number, the legal name, the registered street or postcode,
+and whether the page is a different business, a parking page or a shared portal. The labels and the quoted evidence
+are in `eval/gold.jsonl`.
+
+Against the agent as it stood at commit 59bead23, six of the thirty were wrong:
+
+| Company | Published | What it really was |
+|---|---|---|
+| PAULSEN DRIFT AS | paulsendrift.no | One.com placeholder, "Webhosting made simple" |
+| HOA INVEST AS | hoainvest.com | a California investment firm |
+| INDUSTRIFINANS AS | industrifinans.no | right brand and street, page states org number 993 075 558 |
+| BUCK HOLDING AS | buckholding.com | bot-verification wall |
+| UNIQ INVEST AS | uniqinvest.com | 114-byte empty document |
+| ECHO HOLDING AS | echoholding.com | 114-byte empty document |
+
+That is 24/30 = 80% exact-entity precision, against a 95% hard gate. All six share one root cause: the legal-name
+tokens were matched against the **hostname**, and the same hostname was then counted a second time as
+corroboration. One fact was doing two jobs, so a domain that merely spelled the company's name was enough to
+publish a page that identified nobody.
+
+Three rules were added in response, each with a regression test:
+
+1. The name must appear in the page's **own content** (title, OpenGraph, JSON-LD, footer or body text). A hostname
+   match alone now yields `name_partial`, never a verified website.
+2. `domain_is_legal_name` counts as corroboration only when something ties the page to Norway: a `.no` host, a
+   `+47` number, a `.no` address, or the country's name. A first attempt used "four digits then a capitalised
+   word" as a Norwegian postcode test; it read the Californian street address "2300 Palm" as a postcode and had
+   to be removed.
+3. A page that states a **different** organisation number under an org-number label is never a verified website,
+   however well the name and address match. This is what separates a sister company from the company.
+
+Parking and hosting placeholders were also added to the parked-page markers, after five One.com "under
+construction" pages and three domain-parking pages were found among the published set.
+
+Re-running the fixed gate offline against the 136 stored homepage snapshots from run `2026-09-09-submission-1000-final`
+rejects 14 of them and keeps 122. Every one of the 14 was inspected: eight parking or placeholder pages, two
+different stated organisation numbers, three empty or bot-walled documents, and one name-only stub. No correct
+site was lost. On the thirty hand-labelled rows the fixed gate publishes no known-wrong website.
+
+The remaining honest gap: 40 of the 70 published sites in the sample were not hand-checked, so the measured
+precision covers the audited rows only. Recall is not measured at all, because it needs the evaluator's pooled
+union of what every entrant found.

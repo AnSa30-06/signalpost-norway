@@ -103,12 +103,45 @@ def _page(url, html):
 def test_domain_spelling_a_multiword_name_is_corroboration():
     """afgruppen.no for "AF GRUPPEN ASA": the company registered a domain that spells out its legal name."""
     from signalpost import identity
-    html = "<html><head><title>AF Gruppen</title></head><body><p>AF Gruppen bygger i Oslo.</p></body></html>"
+    html = ("<html><head><title>AF Gruppen</title></head><body><p>AF Gruppen bygger i Oslo.</p>"
+            "<footer>Kontakt: post@afgruppen.no, tlf +47 22 89 11 00</footer></body></html>")
     profile = {"organisation_number": "938702675", "name": "AF GRUPPEN ASA", "municipality": "OSLO",
                "registry": {"forretningsadresse": {"adresse": ["Standardveien 1"], "postnummer": "0581", "poststed": "OSLO", "kommune": "OSLO"}}}
     res = identity.assess(profile, _page("https://www.afgruppen.no/", html))
     assert res["status"] == "exact"
     assert any(r.startswith("domain_is_legal_name:") for r in res["reasons"])
+
+
+def test_hosting_placeholder_is_never_the_official_website():
+    """paulsendrift.no served "Hosted By One.com" and was published as PAULSEN DRIFT AS on the domain name alone."""
+    from signalpost import identity
+    html = "<html><head><title>Hosted By One.com | Webhosting made simple</title></head><body><p>Webhosting made simple</p></body></html>"
+    profile = {"organisation_number": "925741787", "name": "PAULSEN DRIFT AS", "municipality": "ALTA",
+               "registry": {"forretningsadresse": {"adresse": ["Sagasletta 4"], "postnummer": "9517", "poststed": "ALTA", "kommune": "ALTA"}}}
+    res = identity.assess(profile, _page("https://paulsendrift.no/", html))
+    assert res["status"] != "exact" and res["score"] <= 0.3
+
+
+def test_foreign_namesake_on_a_matching_domain_is_not_exact():
+    """hoainvest.com spells HOA INVEST AS exactly and is a California firm: nothing on it ties it to Norway."""
+    from signalpost import identity
+    html = ("<html><head><title>HOA Invest</title></head><body><p>HOA Invest serves homeowner associations."
+            "</p><footer>Irvine, California. Contact info@hoainvest.com</footer></body></html>")
+    profile = {"organisation_number": "930312312", "name": "HOA INVEST AS", "municipality": "BÆRUM",
+               "registry": {"forretningsadresse": {"adresse": ["Hoslejordet 10"], "postnummer": "1362", "poststed": "HOSLE", "kommune": "BÆRUM"}}}
+    res = identity.assess(profile, _page("https://hoainvest.com/", html))
+    assert res["status"] != "exact"
+    assert not any(r.startswith("domain_is_legal_name:") for r in res["reasons"])
+
+
+def test_name_only_in_the_hostname_never_counts_as_the_name_being_present():
+    """The name must appear in the page's own content; a domain string is not the page identifying itself."""
+    from signalpost import identity
+    html = "<html><head><title>Velkommen</title></head><body><p>Vi selger blomster. Ring +47 22 00 00 00.</p></body></html>"
+    profile = {"organisation_number": "928608360", "name": "LILLY BLOMSTER AS", "municipality": "OSLO",
+               "registry": {"forretningsadresse": {"adresse": ["Storgata 1"], "postnummer": "0155", "poststed": "OSLO", "kommune": "OSLO"}}}
+    res = identity.assess(profile, _page("https://lillyblomster.no/", html))
+    assert res["status"] != "exact"
 
 
 def test_single_word_name_on_a_matching_domain_is_not_enough():
@@ -136,3 +169,31 @@ def test_zero_subunits_is_explicit_zero():
     o.workplaces()
     cnt = [c for c in o.claims if c["field"] == "workplace_count"][0]
     assert cnt["value"] == 0 and cnt["availability"] == "available" and "zero" in cnt["note"]
+
+
+def test_a_different_stated_org_number_blocks_verification():
+    """industrifinans.no carries the right brand and the exact registered street, and states another entity's number."""
+    from signalpost import identity
+    html = ("<html><head><title>Industrifinans</title></head><body><p>Industrifinans</p>"
+            "<footer>Oscars gt. 30, 0352 Oslo. Org.nummer: 993 075 558</footer></body></html>")
+    profile = {"organisation_number": "924351020", "name": "INDUSTRIFINANS AS", "municipality": "OSLO",
+               "registry": {"forretningsadresse": {"adresse": ["Oscars gate 30"], "postnummer": "0352", "poststed": "OSLO", "kommune": "OSLO"}}}
+    res = identity.assess(profile, _page("https://www.industrifinans.no/", html))
+    assert res["status"] != "exact"
+    assert "name_match_but_other_org_number" in res["reasons"]
+
+
+def test_our_own_org_number_still_wins_over_the_mismatch_rule():
+    from signalpost import identity
+    html = ("<html><head><title>Elinsta AS</title></head><body><p>Elinsta AS</p>"
+            "<footer>Org.nr.: 918453547. Levert av Nettbyraa AS, org.nr 999 888 777</footer></body></html>")
+    profile = {"organisation_number": "918453547", "name": "ELINSTA AS", "municipality": "LØRENSKOG", "registry": {}}
+    res = identity.assess(profile, _page("https://elinsta.no/", html))
+    assert res["status"] == "exact" and res["reasons"] == ["org_number_on_page"]
+
+
+def test_other_org_numbers_helper():
+    from signalpost.identity import other_org_numbers
+    assert other_org_numbers("Org.nummer: 993 075 558", "924351020") == ["993075558"]
+    assert other_org_numbers("Org.nr 924 351 020", "924351020") == []
+    assert other_org_numbers("Ring oss paa 993 075 558", "924351020") == []   # unlabelled digits are not an org number

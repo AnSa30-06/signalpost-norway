@@ -1,0 +1,2721 @@
+[
+{
+"org": "920844553",
+"name": "AWARE OF AS",
+"municipality": "ASKER",
+"postcode": "3440",
+"street": "Bjerkelundveien 29",
+"industry": "Annen undervisning ellers",
+"state": "available",
+"published": "https://awareof.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"note": "",
+"cands": [
+[
+"https://awareof.no/",
+"exact",
+1.0
+]
+],
+"split": "development"
+},
+{
+"org": "929066340",
+"name": "CAFÉ SAMMEN AS",
+"municipality": "INDRE ØSTFOLD",
+"postcode": "1830",
+"street": "Guderudgata 2",
+"industry": "Drift av restauranter",
+"state": "available",
+"published": "https://www.cafesammen.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"note": "",
+"cands": [
+[
+"https://cafesammen.no/",
+"exact",
+1.0
+]
+],
+"split": "development"
+},
+{
+"org": "915984320",
+"name": "JAN LIND AS",
+"municipality": "NORDKAPP",
+"postcode": "9750",
+"street": "Notveien 1",
+"industry": "Fiske og fangst i sjø",
+"state": "available",
+"published": "https://janlind.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:janlind"
+],
+"note": "",
+"cands": [
+[
+"https://janlind.no/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "924303824",
+"name": "ELI REN AS",
+"municipality": "SANDNES",
+"postcode": "4324",
+"street": "Krunemyr 9",
+"industry": "Rengjøring av bygninger",
+"state": "available",
+"published": "https://www.eliren.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:sandnes",
+"postcode:4324",
+"street:krunemyr"
+],
+"note": "",
+"cands": [
+[
+"https://eliren.no/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "935942969",
+"name": "LEDERKOMPASSET AS",
+"municipality": "NORDRE FOLLO",
+"postcode": "1423",
+"street": "c/o Lise Merete Austvik Finstad hageby 10",
+"industry": "Bedriftsrådgivning og annen administrativ rådgivning",
+"state": "available",
+"published": "https://www.lederkompasset.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:ski",
+"postcode:1423",
+"street:finstad hageby"
+],
+"note": "",
+"cands": [
+[
+"https://lederkompasset.no/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "934957709",
+"name": "VESTFOLD BILSALG AS",
+"municipality": "TØNSBERG",
+"postcode": "3170",
+"street": "Andebuveien 63",
+"industry": "Detaljhandel med motorvogner",
+"state": "available",
+"published": "https://www.vestfoldbilsalg.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:vestfoldbilsalg"
+],
+"note": "",
+"cands": [
+[
+"https://vestfoldbilsalg.no/",
+"exact",
+0.95
+]
+],
+"split": "final"
+},
+{
+"org": "929495853",
+"name": "REGISTAN RESTAURANT AS",
+"municipality": "OSLO",
+"postcode": "0190",
+"street": "Grønlandsleiret 79",
+"industry": "Drift av restauranter",
+"state": "available",
+"published": "https://registanrestaurant.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:registanrestaurant",
+"place:oslo",
+"postcode:0190",
+"street:gronlandsleiret"
+],
+"note": "",
+"cands": [
+[
+"https://registanrestaurant.no/",
+"exact",
+0.95
+]
+],
+"split": "validation"
+},
+{
+"org": "823041772",
+"name": "TROLLTEK AS",
+"municipality": "MOLDE",
+"postcode": "6456",
+"street": "Geitneshøgda 8A",
+"industry": "Godstransport på vei",
+"state": "available",
+"published": "https://www.trolltek.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:skala",
+"postcode:6456",
+"street:geitneshogda"
+],
+"note": "",
+"cands": [
+[
+"https://trolltek.no/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "918453547",
+"name": "ELINSTA AS",
+"municipality": "LØRENSKOG",
+"postcode": "1461",
+"street": "Industriveien 6",
+"industry": "Elektrisk installasjonsarbeid",
+"state": "available",
+"published": "https://elinsta.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"note": "",
+"cands": [
+[
+"https://www.elinsta.no/",
+"exact",
+1.0
+]
+],
+"split": "development"
+},
+{
+"org": "918412344",
+"name": "PLAN1 AS",
+"municipality": "ELVERUM",
+"postcode": "2408",
+"street": "Elvarheimgata 10B",
+"industry": "Arkitektvirksomhet",
+"state": "available",
+"published": "https://p1.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"note": "",
+"cands": [
+[
+"https://www.p1.no/",
+"exact",
+1.0
+]
+],
+"split": "development"
+},
+{
+"org": "992814942",
+"name": "BAMSE PRODUKTER AS",
+"municipality": "FREDRIKSTAD",
+"postcode": "1636",
+"street": "Nabbetorp Hovedgård Nabbetorpveien 99",
+"industry": "Fysioterapi- og ergoterapitjenester",
+"state": "available",
+"published": "https://bamseprodukter.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"note": "",
+"cands": [
+[
+"https://www.bamseprodukter.no/",
+"exact",
+1.0
+]
+],
+"split": "development"
+},
+{
+"org": "935764254",
+"name": "FORM STUDIO AS",
+"municipality": "BERGEN",
+"postcode": "5017",
+"street": "Halfdan Kjerulfs gate 4",
+"industry": "Treningssentervirksomhet",
+"state": "available",
+"published": "https://www.formstudio.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:formstudio",
+"place:bergen",
+"postcode:5017",
+"street:halfdan kjerulfs gate"
+],
+"note": "",
+"cands": [
+[
+"https://formstudio.no/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "913599578",
+"name": "INSVIVIA TECHNOLOGIES AS",
+"municipality": "FLEKKEFJORD",
+"postcode": "4432",
+"street": "Manshausveien 22",
+"industry": "Forskning og eksperimentell utvikling innenfor naturvitenskap og teknikk",
+"state": "available",
+"published": "https://www.insvivia.com/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"note": "",
+"cands": [
+[
+"https://insviviatechnologies.no/",
+"no_site",
+null
+],
+[
+"https://insvivia-technologies.no/",
+"no_site",
+null
+],
+[
+"https://insvivia.no/",
+"exact",
+1.0
+]
+],
+"split": "final"
+},
+{
+"org": "925741787",
+"name": "PAULSEN DRIFT AS",
+"municipality": "ALTA",
+"postcode": "9517",
+"street": "Sagasletta 4",
+"industry": "Grunnarbeid",
+"state": "available",
+"published": "https://paulsendrift.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:paulsendrift"
+],
+"note": "",
+"cands": [
+[
+"https://paulsendrift.no/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "994405667",
+"name": "DØRFABRIKKEN VATNESTRØM AS",
+"municipality": "IVELAND",
+"postcode": "4730",
+"street": "Vatnestrøm industriområde 4",
+"industry": "Produksjon av dører og vinduer i tre",
+"state": "available",
+"published": "https://dorfabrikken.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:iveland",
+"postcode:4730",
+"street:vatnestrom industriomrade"
+],
+"note": "",
+"cands": [
+[
+"https://dorfabrikkenvatnestrom.no/",
+"no_site",
+null
+],
+[
+"https://dorfabrikken-vatnestrom.no/",
+"no_site",
+null
+],
+[
+"https://dorfabrikken.no/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "933335739",
+"name": "HOUSE OF HOME AS",
+"municipality": "STAVANGER",
+"postcode": "4014",
+"street": "Kvitsøygata 15",
+"industry": "Interiørdesignvirksomhet",
+"state": "available",
+"published": "https://www.houseofhome.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"note": "",
+"cands": [
+[
+"https://houseofhome.no/",
+"exact",
+1.0
+]
+],
+"split": "development"
+},
+{
+"org": "940598117",
+"name": "NEMS AS",
+"municipality": "SANDNES",
+"postcode": "4313",
+"street": "Vassbotnen 1",
+"industry": "All annen faglig, vitenskapelig og teknisk virksomhet ikke nevnt annet sted",
+"state": "available",
+"published": "https://www.nems.eco/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:sandnes",
+"postcode:4313",
+"street:vassbotnen"
+],
+"note": "",
+"cands": [
+[
+"https://www.nems.eco/",
+"exact",
+0.95
+]
+],
+"split": "validation"
+},
+{
+"org": "930312312",
+"name": "HOA INVEST AS",
+"municipality": "BÆRUM",
+"postcode": "1362",
+"street": "Hoslejordet 10",
+"industry": "Uoppgitt",
+"state": "available",
+"published": "https://hoainvest.com/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:hoainvest"
+],
+"note": "",
+"cands": [
+[
+"https://hoainvest.no/",
+"no_site",
+null
+],
+[
+"https://hoa-invest.no/",
+"no_site",
+null
+],
+[
+"https://hoainvest.com/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "925171298",
+"name": "AUTOCARRERA AS",
+"municipality": "PORSGRUNN",
+"postcode": "3940",
+"street": "Heistaddalen 37",
+"industry": "Detaljhandel med motorvogner",
+"state": "available",
+"published": "https://www.autocarrera.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:porsgrunn",
+"postcode:3940",
+"street:heistaddalen"
+],
+"note": "",
+"cands": [
+[
+"https://autocarrera.no/",
+"exact",
+0.95
+]
+],
+"split": "validation"
+},
+{
+"org": "929718879",
+"name": "DEBORAH BORGENS STIFTELSE",
+"municipality": "FÆRDER",
+"postcode": null,
+"street": null,
+"industry": "Aktiviteter i fond/legat som støtter veldedige og allmennyttige formål",
+"state": "available",
+"published": "https://deborahborgensstiftelse.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"note": "",
+"cands": [
+[
+"https://deborahborgensstiftelse.no/",
+"exact",
+1.0
+]
+],
+"split": "validation"
+},
+{
+"org": "910402722",
+"name": "ALF JOHANSEN AS",
+"municipality": "SELJORD",
+"postcode": "3840",
+"street": "Brøløsvegen 59",
+"industry": "Grunnarbeid",
+"state": "available",
+"published": "https://alfj.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:seljord",
+"postcode:3840",
+"street:brolosvegen"
+],
+"note": "",
+"cands": [
+[
+"https://www.alfj.no/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "982839521",
+"name": "SAMTEXT INTERNATIONAL AS",
+"municipality": "OSLO",
+"postcode": "0661",
+"street": "Østensjøveien 14A",
+"industry": "Oversettelses- og tolkevirksomhet",
+"state": "available",
+"published": "https://www.samtext.com/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:oslo"
+],
+"note": "",
+"cands": [
+[
+"https://www.samtext.com/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "936164854",
+"name": "BOKFINKEN EIENDOM AS",
+"municipality": "STAVANGER",
+"postcode": "4007",
+"street": "Sverdrups gate 27",
+"industry": "Utleie av egen eller leid fast eiendom",
+"state": "available",
+"published": "https://www.bokfinkeneiendom.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"note": "",
+"cands": [
+[
+"https://bokfinkeneiendom.no/",
+"exact",
+1.0
+]
+],
+"split": "development"
+},
+{
+"org": "928858421",
+"name": "VESLE LAMPE AS",
+"municipality": "DRAMMEN",
+"postcode": "3032",
+"street": "Jordbærveien 21",
+"industry": "Detaljhandel med brukte varer",
+"state": "available",
+"published": "https://veslelampe.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:veslelampe"
+],
+"note": "",
+"cands": [
+[
+"https://veslelampe.no/",
+"exact",
+0.95
+]
+],
+"split": "validation"
+},
+{
+"org": "921196261",
+"name": "STRIKKEMAGI AS",
+"municipality": "BÆRUM",
+"postcode": "1364",
+"street": "Snarøyveien 55",
+"industry": "Detaljhandel med tekstiler og utstyrsvarer",
+"state": "available",
+"published": "https://www.strikkemagi.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"note": "",
+"cands": [
+[
+"https://strikkemagi.no/",
+"exact",
+1.0
+]
+],
+"split": "validation"
+},
+{
+"org": "932004879",
+"name": "ASI ELEKTRO AS",
+"municipality": "KLEPP",
+"postcode": "4340",
+"street": "Vardheivegen 68",
+"industry": "Elektrisk installasjonsarbeid",
+"state": "available",
+"published": "https://asi-elektro.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"note": "",
+"cands": [
+[
+"https://asielektro.no/",
+"unreachable",
+null
+],
+[
+"https://asi-elektro.no/",
+"exact",
+1.0
+]
+],
+"split": "development"
+},
+{
+"org": "914720958",
+"name": "NORDOX AS",
+"municipality": "OSLO",
+"postcode": "0661",
+"street": "Østensjøveien 13",
+"industry": "Produksjon av fargestoffer og pigmenter",
+"state": "available",
+"published": "https://nordox.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:oslo",
+"postcode:0661",
+"street:ostensjoveien"
+],
+"note": "",
+"cands": [
+[
+"https://nordox.no/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "988350567",
+"name": "EUKLIDES AS",
+"municipality": "OSLO",
+"postcode": "0277",
+"street": "Drammensveien 130",
+"industry": "Engroshandel med husholdnings-, kontor- og butikkmøbler, gulvtepper og belysningsutstyr",
+"state": "available",
+"published": "https://www.euklides.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:oslo",
+"postcode:0277",
+"street:drammensveien"
+],
+"note": "",
+"cands": [
+[
+"https://www.euklides.no/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "923031480",
+"name": "RESTAURANT STALLEN AS",
+"municipality": "OSLO",
+"postcode": "0354",
+"street": "Underhaugsveien 28",
+"industry": "Drift av restauranter",
+"state": "available",
+"published": "https://www.restaurantstallen.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:restaurantstallen",
+"place:oslo",
+"postcode:0354",
+"street:underhaugsveien"
+],
+"note": "",
+"cands": [
+[
+"https://restaurantstallen.no/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "913194721",
+"name": "SPEKTRA REGNSKAP AS",
+"municipality": "OSLO",
+"postcode": "0186",
+"street": "Brugata 14",
+"industry": "Regnskapsføring og bokføring",
+"state": "available",
+"published": "http://spektraregnskap.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:spektraregnskap"
+],
+"note": "",
+"cands": [
+[
+"https://spektraregnskap.no/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "920283276",
+"name": "BUCK HOLDING AS",
+"municipality": "BERGEN",
+"postcode": "5124",
+"street": "Djupedalen 21",
+"industry": "Kjøp og salg av egen fast eiendom",
+"state": "available",
+"published": "https://buckholding.com/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:buckholding"
+],
+"note": "",
+"cands": [
+[
+"https://buckholding.no/",
+"no_site",
+null
+],
+[
+"https://buck-holding.no/",
+"no_site",
+null
+],
+[
+"https://buckholding.com/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "925098825",
+"name": "UNIQ INVEST AS",
+"municipality": "TRONDHEIM",
+"postcode": "7041",
+"street": "Ladebekken 36",
+"industry": "Undervisning innenfor idrett og rekreasjon",
+"state": "available",
+"published": "https://uniqinvest.com/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:uniqinvest"
+],
+"note": "",
+"cands": [
+[
+"https://uniqinvest.no/",
+"no_site",
+null
+],
+[
+"https://uniq-invest.no/",
+"no_site",
+null
+],
+[
+"https://uniqinvest.com/",
+"exact",
+0.95
+]
+],
+"split": "validation"
+},
+{
+"org": "926645579",
+"name": "ELITE TRAVEL AS",
+"municipality": "HAUGESUND",
+"postcode": "5525",
+"street": "Smedasundet 97",
+"industry": "Reisearrangørvirksomhet ellers",
+"state": "available",
+"published": "https://www.elitetravel.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:elitetravel"
+],
+"note": "",
+"cands": [
+[
+"https://www.elitetravel.no/",
+"exact",
+0.95
+]
+],
+"split": "validation"
+},
+{
+"org": "919483067",
+"name": "PIONEER ROBOTICS AS",
+"municipality": "GRIMSTAD",
+"postcode": "4879",
+"street": "Langestrand 37",
+"industry": "Dataprogrammeringstjenester",
+"state": "available",
+"published": "https://www.pioneer-robotics.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:pioneer-robotics"
+],
+"note": "",
+"cands": [
+[
+"https://pioneerrobotics.no/",
+"no_site",
+null
+],
+[
+"https://pioneer-robotics.no/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "988103381",
+"name": "ING. TAULE AS",
+"municipality": "ALVER",
+"postcode": "5936",
+"street": "Radøyvegen 1400",
+"industry": "Annen teknisk konsulentvirksomhet",
+"state": "available",
+"published": "https://www.ing-taule.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:ing-taule",
+"place:alver",
+"place:manger",
+"postcode:5936",
+"street:radoyvegen"
+],
+"note": "",
+"cands": [
+[
+"https://www.ing-taule.no/",
+"exact",
+0.95
+]
+],
+"split": "validation"
+},
+{
+"org": "928970736",
+"name": "KARATESHOP AS",
+"municipality": "SANDNES",
+"postcode": "4315",
+"street": "Gamleveien 25",
+"industry": "Detaljhandel med sportsvarer",
+"state": "available",
+"published": "https://www.karateshop.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"note": "",
+"cands": [
+[
+"https://www.karateshop.no/",
+"exact",
+1.0
+]
+],
+"split": "development"
+},
+{
+"org": "934598601",
+"name": "HMS BEDRIFTEN AS",
+"municipality": "BÆRUM",
+"postcode": "1363",
+"street": "Fjordveien 1",
+"industry": "Forebyggende helsearbeid",
+"state": "available",
+"published": "https://www.hmsbedriften.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:hmsbedriften"
+],
+"note": "",
+"cands": [
+[
+"https://hmsbedriften.no/",
+"exact",
+0.95
+]
+],
+"split": "validation"
+},
+{
+"org": "931081268",
+"name": "SYD VEST SANDNES AS",
+"municipality": "SANDNES",
+"postcode": "4306",
+"street": "Havnegata 15",
+"industry": "Drift av restauranter",
+"state": "available",
+"published": "https://www.sydvestsandnes.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:sydvestsandnes",
+"postcode:4306",
+"street:havnegata"
+],
+"note": "",
+"cands": [
+[
+"https://sydvestsandnes.no/",
+"exact",
+0.95
+]
+],
+"split": "validation"
+},
+{
+"org": "928795063",
+"name": "ENGSTRØM TRAFIKKSKOLE AS",
+"municipality": "SANDEFJORD",
+"postcode": "3238",
+"street": "Peder Bogens gate 6A",
+"industry": "Undervisning ved godkjente trafikkskoler",
+"state": "available",
+"published": "https://engstromtrafikkskole.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:engstromtrafikkskole",
+"place:sandefjord",
+"postcode:3238",
+"street:peder bogens gate"
+],
+"note": "",
+"cands": [
+[
+"https://engstromtrafikkskole.no/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "932950227",
+"name": "DENNE STRANDA AS",
+"municipality": "STRANDA",
+"postcode": "6200",
+"street": "Bankgata 1",
+"industry": "Bedriftsrådgivning og annen administrativ rådgivning",
+"state": "available",
+"published": "https://www.dennestranda.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:dennestranda"
+],
+"note": "",
+"cands": [
+[
+"https://www.dennestranda.no/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "997104749",
+"name": "FIRDA BYGG AS",
+"municipality": "SUNNFJORD",
+"postcode": "6847",
+"street": "Alhus",
+"industry": "Oppføring av bygninger",
+"state": "available",
+"published": "https://www.firdabygg.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:firdabygg",
+"place:sunnfjord",
+"place:vassenden",
+"postcode:6847"
+],
+"note": "",
+"cands": [
+[
+"https://firdabygg.no/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "931789007",
+"name": "FLYVEDYKTIG AS",
+"municipality": "TØNSBERG",
+"postcode": "3170",
+"street": "Torvmyrveien 6",
+"industry": "Annen undervisning ellers",
+"state": "available",
+"published": "https://flyvedyktig.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"note": "",
+"cands": [
+[
+"https://flyvedyktig.no/",
+"exact",
+1.0
+]
+],
+"split": "development"
+},
+{
+"org": "971579447",
+"name": "PRONAV AS",
+"municipality": "EIGERSUND",
+"postcode": "4374",
+"street": "Fiskarvik Maritime Senter Hovlandsveien 52",
+"industry": "Engroshandel med maskiner og utstyr ellers",
+"state": "available",
+"published": "https://www.pronav.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"note": "",
+"cands": [
+[
+"https://pronav.no/",
+"exact",
+1.0
+]
+],
+"split": "final"
+},
+{
+"org": "917823758",
+"name": "MØRE STÅL AS",
+"municipality": "ÅLESUND",
+"postcode": "6018",
+"street": "Breivika industriveg 41",
+"industry": "Bearbeiding av metaller",
+"state": "available",
+"published": "https://morestal.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"note": "",
+"cands": [
+[
+"https://morestal.no/",
+"exact",
+1.0
+]
+],
+"split": "validation"
+},
+{
+"org": "926844288",
+"name": "URHJERTET AS",
+"municipality": "SØRREISA",
+"postcode": "9310",
+"street": "Andsvatnveien 893",
+"industry": "Aktiviteter utført av utflukts- og eventarrangører",
+"state": "available",
+"published": "https://urhjertet.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"note": "",
+"cands": [
+[
+"https://urhjertet.no/",
+"exact",
+1.0
+]
+],
+"split": "development"
+},
+{
+"org": "933344886",
+"name": "SIGURD FOLLAND AS",
+"municipality": "AVERØY",
+"postcode": "6533",
+"street": "Reksundveien 207",
+"industry": "Produksjon av saltfisk, tørrfisk og klippfisk",
+"state": "available",
+"published": "https://sigurdfolland.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"note": "",
+"cands": [
+[
+"https://sigurdfolland.no/",
+"exact",
+1.0
+]
+],
+"split": "final"
+},
+{
+"org": "932236044",
+"name": "FAGENTREPRENØREN AS",
+"municipality": "OSLO",
+"postcode": "1188",
+"street": "Enebakkveien 302",
+"industry": "Oppføring av bygninger",
+"state": "available",
+"published": "https://www.fagent.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:oslo",
+"postcode:1188",
+"street:enebakkveien"
+],
+"note": "",
+"cands": [
+[
+"https://fagent.no/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "971526025",
+"name": "NATUR VIDEREGÅENDE SKOLE STI",
+"municipality": "OSLO",
+"postcode": "1081",
+"street": "Strømsveien 323A",
+"industry": "Videregående opplæring innenfor yrkesfaglige utdanningsprogram",
+"state": "available",
+"published": "https://natur.vgs.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:oslo",
+"postcode:1081",
+"street:stromsveien"
+],
+"note": "",
+"cands": [
+[
+"https://natur.vgs.no/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "996284115",
+"name": "MOUNTAIN RESORT TRYSIL AS",
+"municipality": "TRONDHEIM",
+"postcode": "7042",
+"street": "c/o Newsec PAM AS Beddingen 10",
+"industry": "Drift av hoteller",
+"state": "available",
+"published": "https://www.mountainresorttrysil.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:mountainresorttrysil"
+],
+"note": "",
+"cands": [
+[
+"https://mountainresorttrysil.no/",
+"exact",
+0.95
+]
+],
+"split": "validation"
+},
+{
+"org": "816877512",
+"name": "TT PROSJEKT AS",
+"municipality": "VERDAL",
+"postcode": "7654",
+"street": "Holmsveet 34",
+"industry": "Andre egeninvesteringsselskaper",
+"state": "available",
+"published": "https://ttprosjekt.com/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:ttprosjekt"
+],
+"note": "",
+"cands": [
+[
+"https://ttprosjekt.no/",
+"no_site",
+null
+],
+[
+"https://tt-prosjekt.no/",
+"no_site",
+null
+],
+[
+"https://ttprosjekt.com/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "840880192",
+"name": "AJOUR REGNSKAP AS",
+"municipality": "VOLDA",
+"postcode": "6100",
+"street": "Hamnegata 10",
+"industry": "Regnskapsføring og bokføring",
+"state": "available",
+"published": "https://www.ajour-regnskap.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"note": "",
+"cands": [
+[
+"https://ajourregnskap.no/",
+"unreachable",
+null
+],
+[
+"https://ajour-regnskap.no/",
+"exact",
+1.0
+]
+],
+"split": "development"
+},
+{
+"org": "925540250",
+"name": "MELHUS MINILAGER AS",
+"municipality": "MELHUS",
+"postcode": "7224",
+"street": "Øysandvegen 175",
+"industry": "Utleie av egen eller leid fast eiendom",
+"state": "available",
+"published": "https://melhus-minilager.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"note": "",
+"cands": [
+[
+"https://melhusminilager.no/",
+"unreachable",
+null
+],
+[
+"https://melhus-minilager.no/",
+"exact",
+1.0
+]
+],
+"split": "development"
+},
+{
+"org": "921880596",
+"name": "FJORDEN KULTURDRIFT AS",
+"municipality": "SANDEFJORD",
+"postcode": "3236",
+"street": "Bekkeveien 9",
+"industry": "Utleie av egen eller leid fast eiendom",
+"state": "available",
+"published": "https://www.fjordenkulturdrift.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:fjordenkulturdrift",
+"place:sandefjord"
+],
+"note": "",
+"cands": [
+[
+"https://fjordenkulturdrift.no/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "953349469",
+"name": "SOLVEIEN BORETTSLAG",
+"municipality": "TØNSBERG",
+"postcode": "3126",
+"street": "c/o OBOS Storgaten 20",
+"industry": "Aktiviteter i borettslag og boligsameier",
+"state": "available",
+"published": "https://vibbo.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"note": "",
+"cands": [
+[
+"https://vibbo.no/solveien",
+"exact",
+1.0
+]
+],
+"split": "development"
+},
+{
+"org": "952430475",
+"name": "BIOKJEMI NORGE AS",
+"municipality": "VENNESLA",
+"postcode": "4715",
+"street": "Øvrebø Industriområde 13",
+"industry": "Engroshandel med kjemiske produkter",
+"state": "available",
+"published": "https://www.biokjemi.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:ovrebo",
+"postcode:4715",
+"street:ovrebo industriomrade"
+],
+"note": "",
+"cands": [
+[
+"https://www.biokjemi.no/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "996467775",
+"name": "POL BETONG AS",
+"municipality": "SARPSBORG",
+"postcode": "1712",
+"street": "Stubberudveien 8",
+"industry": "Annen spesialisert bygge- og anleggsvirksomhet ikke nevnt annet sted",
+"state": "available",
+"published": "https://polbetong.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:polbetong"
+],
+"note": "",
+"cands": [
+[
+"https://www.polbetong.no/",
+"exact",
+0.95
+]
+],
+"split": "final"
+},
+{
+"org": "927352427",
+"name": "FREDRIKSEN SILKETRYKK AS",
+"municipality": "HJELMELAND",
+"postcode": "4130",
+"street": "Viganeset 82",
+"industry": "Etterbehandling av tekstiler",
+"state": "available",
+"published": "https://www.fredriksensilketrykk.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:fredriksensilketrykk",
+"place:hjelmeland",
+"postcode:4130",
+"street:viganeset"
+],
+"note": "",
+"cands": [
+[
+"https://fredriksensilketrykk.no/",
+"exact",
+0.95
+]
+],
+"split": "validation"
+},
+{
+"org": "866526362",
+"name": "LINDKJENN AS",
+"municipality": "PORSGRUNN",
+"postcode": "3925",
+"street": "Øyekastvegen 32",
+"industry": "Maler- og glassarbeid",
+"state": "available",
+"published": "https://lindkjenn.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:porsgrunn",
+"postcode:3925"
+],
+"note": "",
+"cands": [
+[
+"https://lindkjenn.no/",
+"exact",
+0.95
+]
+],
+"split": "validation"
+},
+{
+"org": "981242009",
+"name": "IDE SYSTEMER AS",
+"municipality": "DRAMMEN",
+"postcode": "3057",
+"street": "Teglverksveien 83",
+"industry": "Reklamebyråvirksomhet",
+"state": "available",
+"published": "https://idesystemer.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"note": "",
+"cands": [
+[
+"https://www.ide-systemer.no/",
+"exact",
+1.0
+]
+],
+"split": "validation"
+},
+{
+"org": "924351020",
+"name": "INDUSTRIFINANS AS",
+"municipality": "OSLO",
+"postcode": "0352",
+"street": "c/o Industrifinans Oscars gate 30",
+"industry": "Utleie av egen eller leid fast eiendom",
+"state": "available",
+"published": "https://www.industrifinans.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:oslo",
+"postcode:0121",
+"postcode:0352",
+"street:postboks"
+],
+"note": "",
+"cands": [
+[
+"https://industrifinans.no/",
+"exact",
+0.95
+]
+],
+"split": "validation"
+},
+{
+"org": "998005809",
+"name": "VARDE FILM AS",
+"municipality": "BJØRNAFJORDEN",
+"postcode": "5211",
+"street": "Nordmarka 77B",
+"industry": "Produksjon av film, video og fjernsynsprogrammer",
+"state": "available",
+"published": "https://www.vardefilm.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:vardefilm"
+],
+"note": "",
+"cands": [
+[
+"https://vardefilm.no/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "929955633",
+"name": "XANI AS",
+"municipality": "OSLO",
+"postcode": "0956",
+"street": "Sandåsveien 49B",
+"industry": "Kombinerte tjenester tilknyttet eiendomsdrift",
+"state": "available",
+"published": "https://xani.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"note": "",
+"cands": [
+[
+"https://xani.no/",
+"exact",
+1.0
+]
+],
+"split": "development"
+},
+{
+"org": "928568008",
+"name": "FEELGOOD BEKKESTUA AS",
+"municipality": "BÆRUM",
+"postcode": "1357",
+"street": "Nadderudveien 1",
+"industry": "Treningssentervirksomhet",
+"state": "available",
+"published": "https://www.feelgoodbekkestua.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:feelgoodbekkestua",
+"postcode:1357",
+"street:nadderudveien"
+],
+"note": "",
+"cands": [
+[
+"https://feelgoodbekkestua.no/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "937083084",
+"name": "ON TIME AS",
+"municipality": "OSLO",
+"postcode": "0658",
+"street": "Strømsveien 40",
+"industry": "Passasjertransport på forespørsel utført av fører med kjøretøy",
+"state": "available",
+"published": "https://ontime.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:oslo"
+],
+"note": "",
+"cands": [
+[
+"https://ontime.no/",
+"exact",
+0.95
+]
+],
+"split": "validation"
+},
+{
+"org": "964527768",
+"name": "ECHO HOLDING AS",
+"municipality": "SANDNES",
+"postcode": "4319",
+"street": "Lunden 6",
+"industry": "Engroshandel med maskiner og utstyr ellers",
+"state": "available",
+"published": "https://echoholding.com/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:echoholding"
+],
+"note": "",
+"cands": [
+[
+"https://echoholding.no/",
+"no_site",
+null
+],
+[
+"https://echo-holding.no/",
+"no_site",
+null
+],
+[
+"https://echoholding.com/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "932692694",
+"name": "KOMO HOUSE AS",
+"municipality": "ASKER",
+"postcode": "1389",
+"street": "Skjellestadhagen 45",
+"industry": "Uoppgitt",
+"state": "available",
+"published": "https://komohouse.com/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:komohouse",
+"place:heggedal"
+],
+"note": "",
+"cands": [
+[
+"https://komohouse.no/",
+"no_site",
+null
+],
+[
+"https://komo-house.no/",
+"no_site",
+null
+],
+[
+"https://komohouse.com/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "933737934",
+"name": "KONGSBERG AUTOSERVICE AS",
+"municipality": "KONGSBERG",
+"postcode": "3610",
+"street": "Gomsrudveien 120",
+"industry": "Reparasjon og vedlikehold av motorvogner",
+"state": "available",
+"published": "https://www.kongsbergautoservice.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"note": "",
+"cands": [
+[
+"https://kongsbergautoservice.no/",
+"exact",
+1.0
+]
+],
+"split": "development"
+},
+{
+"org": "992837977",
+"name": "STOA ELEKTRONIKK AS",
+"municipality": "GRIMSTAD",
+"postcode": "4870",
+"street": "Barlinda 25",
+"industry": "Kuldeanlegg-, varmepumpearbeid og installasjon av peiser",
+"state": "available",
+"published": "https://www.stoaelektronikk.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:stoaelektronikk",
+"place:fevik",
+"place:grimstad"
+],
+"note": "",
+"cands": [
+[
+"https://stoaelektronikk.no/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "925572683",
+"name": "JOHANNESSEN PROSJEKTTJENESTER AS",
+"municipality": "TØNSBERG",
+"postcode": "3170",
+"street": "c/o Hans-Petter Johannessen Olav Digres vei 56",
+"industry": "Byggeteknisk konsulentvirksomhet",
+"state": "available",
+"published": "https://johannessenprosjekttjenester.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:johannessenprosjekttjenester"
+],
+"note": "",
+"cands": [
+[
+"https://johannessenprosjekttjenester.no/",
+"exact",
+0.95
+]
+],
+"split": "development"
+},
+{
+"org": "933451550",
+"name": "KYSTSKOLEN AS",
+"municipality": "BÆRUM",
+"postcode": "1358",
+"street": "Gimleveien 8B",
+"industry": "Annen trafikkskoleundervisning",
+"state": "available",
+"published": "https://www.kystskolen.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"note": "",
+"cands": [
+[
+"https://kystskolen.no/",
+"exact",
+1.0
+]
+],
+"split": "development"
+},
+{
+"org": "996066266",
+"name": "NORGES MUSIKKHØGSKOLES LEGAT TIL BESTE FOR MUSIKKSTUDERENDE STI",
+"municipality": "OSLO",
+"postcode": null,
+"street": null,
+"industry": "Aktiviteter i fond/legat som støtter veldedige og allmennyttige formål",
+"state": "ambiguous",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "the registry-listed website did not prove this exact entity (['name_not_found']); tried: https://www.unifor.no/ (related_or_uncertain: 200); https://norgesmusikkhogskoleslegattilbesteformusikkstuderen",
+"cands": [
+[
+"https://www.unifor.no/",
+"related_or_uncertain",
+0.3
+],
+[
+"https://norgesmusikkhogskoleslegattilbesteformusikkstuderende.no/",
+"no_site",
+null
+],
+[
+"https://norges-musikkhogskoles-legat-til-beste-for-musikkstuderende.no/",
+"no_site",
+null
+]
+],
+"split": "validation"
+},
+{
+"org": "995064413",
+"name": "FOR MEN STORO AS",
+"municipality": "OSLO",
+"postcode": "0485",
+"street": "Storo Storsenter Vitaminveien 7",
+"industry": "Detaljhandel med klær",
+"state": "ambiguous",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:2/3']); tried: https://www.formen.no/ (related_or_uncertain: 200); https://formenstoro.no/ (no_site); https://for-",
+"cands": [
+[
+"https://www.formen.no/",
+"related_or_uncertain",
+0.3
+],
+[
+"https://formenstoro.no/",
+"no_site",
+null
+],
+[
+"https://for-men-storo.no/",
+"no_site",
+null
+]
+],
+"split": "development"
+},
+{
+"org": "998582628",
+"name": "SANDA BUTIKKDRIFT AS",
+"municipality": "LILLESTRØM",
+"postcode": "2010",
+"street": "Støperiveien 5",
+"industry": "Detaljhandel med bredt vareutvalg med hovedvekt på nærings- og nytelsesmidler",
+"state": "ambiguous",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "the registry-listed website did not prove this exact entity (['name_not_found']); tried: https://www.rema.no/ (related_or_uncertain: 200); https://sandabutikkdrift.no/ (no_site); https://sanda-butikkd",
+"cands": [
+[
+"https://www.rema.no/",
+"related_or_uncertain",
+0.3
+],
+[
+"https://sandabutikkdrift.no/",
+"no_site",
+null
+],
+[
+"https://sanda-butikkdrift.no/",
+"no_site",
+null
+]
+],
+"split": "final"
+},
+{
+"org": "989116576",
+"name": "VESTFJORDGATA 69 AS",
+"municipality": "VÅGAN",
+"postcode": "8300",
+"street": "Kirkegata 13",
+"industry": "Utleie av egen eller leid fast eiendom",
+"state": "ambiguous",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "the registry-listed website did not prove this exact entity (['name_not_found']); tried: https://www.boligforfolket.no/ (related_or_uncertain: 200); https://vestfjordgata69.no/ (no_site); https://vest",
+"cands": [
+[
+"https://www.boligforfolket.no/",
+"related_or_uncertain",
+0.3
+],
+[
+"https://vestfjordgata69.no/",
+"no_site",
+null
+],
+[
+"https://vestfjordgata-69.no/",
+"no_site",
+null
+]
+],
+"split": "development"
+},
+{
+"org": "977124786",
+"name": "PROFESSOR MORGENSTIERNES FOND STI",
+"municipality": "OSLO",
+"postcode": null,
+"street": null,
+"industry": "Aktiviteter i fond/legat som støtter veldedige og allmennyttige formål",
+"state": "ambiguous",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "the registry-listed website did not prove this exact entity (['name_not_found']); tried: https://www.unifor.no/ (related_or_uncertain: 200); https://professormorgenstiernesfond.no/ (no_site); https://",
+"cands": [
+[
+"https://www.unifor.no/",
+"related_or_uncertain",
+0.3
+],
+[
+"https://professormorgenstiernesfond.no/",
+"no_site",
+null
+],
+[
+"https://professor-morgenstiernes-fond.no/",
+"no_site",
+null
+]
+],
+"split": "final"
+},
+{
+"org": "984797737",
+"name": "SAMEIET KIRKEVEIEN 65",
+"municipality": "OSLO",
+"postcode": "0569",
+"street": "c/o Enqvist Boligforvaltning AS Konghellegata 3",
+"industry": "Aktiviteter i borettslag og boligsameier",
+"state": "ambiguous",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "the registry-listed website did not prove this exact entity (['name_not_found']); tried: https://www.enqvist.no/ (related_or_uncertain: 200); https://sameietkirkeveien65.no/ (no_site); https://sameiet",
+"cands": [
+[
+"https://www.enqvist.no/",
+"related_or_uncertain",
+0.3
+],
+[
+"https://sameietkirkeveien65.no/",
+"no_site",
+null
+],
+[
+"https://sameiet-kirkeveien-65.no/",
+"no_site",
+null
+]
+],
+"split": "development"
+},
+{
+"org": "984023804",
+"name": "PRODECO PROSJEKT AS",
+"municipality": "ÅLESUND",
+"postcode": "6020",
+"street": "Blindheimsbreivik",
+"industry": "Byggeteknisk konsulentvirksomhet",
+"state": "ambiguous",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:1/2']); tried: https://www.prodeco.no/ (related_or_uncertain: 200); https://prodecoprosjekt.no/ (no_site); https:/",
+"cands": [
+[
+"https://www.prodeco.no/",
+"related_or_uncertain",
+0.3
+],
+[
+"https://prodecoprosjekt.no/",
+"no_site",
+null
+],
+[
+"https://prodeco-prosjekt.no/",
+"no_site",
+null
+]
+],
+"split": "final"
+},
+{
+"org": "932376326",
+"name": "POLARJO AS",
+"municipality": "NES",
+"postcode": "2165",
+"street": "Tellusvegen 5G",
+"industry": "Detaljhandel med informasjons- og kommunikasjonsteknologiutstyr",
+"state": "ambiguous",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "the registry-listed website did not prove this exact entity (['name_not_found']); tried: https://www.kvik.no/ (related_or_uncertain: 200); https://polarjo.no/ (no_site); https://polarjo.com/ (review: ",
+"cands": [
+[
+"https://www.kvik.no/",
+"related_or_uncertain",
+0.3
+],
+[
+"https://polarjo.no/",
+"no_site",
+null
+],
+[
+"https://polarjo.com/",
+"review",
+0.8
+]
+],
+"split": "validation"
+},
+{
+"org": "932770504",
+"name": "BA GJENVINNING AS",
+"municipality": "KONGSVINGER",
+"postcode": "2211",
+"street": "Mårvegen 14",
+"industry": "Materialgjenvinning",
+"state": "ambiguous",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "the registry-listed website did not prove this exact entity (['name_only']); tried: https://www.bagjenvinning.no/ (review: 200); https://gjenvinning.no/ (review: 200); https://gjenvinning.com/ (relate",
+"cands": [
+[
+"https://www.bagjenvinning.no/",
+"review",
+0.8
+],
+[
+"https://gjenvinning.no/",
+"review",
+0.8
+],
+[
+"https://gjenvinning.com/",
+"related_or_uncertain",
+0.3
+]
+],
+"split": "development"
+},
+{
+"org": "935872782",
+"name": "INDUSTRIVEIEN 5 RÅDE AS",
+"municipality": "RÅDE",
+"postcode": "1640",
+"street": "Sarpsborgveien 115",
+"industry": "Utleie av egen eller leid fast eiendom",
+"state": "ambiguous",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "the registry-listed website did not prove this exact entity (['name_not_found']); tried: https://www.olimb.no/ (related_or_uncertain: 200); https://industriveienrade.no/ (no_site); https://industrivei",
+"cands": [
+[
+"https://www.olimb.no/",
+"related_or_uncertain",
+0.3
+],
+[
+"https://industriveienrade.no/",
+"no_site",
+null
+],
+[
+"https://industriveien-rade.no/",
+"no_site",
+null
+]
+],
+"split": "development"
+},
+{
+"org": "925231142",
+"name": "ANGR AS",
+"municipality": "ULVIK",
+"postcode": "5730",
+"street": "Apalvegen 72",
+"industry": "Reisearrangørvirksomhet ellers",
+"state": "ambiguous",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "the registry-listed website did not prove this exact entity (['name_only']); tried: https://www.angr.no/ (review: 200); https://angr.com/ (unreachable: tls_incomplete_chain: the site did not send a co",
+"cands": [
+[
+"https://www.angr.no/",
+"review",
+0.8
+],
+[
+"https://angr.com/",
+"unreachable",
+null
+]
+],
+"split": "development"
+},
+{
+"org": "961563194",
+"name": "TICKET FERIEREISER AS",
+"municipality": "OSLO",
+"postcode": "0663",
+"street": "Fredrik Selmers vei 6",
+"industry": "Reisebyråvirksomhet",
+"state": "ambiguous",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:1/2']); tried: https://www.ticket.no/ (related_or_uncertain: 200); https://ticketferiereiser.no/ (no_site); https:",
+"cands": [
+[
+"https://www.ticket.no/",
+"related_or_uncertain",
+0.3
+],
+[
+"https://ticketferiereiser.no/",
+"no_site",
+null
+],
+[
+"https://ticket-feriereiser.no/",
+"no_site",
+null
+]
+],
+"split": "development"
+},
+{
+"org": "981992466",
+"name": "JORDBÆRPIKENE SOLSIDEN AS",
+"municipality": "TRONDHEIM",
+"postcode": "7042",
+"street": "Beddingen 10",
+"industry": "Drift av restauranter",
+"state": "ambiguous",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:1/2']); tried: https://www.jordbarpikene.no/ (related_or_uncertain: 200); https://jordbaerpikenesolsiden.no/ (no_s",
+"cands": [
+[
+"https://www.jordbarpikene.no/",
+"related_or_uncertain",
+0.3
+],
+[
+"https://jordbaerpikenesolsiden.no/",
+"no_site",
+null
+],
+[
+"https://jordbaerpikene-solsiden.no/",
+"no_site",
+null
+]
+],
+"split": "final"
+},
+{
+"org": "990786542",
+"name": "FRIISVEGEN MÅSÅPLASSEN HYTTEGREND AS",
+"municipality": "RINGEBU",
+"postcode": "2630",
+"street": "Måsåplassen",
+"industry": "Utleie av egen eller leid fast eiendom",
+"state": "ambiguous",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:2/3']); tried: https://www.friisvegen.no/ (related_or_uncertain: 200); https://friisvegenmasaplassenhyttegrend.no/",
+"cands": [
+[
+"https://www.friisvegen.no/",
+"related_or_uncertain",
+0.3
+],
+[
+"https://friisvegenmasaplassenhyttegrend.no/",
+"no_site",
+null
+],
+[
+"https://friisvegen-masaplassen-hyttegrend.no/",
+"no_site",
+null
+]
+],
+"split": "development"
+},
+{
+"org": "993617512",
+"name": "BULK VINTERBRO II AS",
+"municipality": "OSLO",
+"postcode": "0279",
+"street": "Karenslyst allé 53",
+"industry": "Utvikling og salg av byggeprosjekter",
+"state": "ambiguous",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:1/3']); tried: https://www.bulk.no/ (related_or_uncertain: 200); https://bulkvinterbroii.no/ (no_site); https://bu",
+"cands": [
+[
+"https://www.bulk.no/",
+"related_or_uncertain",
+0.3
+],
+[
+"https://bulkvinterbroii.no/",
+"no_site",
+null
+],
+[
+"https://bulk-vinterbro-ii.no/",
+"no_site",
+null
+]
+],
+"split": "validation"
+},
+{
+"org": "992941286",
+"name": "BORETTSLAGET YTRE EIGANESVEIEN 19",
+"municipality": "STAVANGER",
+"postcode": "4017",
+"street": "Zetlitzveien 2",
+"industry": "Aktiviteter i borettslag og boligsameier",
+"state": "ambiguous",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "the registry-listed website did not prove this exact entity (['name_not_found']); tried: https://www.bate.no/ (related_or_uncertain: 200); https://borettslagetytreeiganesveien19.no/ (no_site); https:/",
+"cands": [
+[
+"https://www.bate.no/",
+"related_or_uncertain",
+0.3
+],
+[
+"https://borettslagetytreeiganesveien19.no/",
+"no_site",
+null
+],
+[
+"https://borettslaget-ytre-eiganesveien-19.no/",
+"no_site",
+null
+]
+],
+"split": "development"
+},
+{
+"org": "934437861",
+"name": "MANTARAY CONSULTING GROUP AS",
+"municipality": "SØR-ODAL",
+"postcode": "2114",
+"street": "Åkrokvegen 135",
+"industry": "Bedriftsrådgivning og annen administrativ rådgivning",
+"state": "ambiguous",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address was found on the page; not published as verified",
+"cands": [
+[
+"https://mantarayconsulting.no/",
+"no_site",
+null
+],
+[
+"https://mantaray-consulting.no/",
+"no_site",
+null
+],
+[
+"https://mantaray.no/",
+"review",
+0.8
+]
+],
+"split": "development"
+},
+{
+"org": "987378867",
+"name": "HOTEL FREDRIKSTAD AS",
+"municipality": "FREDRIKSTAD",
+"postcode": "1607",
+"street": "Nygata 2-6",
+"industry": "Drift av hoteller",
+"state": "ambiguous",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:1/2']); tried: https://www.nordicchoicehotels.no/ (related_or_uncertain: 200); https://hotelfredrikstad.no/ (unrea",
+"cands": [
+[
+"https://www.nordicchoicehotels.no/",
+"related_or_uncertain",
+0.3
+],
+[
+"https://hotelfredrikstad.no/",
+"unreachable",
+null
+],
+[
+"https://hotel-fredrikstad.no/",
+"no_site",
+null
+]
+],
+"split": "validation"
+},
+{
+"org": "928775496",
+"name": "HÆRVERK FORLAG AS",
+"municipality": "TRONDHEIM",
+"postcode": "7018",
+"street": "Mellomila 15",
+"industry": "Utgivelse av bøker",
+"state": "ambiguous",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address was found on the page; not published as verified",
+"cands": [
+[
+"https://haerverkforlag.no/",
+"no_site",
+null
+],
+[
+"https://haerverk-forlag.no/",
+"no_site",
+null
+],
+[
+"https://haerverk.no/",
+"review",
+0.8
+]
+],
+"split": "final"
+},
+{
+"org": "925243337",
+"name": "OM SHANTI AS",
+"municipality": "LILLEHAMMER",
+"postcode": "2613",
+"street": "c/o Britt Fjeldstad Breisethvegen 2C",
+"industry": "Treningssentervirksomhet",
+"state": "ambiguous",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address was found on the page; not published as verified",
+"cands": [
+[
+"https://omshanti.no/",
+"review",
+0.8
+],
+[
+"https://om-shanti.no/",
+"no_site",
+null
+],
+[
+"https://omshanti.com/",
+"related_or_uncertain",
+0.3
+]
+],
+"split": "validation"
+},
+{
+"org": "916674406",
+"name": "HELVETICA AS",
+"municipality": "TRONDHEIM",
+"postcode": "7055",
+"street": "Horgvegen 14",
+"industry": "Andre egeninvesteringsselskaper",
+"state": "not_available",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "no website found: registry lists none and no domain guess proved the exact entity; tried: https://helvetica.no/ (review: 200); https://helvetica.com/ (review: 200)",
+"cands": [
+[
+"https://helvetica.no/",
+"review",
+0.8
+],
+[
+"https://helvetica.com/",
+"review",
+0.8
+]
+],
+"split": "development"
+},
+{
+"org": "998823269",
+"name": "ANJA HOLDING AS",
+"municipality": "OSLO",
+"postcode": "0575",
+"street": "c/o Anja Marheim Frydenbergveien 28C",
+"industry": "All annen faglig, vitenskapelig og teknisk virksomhet ikke nevnt annet sted",
+"state": "not_available",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "no website found: registry lists none and no domain guess proved the exact entity; tried: https://anjaholding.no/ (no_site); https://anja-holding.no/ (no_site); https://anjaholding.com/ (no_site)",
+"cands": [
+[
+"https://anjaholding.no/",
+"no_site",
+null
+],
+[
+"https://anja-holding.no/",
+"no_site",
+null
+],
+[
+"https://anjaholding.com/",
+"no_site",
+null
+]
+],
+"split": "development"
+},
+{
+"org": "992657421",
+"name": "HADAR AS",
+"municipality": "GRAN",
+"postcode": "2750",
+"street": "v/Bjørn Johnsrud Hovsgutua 4",
+"industry": "Uoppgitt",
+"state": "not_available",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "no website found: registry lists none and no domain guess proved the exact entity; tried: https://hadar.no/ (blocked: blocked_by_robots); https://hadar.com/ (no_site)",
+"cands": [
+[
+"https://hadar.no/",
+"blocked",
+null
+],
+[
+"https://hadar.com/",
+"no_site",
+null
+]
+],
+"split": "development"
+},
+{
+"org": "925716294",
+"name": "HORIZON AS",
+"municipality": "BÆRUM",
+"postcode": "1359",
+"street": "C/o Olaf Christian Randklev Ankerveien 210",
+"industry": "Kjøp og salg av egen fast eiendom",
+"state": "not_available",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "no website found: registry lists none and no domain guess proved the exact entity; tried: https://horizon.no/ (unreachable: network: [WinError 10054] An existing connection was forcibly closed by the ",
+"cands": [
+[
+"https://horizon.no/",
+"unreachable",
+null
+],
+[
+"https://horizon.com/",
+"review",
+0.8
+]
+],
+"split": "development"
+},
+{
+"org": "925912824",
+"name": "HEDMARK EIENDOMSUTVIKLING AS",
+"municipality": "HAMAR",
+"postcode": "2322",
+"street": "Todderudvegen 19A",
+"industry": "Utleie av egen eller leid fast eiendom",
+"state": "not_available",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "no website found: registry lists none and no domain guess proved the exact entity; tried: https://hedmarkeiendomsutvikling.no/ (no_site); https://hedmark-eiendomsutvikling.no/ (no_site); https://hedma",
+"cands": [
+[
+"https://hedmarkeiendomsutvikling.no/",
+"no_site",
+null
+],
+[
+"https://hedmark-eiendomsutvikling.no/",
+"no_site",
+null
+],
+[
+"https://hedmark.no/",
+"no_site",
+null
+]
+],
+"split": "development"
+},
+{
+"org": "916228848",
+"name": "NORDGÅRD BIL AS",
+"municipality": "SKIEN",
+"postcode": "3720",
+"street": "Skotfossvegen 35",
+"industry": "Detaljhandel med motorvogner",
+"state": "not_available",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "no website found: registry lists none and no domain guess proved the exact entity; tried: https://nordgardbil.no/ (no_site); https://nordgard-bil.no/ (no_site); https://nordgard.no/ (unreachable: tls_",
+"cands": [
+[
+"https://nordgardbil.no/",
+"no_site",
+null
+],
+[
+"https://nordgard-bil.no/",
+"no_site",
+null
+],
+[
+"https://nordgard.no/",
+"unreachable",
+null
+]
+],
+"split": "validation"
+},
+{
+"org": "829255812",
+"name": "REINEHOLMEN HOTELL EIENDOM AS",
+"municipality": "VESTVÅGØY",
+"postcode": null,
+"street": null,
+"industry": null,
+"state": "not_available",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "no website found: registry lists none and no domain guess proved the exact entity; tried: https://reineholmenhotelleiendom.no/ (no_site); https://reineholmen-hotell-eiendom.no/ (no_site); https://rein",
+"cands": [
+[
+"https://reineholmenhotelleiendom.no/",
+"no_site",
+null
+],
+[
+"https://reineholmen-hotell-eiendom.no/",
+"no_site",
+null
+],
+[
+"https://reineholmen.no/",
+"related_or_uncertain",
+0.3
+]
+],
+"split": "development"
+},
+{
+"org": "925832928",
+"name": "TUENVEIEN 88 AS",
+"municipality": "RÆLINGEN",
+"postcode": "2009",
+"street": "Nordbyvegen 25",
+"industry": "Utleie av egen eller leid fast eiendom",
+"state": "not_available",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "no website found: registry lists none and no domain guess proved the exact entity; tried: https://tuenveien88.no/ (no_site); https://tuenveien-88.no/ (no_site); https://tuenveien.no/ (no_site)",
+"cands": [
+[
+"https://tuenveien88.no/",
+"no_site",
+null
+],
+[
+"https://tuenveien-88.no/",
+"no_site",
+null
+],
+[
+"https://tuenveien.no/",
+"no_site",
+null
+]
+],
+"split": "development"
+},
+{
+"org": "924312912",
+"name": "ASKAUTRUD HOLDING AS",
+"municipality": "MOSS",
+"postcode": "1526",
+"street": "Gubbeskogveien 10",
+"industry": "Uoppgitt",
+"state": "not_available",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "no website found: registry lists none and no domain guess proved the exact entity; tried: https://askautrudholding.no/ (no_site); https://askautrud-holding.no/ (no_site); https://askautrud.no/ (unreac",
+"cands": [
+[
+"https://askautrudholding.no/",
+"no_site",
+null
+],
+[
+"https://askautrud-holding.no/",
+"no_site",
+null
+],
+[
+"https://askautrud.no/",
+"unreachable",
+null
+]
+],
+"split": "development"
+},
+{
+"org": "923156062",
+"name": "SMOOTH AS",
+"municipality": "OSLO",
+"postcode": "0181",
+"street": "Torggata 5",
+"industry": "Konsulentvirksomhet tilknyttet informasjonsteknologi og forvaltning og drift av it-systemer",
+"state": "not_available",
+"published": null,
+"score": null,
+"reasons": null,
+"note": "no website found: registry lists none and no domain guess proved the exact entity; tried: https://smooth.no/ (review: 200); https://smooth.com/ (unreachable: network: [WinError 10054] An existing conn",
+"cands": [
+[
+"https://smooth.no/",
+"review",
+0.8
+],
+[
+"https://smooth.com/",
+"unreachable",
+null
+]
+],
+"split": "development"
+}
+]

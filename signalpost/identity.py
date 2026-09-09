@@ -23,7 +23,13 @@ PARKED_MARKERS = (
     "hugedomains", "sedo.com", "dan.com", "afternic", "godaddy.com/domains", "her flytter snart en ny gjest",
     "webhotell er ikke satt opp", "this webpage is parked", "parked by", "domeneparkering", "parkert domene",
     "domain has been registered", "domenet er registrert", "coming soon - this domain",
+    # Hosting-provider placeholders. A One.com placeholder titled "Hosted By One.com | Webhosting made simple"
+    # was published as the official website of PAULSEN DRIFT AS, on the strength of the domain name alone.
+    "hosted by one.com", "webhosting made simple", "welcome to nginx", "apache2 ubuntu default page",
+    "default web site page", "site not configured", "nettsiden er under konstruksjon", "under construction",
+    "parkeringsside", "er parkert", "the domain name is parked", "is registered, but the owner",
 )
+NORWAY_MARKERS = ("norge", "noreg", "norway", "organisasjonsnummer", "org.nr", "orgnr", "org nr")
 TITLE_SEPARATORS = (" | ", " – ", " — ", " - ", " · ", " :: ", " » ")
 _FOLD = str.maketrans({"æ": "ae", "ø": "o", "å": "a", "Æ": "ae", "Ø": "o", "Å": "a"})
 
@@ -123,6 +129,50 @@ def _org_pattern(orgnr: str) -> Optional[re.Pattern]:
     return re.compile(r"(?<!\d)" + r"[\s.]?".join(digits) + r"(?!\d)")
 
 
+ORG_LABEL_RE = re.compile(
+    r"(?:org(?:anisasjons)?\.?\s*(?:nr|nummer)\.?|foretaks(?:nr|nummer)|"
+    r"company\s+(?:reg\.?|registration)\s*(?:no\.?|number)|vat\s*(?:no\.?|number))"
+    r"[^0-9]{0,20}((?:NO)?\s*\d[\s.]?\d[\s.]?\d[\s.]?\d[\s.]?\d[\s.]?\d[\s.]?\d[\s.]?\d[\s.]?\d)", re.I)
+
+
+def other_org_numbers(full_text: str, our_org: str) -> list[str]:
+    """Nine-digit organisation numbers the page LABELS as its own, excluding ours.
+
+    A site that states its own organisation number has named its legal entity. industrifinans.no carries the
+    right brand and the exact registered street of INDUSTRIFINANS AS (924351020) and states
+    "Org.nummer: 993 075 558" — a different entity at the same address. Name and address alone cannot separate
+    a sister company from the company; a stated organisation number can.
+    """
+    ours = re.sub(r"\D", "", str(our_org or ""))
+    found = []
+    for m in ORG_LABEL_RE.finditer(full_text or ""):
+        digits = re.sub(r"\D", "", m.group(1))
+        if len(digits) == 9 and digits != ours and digits not in found:
+            found.append(digits)
+    return found
+
+
+def _norway_signal(folded_text: str, full_text: str, hostname: str = "") -> bool:
+    """Does anything tie this page to Norway?
+
+    This guards the domain-spells-the-name corroborator against a foreign namesake: hoainvest.com spells
+    HOA INVEST AS exactly and is a California investment firm.
+
+    Every signal here must be unambiguous. A "4 digits then a capitalised word" test for a Norwegian postcode
+    was tried and removed: it read the Californian street address "2300 Palm" as a Norwegian postcode and let
+    that namesake through. A .no domain, a +47 number and the country's name cannot be produced by accident.
+    """
+    if fold(hostname).rstrip(".").endswith(".no"):
+        return True
+    if any(m in folded_text for m in NORWAY_MARKERS):
+        return True
+    if re.search(r"\+\s?47[\s\d]{6,}", full_text):                 # Norwegian dialling code
+        return True
+    if re.search(r"@[\w.-]+\.no\b", full_text) or re.search(r"https?://[\w.-]+\.no\b", full_text):
+        return True
+    return False
+
+
 def _corroborators(profile: dict, folded_text: str) -> list[str]:
     reg = profile.get("registry") or {}
     hits = []
@@ -192,13 +242,23 @@ def assess(profile: dict, page, extra_text: str = "") -> dict:
         return _finish(result)
 
     want = name_tokens(profile.get("name"))
-    have = set()
-    for _, part in parts:
-        have.update(tokens(part))
+    # The company name must appear in the page's OWN content. Matching it against the hostname proves only that
+    # somebody registered that domain, and then counting the same domain again as corroboration counts one fact
+    # twice. That circularity published a hosting placeholder and a Californian namesake as verified websites.
+    content_parts = [(k, v) for k, v in parts if k != "hostname"]
+    have_content = set()
+    for _, part in content_parts:
+        have_content.update(tokens(part))
+    have_content.update(tokens(full_text))   # the page's own visible text is self-identification too
     host_compact = re.sub(r"[^a-z0-9]", "", fold(hostname))
-    present = [t for t in want if t in have or (len(t) >= 4 and t in host_compact)]
-    best_part = max(parts, key=lambda p: (len(set(tokens(p[1])) & set(want)), -len(p[1] or "x")))[1] or title
+    present = [t for t in want if t in have_content]
+    present_or_host = [t for t in want if t in have_content or (len(t) >= 4 and t in host_compact)]
+    best_part = max(content_parts, key=lambda p: (len(set(tokens(p[1])) & set(want)), -len(p[1] or "x")))[1] or title
     span = re.sub(r"\s+", " ", best_part).strip()[:300]
+    if want and not set(want) & set(tokens(best_part)):
+        # the name is in the body rather than the title: quote where it actually appears
+        longest = max(want, key=len)
+        span = span_around(full_text, longest, 110) or span
     if want and len(present) == len(want):
         corr = _corroborators(profile, folded_all)
         # A one-word name ("Semaphore", "Vitamat") plus a city name is not proof: cities appear on many pages.
@@ -209,15 +269,24 @@ def assess(profile: dict, page, extra_text: str = "") -> dict:
         raw = [t for t in tokens(profile.get("name")) if t not in LEGAL_FORMS]
         name_compact = "".join(raw)
         labels = [l for l in fold(hostname).split(".") if l and l != "www"]
-        if len(raw) >= 2 and len(name_compact) >= 7 and labels and re.sub(r"[^a-z0-9]", "", labels[0]) == name_compact:
+        if (len(raw) >= 2 and len(name_compact) >= 7 and labels
+                and re.sub(r"[^a-z0-9]", "", labels[0]) == name_compact
+                and _norway_signal(folded_all, full_text, hostname)):
             corr = sorted(set(corr) | {f"domain_is_legal_name:{labels[0]}"})
             strong = strong or [f"domain_is_legal_name:{labels[0]}"]
+        # A different, self-declared organisation number means this page belongs to another legal entity.
+        # Keep it as a candidate, never as a verified website.
+        others = other_org_numbers(full_text, profile.get("organisation_number"))
+        if others:
+            result.update(score=0.8, reasons=["name_match_but_other_org_number", f"page_states:{others[0]}"],
+                          claim_span=span_around(full_text, others[0], 90) or span)
+            return _finish(result)
         if corr and (len(want) >= 2 or strong):
             result.update(score=0.95, reasons=["name_and_address", *corr], claim_span=span)
         else:
             result.update(score=0.8, reasons=["name_only"], claim_span=span)
-    elif present:
-        result.update(score=0.3, reasons=["name_partial", f"tokens:{len(present)}/{len(want)}"], claim_span=span)
+    elif present_or_host:
+        result.update(score=0.3, reasons=["name_partial", f"tokens:{len(present_or_host)}/{len(want)}"], claim_span=span)
     else:
         result.update(score=0.3, reasons=["name_not_found"], claim_span=span)
     return _finish(result)
