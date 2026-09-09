@@ -1,13 +1,13 @@
 {
-  "run_id": "2026-09-09-submission-1000-refresh",
-  "started_at": "2026-09-09T13:04:06Z",
-  "completed_at": "2026-09-09T13:15:00Z",
-  "agent_version": "1.0.0+25d1398",
+  "run_id": "2026-09-09-submission-1000-final",
+  "started_at": "2026-09-09T14:55:52Z",
+  "completed_at": "2026-09-09T15:07:13Z",
+  "agent_version": "1.0.0+7ca4683",
   "inputs": 1000,
   "envelopes": 1000,
   "terminal_status_counts": {
-    "completed_with_errors": 904,
-    "completed": 96
+    "completed_with_errors": 29,
+    "completed": 971
   },
   "section_state_counts": {
     "identity": {
@@ -25,16 +25,14 @@
       "available": 1000
     },
     "web": {
-      "not_available": 788,
-      "ambiguous": 102,
-      "available": 96,
-      "failed": 8,
-      "blocked": 6
+      "failed": 28,
+      "not_available": 779,
+      "available": 136,
+      "ambiguous": 53,
+      "blocked": 4
     },
     "hiring": {
-      "failed": 904,
-      "not_available": 84,
-      "available": 12
+      "available": 1000
     },
     "activity": {
       "available": 1000
@@ -70,39 +68,53 @@
     "workplace": 797,
     "workplace_count": 1000,
     "registry_update": 13897,
+    "active_job_count": 1000,
     "registry_employees": 149,
+    "official_website": 136,
+    "public_brand": 132,
+    "website_title": 134,
     "registry_mobile": 201,
+    "website_description": 80,
+    "contact_email": 182,
+    "contact_phone": 162,
     "former_names": 251,
     "registry_email": 208,
-    "official_website": 96,
-    "public_brand": 95,
-    "website_title": 96,
-    "social_profile": 120,
-    "contact_email": 141,
-    "contact_phone": 137,
-    "website_description": 65,
-    "sitemap_lastmod": 65,
-    "site_location": 16,
+    "sitemap_lastmod": 82,
+    "social_profile": 152,
+    "site_location": 22,
     "registry_phone": 167,
     "registry_website": 104,
-    "careers_page": 15,
-    "news_item": 148,
+    "careers_page": 20,
+    "news_item": 205,
+    "job_posting": 4,
     "site_leader": 32
   },
-  "requests": 8541,
-  "bytes": 132257116,
+  "requests": 8338,
+  "bytes": 194743378,
   "third_party_cost_usd": 0.0,
-  "runtime_ms": 654604,
-  "p50_ms": 13763,
-  "p95_ms": 52010,
+  "runtime_ms": 681300,
+  "p50_ms": 9034,
+  "p95_ms": 45468,
   "budget_exhausted_companies": [
-    "918412344"
+    "918412344",
+    "932770504"
   ],
-  "previous_run_id": "2026-09-09-submission-1000",
+  "previous_run_id": "2026-09-09-submission-1000-v3",
   "changes_by_type": {
+    "availability_changed": 15,
+    "changed_website": 2,
+    "new_job": 1,
     "new_website": 1,
-    "new_location": 1,
-    "availability_changed": 7
+    "new_social_profile": 5
   },
-  "validation_problems": 0
+  "validation_problems": 0,
+  "nav_feed": {
+    "pages": 102,
+    "ads_seen": 32510,
+    "active_ads": 9608,
+    "days": 60,
+    "built_at": "2026-09-09T14:57:35Z",
+    "token_source": "public",
+    "errors": []
+  }
 }

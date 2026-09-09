@@ -109,24 +109,27 @@ not a measurement. See [docs/CRAWLERS.md](docs/CRAWLERS.md) for the per-company 
 
 ## Measured
 
-First 1,000-company run, 2026-09-09, 32 workers, this laptop (`submission/run-report-1000.json`, `eval/report-run1.json`):
+Final 1,000-company run, 2026-09-09, 24 workers, this laptop (`submission/run-report-1000.json`, `eval/report.json`):
 
 | Measure | Value |
 |---|---|
 | envelopes / inputs | 1,000 / 1,000, zero validation problems |
-| requests | 8,572 total, 8.6 per company mean, 26 max (one company hit its cap) |
-| wall clock | 10.7 min for 1,000 companies at 32 workers; p50 14 s, p95 54 s per company |
-| bytes | 134 MB of snapshots |
+| requests | 8,338 total, 8.3 per company mean; plus 103 for the once-per-run NAV feed scan |
+| wall clock | 11.4 min for 1,000 companies; p50 9 s, p95 45 s per company |
 | third-party cost | $0 |
-| identity / accounts / leadership / workplaces / activity | 1,000 / 999 / 999 / 1,000 / 1,000 available |
-| web | 101 verified exact, 103 ambiguous (name matched, not proven), 780 no site found, 10 failed, 6 blocked |
-| hiring | 899 `failed`: NAV answered HTTP 429 for this IP during the run (see LIMITATIONS.md); 13 available, 88 not_available |
+| identity / accounts / leadership / workplaces / activity / hiring | 1,000 / 999 / 999 / 1,000 / 1,000 / 1,000 sections available |
+| web | 136 verified exact, 53 ambiguous (name matched, entity not proven), 779 no site found, 28 unreachable, 4 blocked |
+| NAV job feed | 9,608 active national ads scanned; 4 companies hiring, every one confirmed by an organisation number in NAV's own record |
 | evidence completeness | 100% of `available` claims carry evidence with a literal span |
 
-A refresh pass against that run is the submitted artifact (`submission/`); its report is `submission/run-report-1000.json`
-and its change counts are in `changes_by_type`. For a 100-company evaluator batch the same per-company numbers give
-roughly 900-1,500 requests and 4-8 minutes at 8 workers.
+Scaled to a 100-company evaluator batch: about 103 + 830 = 930 requests (cap 1,950) and roughly 4 minutes at 8 workers.
 
+Two numbers are deliberately not claimed. Wrong-company publications and claim-span support are **not measured**,
+because no hand-labelled gold set exists yet; `eval/score.py` reports them only against a gold file you supply.
+Website coverage of 13.6% reflects the population: a random draw from the registry is mostly holding companies and
+property entities with no website at all, and the gate publishes only what it can prove.
+
+## Secrets
 ## Secrets
 
 Two optional environment variables. `NAV_FEED_TOKEN`: a private consumer token for NAV's job vacancy feed; without it
