@@ -136,3 +136,46 @@ site was lost. On the thirty hand-labelled rows the fixed gate publishes no know
 The remaining honest gap: 40 of the 70 published sites in the sample were not hand-checked, so the measured
 precision covers the audited rows only. Recall is not measured at all, because it needs the evaluator's pooled
 union of what every entrant found.
+
+## Second audit round, 2026-09-10: 200 companies
+
+The first audit covered thirty companies and fixed six wrong publications. This round covered about two hundred,
+chosen to sit where the risk actually is rather than at random:
+
+- all 86 published sites verified by the 0.95 rule (name plus a corroborator) — the rule that can be wrong;
+- a check of the 42 published by the 1.0 rule, which requires the organisation number on the page;
+- all 66 companies the agent marked `ambiguous`, to measure the opposite error: withholding a correct site.
+
+Each published page was read from its stored snapshot, and any page whose snapshot left the question open was
+fetched again over a path outside this machine's network. Labels and quoted evidence are in `eval/gold.jsonl`.
+
+**Precision.** Of the 86 risky publications, two were wrong:
+
+| Company | Published | What it was |
+|---|---|---|
+| POCO LOCO AS | poco-loco.no | a bare LiteSpeed directory listing, "Index of /" |
+| BLAAUW AS | blaauw.no | the group's site: "Einar Blaauw AS", contact "Blaauw Holding AS" |
+
+One more looked wrong and was not. `varmefag.no` is a national fireplace chain, but the page **we stored** reads
+"Velkommen til Varmefag Ålesund. Hos Varmefag Ålesund (PD Stafseth AS)" — the operator is named, so the match is
+right. It is recorded as `correct_weak_url`, because the published address is the chain root and another visitor
+would not see that store. The same category covers the housing co-op whose page lives on the OBOS portal.
+
+**Recall.** Of the 66 `ambiguous` companies, five were correctly withheld (a French motorsport firm, a United
+States hotel, the McCormick brand site, a California investment firm, and a page stating another entity's
+organisation number) — but **seven were wrong to withhold**. In each the page simply writes the company's name
+out in full, for example "Norfrag Tank og Silo as tilbyr leveranse av tanker og siloer", while carrying no
+address to corroborate it.
+
+Two rules came out of this round:
+
+1. A bare web-server directory listing is a parked page, never a website.
+2. The full legal name written as a **contiguous phrase** on a page with a Norway signal is corroboration in its
+   own right. Separate tokens scattered over a page are weak; the whole name as a phrase is not something an
+   unrelated site produces. Multi-word names only, so a one-word namesake cannot use it.
+
+Re-running the fixed gate offline over the stored snapshots: 127 of 128 publications stand, POCO LOCO is dropped,
+and 7 of the withheld companies are promoted. No foreign namesake was promoted — the Norway signal held every one.
+
+**Still not measured.** Recall against the evaluator's pooled union of what every entrant found. That number
+cannot be produced locally, and no figure here should be read as a substitute for it.
