@@ -28,6 +28,8 @@ PARKED_MARKERS = (
     "hosted by one.com", "webhosting made simple", "welcome to nginx", "apache2 ubuntu default page",
     "default web site page", "site not configured", "nettsiden er under konstruksjon", "under construction",
     "parkeringsside", "er parkert", "the domain name is parked", "is registered, but the owner",
+    # A bare web-server directory listing is not a website: poco-loco.no served "Index of /" and was published.
+    "index of /", "directory listing for", "proudly served by litespeed web server",
 )
 NORWAY_MARKERS = ("norge", "noreg", "norway", "organisasjonsnummer", "org.nr", "orgnr", "org nr")
 TITLE_SEPARATORS = (" | ", " – ", " — ", " - ", " · ", " :: ", " » ")
@@ -269,11 +271,20 @@ def assess(profile: dict, page, extra_text: str = "") -> dict:
         raw = [t for t in tokens(profile.get("name")) if t not in LEGAL_FORMS]
         name_compact = "".join(raw)
         labels = [l for l in fold(hostname).split(".") if l and l != "www"]
+        norwegian = _norway_signal(folded_all, full_text, hostname)
         if (len(raw) >= 2 and len(name_compact) >= 7 and labels
-                and re.sub(r"[^a-z0-9]", "", labels[0]) == name_compact
-                and _norway_signal(folded_all, full_text, hostname)):
+                and re.sub(r"[^a-z0-9]", "", labels[0]) == name_compact and norwegian):
             corr = sorted(set(corr) | {f"domain_is_legal_name:{labels[0]}"})
             strong = strong or [f"domain_is_legal_name:{labels[0]}"]
+        # The full legal name written out as a phrase is itself strong: "Norfrag Tank og Silo as" is not a
+        # sentence a random site produces, unlike its separate tokens. Multi-word names only, and only with a
+        # Norway signal, so a foreign namesake writing its own identical name out cannot use this route.
+        phrase = " ".join(raw)
+        if len(raw) >= 2 and len(name_compact) >= 7 and norwegian and re.search(
+                r"\b" + r"\s+".join(re.escape(t) for t in raw) + r"\b", folded_all):
+            corr = sorted(set(corr) | {"legal_name_phrase_on_page"})
+            strong = strong or ["legal_name_phrase_on_page"]
+            span = span_around(full_text, phrase, 140) or span
         # A different, self-declared organisation number means this page belongs to another legal entity.
         # Keep it as a candidate, never as a verified website.
         others = other_org_numbers(full_text, profile.get("organisation_number"))

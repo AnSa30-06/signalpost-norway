@@ -211,3 +211,12 @@ def test_consumer_mail_domains_are_not_candidates():
     from signalpost.discovery import email_domain_candidate
     for addr in ("ola@gmail.com", "kari@hotmail.no", "post@online.no", "notanemail"):
         assert email_domain_candidate({"registry": {"epostadresse": addr}}) is None
+
+
+def test_a_bare_directory_listing_is_not_a_website():
+    """poco-loco.no served "Index of /" from LiteSpeed and was published as POCO LOCO AS."""
+    from signalpost import identity
+    html = "<html><head><title>Index of /</title></head><body><h1>Index of /</h1><p>Proudly Served by LiteSpeed Web Server at poco-loco.no Port 443</p></body></html>"
+    profile = {"organisation_number": "988878154", "name": "POCO LOCO AS", "municipality": "OSLO", "registry": {}}
+    res = identity.assess(profile, _page("https://poco-loco.no/", html))
+    assert res["status"] != "exact" and res["score"] <= 0.3

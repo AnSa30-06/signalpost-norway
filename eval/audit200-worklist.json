@@ -1,0 +1,2160 @@
+{
+"published": [
+{
+"org": "816877512",
+"name": "TT PROSJEKT AS",
+"site": "https://ttprosjekt.com/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:ttprosjekt"
+],
+"state": "available"
+},
+{
+"org": "820890752",
+"name": "INGEBJØRG BRATLAND AS",
+"site": "https://www.ingebjorgbratland.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:ingebjorgbratland"
+],
+"state": "available"
+},
+{
+"org": "823041772",
+"name": "TROLLTEK AS",
+"site": "https://www.trolltek.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:skala",
+"postcode:6456",
+"street:geitneshogda"
+],
+"state": "available"
+},
+{
+"org": "823162812",
+"name": "WEBLA AS",
+"site": "https://webla.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "824809852",
+"name": "DARK NORDFJORD AS",
+"site": "https://darknordfjord.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:darknordfjord",
+"place:nordfjordeid",
+"place:stad",
+"postcode:6770",
+"street:sjogata"
+],
+"state": "available"
+},
+{
+"org": "827301272",
+"name": "KVÅL GRILLEN AS",
+"site": "https://kvalgrillen.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:kvalgrillen",
+"postcode:7228",
+"street:vassfjellvegen"
+],
+"state": "available"
+},
+{
+"org": "829011522",
+"name": "EDS BYGGUTVIKLING AS",
+"site": "https://edsbygg.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:oslo"
+],
+"state": "available"
+},
+{
+"org": "840880192",
+"name": "AJOUR REGNSKAP AS",
+"site": "https://www.ajour-regnskap.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "866526362",
+"name": "LINDKJENN AS",
+"site": "https://lindkjenn.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:porsgrunn",
+"postcode:3925"
+],
+"state": "available"
+},
+{
+"org": "878646762",
+"name": "STANSEFABRIKKEN PRODUCTS AS",
+"site": "https://www.stansefabrikken.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "879421322",
+"name": "HALVORSEN & REINE AS",
+"site": "https://www.heras.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:drammen",
+"street:gamle kirkeplass"
+],
+"state": "available"
+},
+{
+"org": "886308922",
+"name": "PREG BARNEHAGER AS",
+"site": "https://preg-barnehager.barnehage.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:preg-barnehager",
+"place:oslo",
+"postcode:0572",
+"street:sinsenveien"
+],
+"state": "available"
+},
+{
+"org": "910402722",
+"name": "ALF JOHANSEN AS",
+"site": "https://alfj.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:seljord",
+"postcode:3840",
+"street:brolosvegen"
+],
+"state": "available"
+},
+{
+"org": "912513955",
+"name": "VÅGSGATA LEGESENTER AS",
+"site": "https://vaagsgatalegesenter.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:sandnes",
+"postcode:4306",
+"street:vagsgata"
+],
+"state": "available"
+},
+{
+"org": "913128834",
+"name": "DAHLS DATA AS",
+"site": "https://dahlsdata.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:dahlsdata",
+"place:nesodden",
+"place:nesoddtangen",
+"postcode:1450",
+"street:blomsterveien"
+],
+"state": "available"
+},
+{
+"org": "913266013",
+"name": "FERRA CONSULT AS",
+"site": "https://www.ferra.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:harstad",
+"postcode:9485",
+"street:c/o altipluss as",
+"street:klubbholmen",
+"street:postboks"
+],
+"state": "available"
+},
+{
+"org": "913599578",
+"name": "INSVIVIA TECHNOLOGIES AS",
+"site": "https://www.insvivia.com/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "913982789",
+"name": "SMART ROOMS STORD AS",
+"site": "https://smartroomsstord.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:smartroomsstord"
+],
+"state": "available"
+},
+{
+"org": "914720958",
+"name": "NORDOX AS",
+"site": "https://nordox.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:oslo",
+"postcode:0661",
+"street:ostensjoveien"
+],
+"state": "available"
+},
+{
+"org": "915291600",
+"name": "GRAVSTEIN NORGE AS",
+"site": "https://www.gravstein-norge.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:gravstein-norge"
+],
+"state": "available"
+},
+{
+"org": "915984320",
+"name": "JAN LIND AS",
+"site": "https://janlind.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:janlind"
+],
+"state": "available"
+},
+{
+"org": "917823758",
+"name": "MØRE STÅL AS",
+"site": "https://morestal.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "918412344",
+"name": "PLAN1 AS",
+"site": "https://p1.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "918453547",
+"name": "ELINSTA AS",
+"site": "https://elinsta.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "918533257",
+"name": "BREGANOR AS",
+"site": "https://breganor.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "918935576",
+"name": "LOSENBUTIKK AS",
+"site": "https://www.losenbutikk.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "919483067",
+"name": "PIONEER ROBOTICS AS",
+"site": "https://www.pioneer-robotics.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:pioneer-robotics"
+],
+"state": "available"
+},
+{
+"org": "920844553",
+"name": "AWARE OF AS",
+"site": "https://awareof.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "921155182",
+"name": "ASTRUP FEARNLEY AS",
+"site": "https://astrupfearnley.com/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:astrupfearnley",
+"place:oslo",
+"postcode:0191",
+"street:dronning eufemias gate"
+],
+"state": "available"
+},
+{
+"org": "921196261",
+"name": "STRIKKEMAGI AS",
+"site": "https://www.strikkemagi.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "921880596",
+"name": "FJORDEN KULTURDRIFT AS",
+"site": "https://www.fjordenkulturdrift.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:fjordenkulturdrift",
+"place:sandefjord"
+],
+"state": "available"
+},
+{
+"org": "922698805",
+"name": "AGENDI AS",
+"site": "https://www.agendi.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:trondheim",
+"postcode:7047",
+"street:tungasletta"
+],
+"state": "available"
+},
+{
+"org": "923031480",
+"name": "RESTAURANT STALLEN AS",
+"site": "https://www.restaurantstallen.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:restaurantstallen",
+"place:oslo",
+"postcode:0354",
+"street:underhaugsveien"
+],
+"state": "available"
+},
+{
+"org": "923170553",
+"name": "BEDRE TERAPEUTER AS",
+"site": "https://bedreterapeuter.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:bedreterapeuter"
+],
+"state": "available"
+},
+{
+"org": "923240306",
+"name": "KOMNES MASKIN AS",
+"site": "https://www.komnesmaskin.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:komnesmaskin",
+"place:kongsberg"
+],
+"state": "available"
+},
+{
+"org": "923243925",
+"name": "SUNDAY FILM AS",
+"site": "https://www.sundayfilm.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:sundayfilm",
+"place:oslo"
+],
+"state": "available"
+},
+{
+"org": "923532781",
+"name": "MERCHBERRY AS",
+"site": "https://merchberry.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "923789065",
+"name": "PARADIS HUS AS",
+"site": "https://www.paradishus.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "924303824",
+"name": "ELI REN AS",
+"site": "https://www.eliren.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:sandnes",
+"postcode:4324",
+"street:krunemyr"
+],
+"state": "available"
+},
+{
+"org": "924640189",
+"name": "DANSKEN VERTSHUS AS",
+"site": "https://www.danskenvertshus.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:danskenvertshus",
+"place:moss"
+],
+"state": "available"
+},
+{
+"org": "924756128",
+"name": "BVS FILTER AS",
+"site": "https://www.bvsfilter.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "925171298",
+"name": "AUTOCARRERA AS",
+"site": "https://www.autocarrera.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:porsgrunn",
+"postcode:3940",
+"street:heistaddalen"
+],
+"state": "available"
+},
+{
+"org": "925365033",
+"name": "MARKISEDESIGN AS",
+"site": "https://markisedesign.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"street:arkitekt ebbells veg"
+],
+"state": "available"
+},
+{
+"org": "925540250",
+"name": "MELHUS MINILAGER AS",
+"site": "https://melhus-minilager.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "925748641",
+"name": "VIKEN BRANNSIKKERHET AS",
+"site": "https://vikenbrannsikkerhet.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:vikenbrannsikkerhet"
+],
+"state": "available"
+},
+{
+"org": "925817899",
+"name": "NORSK VEDSENTRAL AS",
+"site": "https://norskvedsentral.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "926590464",
+"name": "NORDIC ENTREPRENØR AS",
+"site": "https://www.nordicent.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:trondheim"
+],
+"state": "available"
+},
+{
+"org": "926645579",
+"name": "ELITE TRAVEL AS",
+"site": "https://www.elitetravel.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:elitetravel"
+],
+"state": "available"
+},
+{
+"org": "926844288",
+"name": "URHJERTET AS",
+"site": "https://urhjertet.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "927044110",
+"name": "AUTOAMA AS",
+"site": "https://www.autoama.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:skien",
+"postcode:3735",
+"street:rodmyrlia"
+],
+"state": "available"
+},
+{
+"org": "927352427",
+"name": "FREDRIKSEN SILKETRYKK AS",
+"site": "https://www.fredriksensilketrykk.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:fredriksensilketrykk",
+"place:hjelmeland",
+"postcode:4130",
+"street:viganeset"
+],
+"state": "available"
+},
+{
+"org": "928201139",
+"name": "LOFTHEIM RENOVASJON AS",
+"site": "https://www.loftheimrenovasjon.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:loftheimrenovasjon",
+"place:bryne",
+"postcode:4344",
+"street:halandsvegen"
+],
+"state": "available"
+},
+{
+"org": "928568008",
+"name": "FEELGOOD BEKKESTUA AS",
+"site": "https://www.feelgoodbekkestua.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:feelgoodbekkestua",
+"postcode:1357",
+"street:nadderudveien"
+],
+"state": "available"
+},
+{
+"org": "928795063",
+"name": "ENGSTRØM TRAFIKKSKOLE AS",
+"site": "https://engstromtrafikkskole.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:engstromtrafikkskole",
+"place:sandefjord",
+"postcode:3238",
+"street:peder bogens gate"
+],
+"state": "available"
+},
+{
+"org": "928858421",
+"name": "VESLE LAMPE AS",
+"site": "https://veslelampe.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:veslelampe"
+],
+"state": "available"
+},
+{
+"org": "928970736",
+"name": "KARATESHOP AS",
+"site": "https://www.karateshop.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "929066340",
+"name": "CAFÉ SAMMEN AS",
+"site": "https://www.cafesammen.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "929495853",
+"name": "REGISTAN RESTAURANT AS",
+"site": "https://registanrestaurant.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:registanrestaurant",
+"place:oslo",
+"postcode:0190",
+"street:gronlandsleiret"
+],
+"state": "available"
+},
+{
+"org": "929718879",
+"name": "DEBORAH BORGENS STIFTELSE",
+"site": "https://deborahborgensstiftelse.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "929955633",
+"name": "XANI AS",
+"site": "https://xani.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "930904767",
+"name": "KLINIKKBYGG AS",
+"site": "https://klinikkbygg.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:tjome",
+"postcode:3145",
+"street:lillekjaere"
+],
+"state": "available"
+},
+{
+"org": "931081268",
+"name": "SYD VEST SANDNES AS",
+"site": "https://www.sydvestsandnes.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:sydvestsandnes",
+"postcode:4306",
+"street:havnegata"
+],
+"state": "available"
+},
+{
+"org": "931570668",
+"name": "BELGAU FILM AS",
+"site": "https://belgaufilm.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:belgaufilm",
+"place:oslo"
+],
+"state": "available"
+},
+{
+"org": "931789007",
+"name": "FLYVEDYKTIG AS",
+"site": "https://flyvedyktig.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "931858068",
+"name": "AMINO AS",
+"site": "https://www.amino.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "932004879",
+"name": "ASI ELEKTRO AS",
+"site": "https://asi-elektro.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "932194937",
+"name": "SAGELV RÅDGIVNING & KOMPETANSE AS",
+"site": "https://sagelv.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:alta",
+"postcode:9515",
+"street:amtmannsnesveien"
+],
+"state": "available"
+},
+{
+"org": "932236044",
+"name": "FAGENTREPRENØREN AS",
+"site": "https://www.fagent.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:oslo",
+"postcode:1188",
+"street:enebakkveien"
+],
+"state": "available"
+},
+{
+"org": "932692694",
+"name": "KOMO HOUSE AS",
+"site": "https://komohouse.com/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:komohouse",
+"place:heggedal"
+],
+"state": "available"
+},
+{
+"org": "932950227",
+"name": "DENNE STRANDA AS",
+"site": "https://www.dennestranda.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:dennestranda"
+],
+"state": "available"
+},
+{
+"org": "933335739",
+"name": "HOUSE OF HOME AS",
+"site": "https://www.houseofhome.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "933344886",
+"name": "SIGURD FOLLAND AS",
+"site": "https://sigurdfolland.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "933451550",
+"name": "KYSTSKOLEN AS",
+"site": "https://www.kystskolen.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "933737934",
+"name": "KONGSBERG AUTOSERVICE AS",
+"site": "https://www.kongsbergautoservice.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "934393090",
+"name": "LEFTOVERS AS",
+"site": "https://leftovers.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "934566823",
+"name": "HAGIA GRUNNAN AS",
+"site": "https://grunnan.hagia.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:stjordal",
+"street:husbyfaret"
+],
+"state": "available"
+},
+{
+"org": "934598601",
+"name": "HMS BEDRIFTEN AS",
+"site": "https://www.hmsbedriften.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:hmsbedriften"
+],
+"state": "available"
+},
+{
+"org": "934746198",
+"name": "FAGERHAUG ELEKTRO AS",
+"site": "https://fagerhaug-elektro.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "934957709",
+"name": "VESTFOLD BILSALG AS",
+"site": "https://www.vestfoldbilsalg.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:vestfoldbilsalg"
+],
+"state": "available"
+},
+{
+"org": "935467438",
+"name": "ANIMANIA ULLEVAAL AS",
+"site": "https://www.animania.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:oslo",
+"postcode:0855",
+"street:sognsveien"
+],
+"state": "available"
+},
+{
+"org": "935764254",
+"name": "FORM STUDIO AS",
+"site": "https://www.formstudio.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:formstudio",
+"place:bergen",
+"postcode:5017",
+"street:halfdan kjerulfs gate"
+],
+"state": "available"
+},
+{
+"org": "935839491",
+"name": "KLEVEN GÅRD BRL",
+"site": "https://klevengard.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:klevengard"
+],
+"state": "available"
+},
+{
+"org": "935942969",
+"name": "LEDERKOMPASSET AS",
+"site": "https://www.lederkompasset.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:ski",
+"postcode:1423",
+"street:finstad hageby"
+],
+"state": "available"
+},
+{
+"org": "936120121",
+"name": "COLOR BAR NORGE AS",
+"site": "https://color-bar.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "936164854",
+"name": "BOKFINKEN EIENDOM AS",
+"site": "https://www.bokfinkeneiendom.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "936367348",
+"name": "LUCKY7 STABLES AS",
+"site": "https://www.lucky7.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:vinterbro",
+"postcode:1407",
+"street:nordbyfaret"
+],
+"state": "available"
+},
+{
+"org": "936374921",
+"name": "FLOKA AS",
+"site": "https://floka.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "937083084",
+"name": "ON TIME AS",
+"site": "https://ontime.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:oslo"
+],
+"state": "available"
+},
+{
+"org": "938390762",
+"name": "STAVIK TREVARE AS",
+"site": "https://www.stavik.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:bud",
+"place:hustadvika",
+"postcode:6430",
+"street:gulvegen"
+],
+"state": "available"
+},
+{
+"org": "939194428",
+"name": "COCHS PENSJONAT AS",
+"site": "https://www.cochspensjonat.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "940598117",
+"name": "NEMS AS",
+"site": "https://www.nems.eco/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:sandnes",
+"postcode:4313",
+"street:vassbotnen"
+],
+"state": "available"
+},
+{
+"org": "952430475",
+"name": "BIOKJEMI NORGE AS",
+"site": "https://www.biokjemi.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:ovrebo",
+"postcode:4715",
+"street:ovrebo industriomrade"
+],
+"state": "available"
+},
+{
+"org": "960624610",
+"name": "QA RESOURCES AS",
+"site": "https://qaresources.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:qaresources",
+"place:sandnes"
+],
+"state": "available"
+},
+{
+"org": "963649738",
+"name": "P D STAFSETH AS",
+"site": "https://www.varmefag.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:alesund",
+"postcode:6018",
+"street:smibakken"
+],
+"state": "available"
+},
+{
+"org": "965262180",
+"name": "DENSTAD & DENSTAD AS",
+"site": "https://denstad.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:bodo",
+"postcode:8003",
+"street:langstranda"
+],
+"state": "available"
+},
+{
+"org": "971254572",
+"name": "GARDER BARNEHAGE",
+"site": "https://www.garder.barnehageside.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:vestby",
+"postcode:1544",
+"street:garderveien"
+],
+"state": "available"
+},
+{
+"org": "971526025",
+"name": "NATUR VIDEREGÅENDE SKOLE STI",
+"site": "https://natur.vgs.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:oslo",
+"postcode:1081",
+"street:stromsveien"
+],
+"state": "available"
+},
+{
+"org": "971579447",
+"name": "PRONAV AS",
+"site": "https://www.pronav.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "975965988",
+"name": "SNÅSNINGEN AS",
+"site": "https://www.snasningen.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:snasa",
+"postcode:7760",
+"street:viosen"
+],
+"state": "available"
+},
+{
+"org": "976585585",
+"name": "SUNDT AIR AS",
+"site": "https://www.sundtair.com/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "977107385",
+"name": "INDRE SALTEN OPPLÆRINGSKONTOR AS",
+"site": "https://isok.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:fauske",
+"postcode:8200",
+"street:storgaten"
+],
+"state": "available"
+},
+{
+"org": "979607008",
+"name": "STATEMENT AS",
+"site": "https://statement.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "981165284",
+"name": "SIBI AS",
+"site": "https://www.sibi.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"postcode:5210"
+],
+"state": "available"
+},
+{
+"org": "981242009",
+"name": "IDE SYSTEMER AS",
+"site": "https://idesystemer.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "982677432",
+"name": "GUNNAR RUUD CATERING AS",
+"site": "https://www.gunnarruud.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "982839521",
+"name": "SAMTEXT INTERNATIONAL AS",
+"site": "https://www.samtext.com/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:oslo"
+],
+"state": "available"
+},
+{
+"org": "983541666",
+"name": "PETERSEN AS",
+"site": "https://petersenblikk.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "984023804",
+"name": "PRODECO PROSJEKT AS",
+"site": "https://prodeco.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:alesund"
+],
+"state": "available"
+},
+{
+"org": "986537872",
+"name": "OUTDOOR AS",
+"site": "https://www.outdoor.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:asker",
+"postcode:1384",
+"street:semsveien"
+],
+"state": "available"
+},
+{
+"org": "988021083",
+"name": "FROMM NORGE AS",
+"site": "https://www.fromm.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:drammen",
+"place:lierstranda",
+"postcode:3030",
+"street:tolerudveien"
+],
+"state": "available"
+},
+{
+"org": "988024511",
+"name": "BASIA AS",
+"site": "https://www.basia.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:jar",
+"postcode:1358",
+"street:ruglandveien"
+],
+"state": "available"
+},
+{
+"org": "988103381",
+"name": "ING. TAULE AS",
+"site": "https://www.ing-taule.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:ing-taule",
+"place:alver",
+"place:manger",
+"postcode:5936",
+"street:radoyvegen"
+],
+"state": "available"
+},
+{
+"org": "988350567",
+"name": "EUKLIDES AS",
+"site": "https://www.euklides.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:oslo",
+"postcode:0277",
+"street:drammensveien"
+],
+"state": "available"
+},
+{
+"org": "988878154",
+"name": "POCO LOCO AS",
+"site": "https://poco-loco.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:poco-loco"
+],
+"state": "available"
+},
+{
+"org": "989525921",
+"name": "PROMO NORGE AS",
+"site": "https://promonorge.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:promonorge",
+"place:svolvaer",
+"place:vagan",
+"postcode:8300",
+"street:havneterminalen"
+],
+"state": "available"
+},
+{
+"org": "990142041",
+"name": "3D VERIFIER AS",
+"site": "https://3dverifier.com/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:3dverifier"
+],
+"state": "available"
+},
+{
+"org": "990348529",
+"name": "BLAAUW AS",
+"site": "https://www.blaauw.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:bergen",
+"postcode:5004"
+],
+"state": "available"
+},
+{
+"org": "990634289",
+"name": "ERV TEKNIKK AS",
+"site": "https://www.erv.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "991403078",
+"name": "CARAVELLE TOURS AS",
+"site": "https://caravelletours.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:caravelletours",
+"place:moss",
+"postcode:1523",
+"street:tor sornes vei"
+],
+"state": "available"
+},
+{
+"org": "992814942",
+"name": "BAMSE PRODUKTER AS",
+"site": "https://bamseprodukter.no/",
+"score": 1.0,
+"reasons": [
+"org_number_on_page"
+],
+"state": "available"
+},
+{
+"org": "992837977",
+"name": "STOA ELEKTRONIKK AS",
+"site": "https://www.stoaelektronikk.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:stoaelektronikk",
+"place:fevik",
+"place:grimstad"
+],
+"state": "available"
+},
+{
+"org": "994267221",
+"name": "GARMO MASKIN AS",
+"site": "https://garmomaskin.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:garmomaskin",
+"place:vaga"
+],
+"state": "available"
+},
+{
+"org": "994405667",
+"name": "DØRFABRIKKEN VATNESTRØM AS",
+"site": "https://dorfabrikken.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"place:iveland",
+"postcode:4730",
+"street:vatnestrom industriomrade"
+],
+"state": "available"
+},
+{
+"org": "996284115",
+"name": "MOUNTAIN RESORT TRYSIL AS",
+"site": "https://www.mountainresorttrysil.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:mountainresorttrysil"
+],
+"state": "available"
+},
+{
+"org": "996467775",
+"name": "POL BETONG AS",
+"site": "https://polbetong.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:polbetong"
+],
+"state": "available"
+},
+{
+"org": "997104749",
+"name": "FIRDA BYGG AS",
+"site": "https://www.firdabygg.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:firdabygg",
+"place:sunnfjord",
+"place:vassenden",
+"postcode:6847"
+],
+"state": "available"
+},
+{
+"org": "998005809",
+"name": "VARDE FILM AS",
+"site": "https://www.vardefilm.no/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:vardefilm"
+],
+"state": "available"
+},
+{
+"org": "999608361",
+"name": "NORSK GAUPE AS",
+"site": "https://norskgaupe.com/",
+"score": 0.95,
+"reasons": [
+"name_and_address",
+"domain_is_legal_name:norskgaupe"
+],
+"state": "available"
+}
+],
+"ambiguous": [
+{
+"org": "826916362",
+"name": "SOLÅSEN UTLEIE AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://solasen.no/",
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address "
+},
+{
+"org": "834967502",
+"name": "CURA CONSULTING AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://cura-consulting.com/",
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address "
+},
+{
+"org": "880441752",
+"name": "JET HOLDING AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://jet-holding.com/",
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address "
+},
+{
+"org": "884039452",
+"name": "NORFRAG TANK OG SILO AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://norfrag.no/",
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address "
+},
+{
+"org": "889251182",
+"name": "SRG INTERNATIONAL AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://srg-international.com/",
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address "
+},
+{
+"org": "911564386",
+"name": "BS BYGG AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://bs-bygg.com/",
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address "
+},
+{
+"org": "911755297",
+"name": "THAI KITCHEN AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://thaikitchen.com/",
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address "
+},
+{
+"org": "916473567",
+"name": "BULK GARDERMOEN IV AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:1/3']); tried: https://w"
+},
+{
+"org": "916918127",
+"name": "KLP EIENDOM OSLO HOLDING AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:3/4']); tried: https://w"
+},
+{
+"org": "919529563",
+"name": "VISIT JÆREN AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://visitjaeren.no/",
+"note": "candidate matched the company name (name_match_but_other_org_number, page_states:986517138) but neither the or"
+},
+{
+"org": "920830382",
+"name": "FLEX UTVIKLING AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://flexutvikling.no/",
+"note": "candidate matched the company name (name_match_but_other_org_number, page_states:999337406) but neither the or"
+},
+{
+"org": "921251238",
+"name": "ÅPNE ROM AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://apnerom.no/",
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address "
+},
+{
+"org": "921811373",
+"name": "GRENSELUNDEN GARASJESAMEIE",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_not_found']); tried: https://www.agioforva"
+},
+{
+"org": "924581425",
+"name": "IKESS KURS AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://www.ikess.no/",
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address "
+},
+{
+"org": "925231142",
+"name": "ANGR AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_only']); tried: https://www.angr.no/ (revi"
+},
+{
+"org": "925243337",
+"name": "OM SHANTI AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://omshanti.no/",
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address "
+},
+{
+"org": "926379798",
+"name": "AI AI AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://ai-ai.no/",
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address "
+},
+{
+"org": "927944618",
+"name": "BELLAND NATURSTEIN AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://belland.no/",
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address "
+},
+{
+"org": "928082911",
+"name": "SS TUNING AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://ss-tuning.com/",
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address "
+},
+{
+"org": "929931076",
+"name": "FLX MEDIA AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:1/2']); tried: https://w"
+},
+{
+"org": "930190063",
+"name": "MHM INVEST AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://mhm-invest.com/",
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address "
+},
+{
+"org": "930312312",
+"name": "HOA INVEST AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://hoainvest.com/",
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address "
+},
+{
+"org": "931861581",
+"name": "NB UTVIKLING EIENDOM AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:2/3']); tried: https://w"
+},
+{
+"org": "931992333",
+"name": "SPIND TREINDUSTRI AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://spind.no/",
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address "
+},
+{
+"org": "932376326",
+"name": "POLARJO AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_not_found']); tried: https://www.kvik.no/ "
+},
+{
+"org": "932770504",
+"name": "BA GJENVINNING AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_only']); tried: https://www.bagjenvinning."
+},
+{
+"org": "933474224",
+"name": "OIVA HEALTH NORWAY AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://oivahealth.no/",
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address "
+},
+{
+"org": "933758230",
+"name": "NATURSTRAA AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_only']); tried: https://naturstraa.no/ (re"
+},
+{
+"org": "934437861",
+"name": "MANTARAY CONSULTING GROUP AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://mantaray.no/",
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address "
+},
+{
+"org": "934454200",
+"name": "VARIG RÅDGIVNING AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://varig.no/",
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address "
+},
+{
+"org": "934958144",
+"name": "EXPLORER LODGE AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://explorerlodge.com/",
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address "
+},
+{
+"org": "935439035",
+"name": "UNILABS LABORATORIEMEDISIN AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:1/2']); tried: https://w"
+},
+{
+"org": "935872782",
+"name": "INDUSTRIVEIEN 5 RÅDE AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_not_found']); tried: https://www.olimb.no/"
+},
+{
+"org": "942528086",
+"name": "INPUT AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_only']); tried: https://www.input-as.no/ ("
+},
+{
+"org": "947218565",
+"name": "Orkerød 1 Borettslag",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:1/2']); tried: https://w"
+},
+{
+"org": "951516791",
+"name": "ANDØLINGEN BORETTSLAG",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:1/2']); tried: https://w"
+},
+{
+"org": "951678333",
+"name": "STUB BORETTSLAG",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:1/2']); tried: https://u"
+},
+{
+"org": "952006304",
+"name": "BORETTSLAGET RAGNVALD JARLSGT 1 AL",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_not_found']); tried: https://www.obos.no/ "
+},
+{
+"org": "952953842",
+"name": "WILSON MANAGEMENT AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://wilsonship.no/",
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address "
+},
+{
+"org": "954825280",
+"name": "BORETTSLAGET NYE FOSSVEIEN 13",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_not_found']); tried: https://www.enqvist.n"
+},
+{
+"org": "957199437",
+"name": "BORETTSLAGET JENS BJELKESGT 15 AL",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:3/5']); tried: https://w"
+},
+{
+"org": "961563194",
+"name": "TICKET FERIEREISER AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:1/2']); tried: https://w"
+},
+{
+"org": "970173587",
+"name": "STIFTELSEN Å.I.F. TVERKEN",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:1/2']); tried: https://a"
+},
+{
+"org": "974906430",
+"name": "REISEMÅL RYFYLKE AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:1/2']); tried: https://w"
+},
+{
+"org": "975955540",
+"name": "NEDRE KONGERØD BORETTSLAG",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://pbbl.no/",
+"note": "candidate matched the company name (name_match_but_other_org_number, page_states:947173219) but neither the or"
+},
+{
+"org": "977124786",
+"name": "PROFESSOR MORGENSTIERNES FOND STI",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_not_found']); tried: https://www.unifor.no"
+},
+{
+"org": "981992466",
+"name": "JORDBÆRPIKENE SOLSIDEN AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:1/2']); tried: https://w"
+},
+{
+"org": "984094280",
+"name": "KCC CHARTERING AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:1/2']); tried: https://w"
+},
+{
+"org": "984797737",
+"name": "SAMEIET KIRKEVEIEN 65",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_not_found']); tried: https://www.enqvist.n"
+},
+{
+"org": "986771832",
+"name": "PARTNER MEDICAL AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://partner-medical.com/",
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address "
+},
+{
+"org": "986871845",
+"name": "SKREEN TRANSPORT & UTLEIE AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://skreen.no/",
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address "
+},
+{
+"org": "987378867",
+"name": "HOTEL FREDRIKSTAD AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:1/2']); tried: https://w"
+},
+{
+"org": "989116576",
+"name": "VESTFJORDGATA 69 AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_not_found']); tried: https://www.boligforf"
+},
+{
+"org": "990786542",
+"name": "FRIISVEGEN MÅSÅPLASSEN HYTTEGREND AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:2/3']); tried: https://w"
+},
+{
+"org": "991078754",
+"name": "TOP AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_not_found']); tried: https://www.techni.no"
+},
+{
+"org": "992583711",
+"name": "HOSPICEFORUM NORGE",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_only']); tried: https://www.hospiceforum.n"
+},
+{
+"org": "992941286",
+"name": "BORETTSLAGET YTRE EIGANESVEIEN 19",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:1/4']); tried: https://w"
+},
+{
+"org": "993349518",
+"name": "MIMETA - SENTER FOR KULTUR OG UTVIKLING AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:2/5']); tried: https://w"
+},
+{
+"org": "993617512",
+"name": "BULK VINTERBRO II AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:1/3']); tried: https://w"
+},
+{
+"org": "993937185",
+"name": "TERMINALBUKTA SJØGRUNN AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_not_found']); tried: https://eidos.no/ (re"
+},
+{
+"org": "994415093",
+"name": "A-TEC AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_only']); tried: https://www.a-tec.no/ (rev"
+},
+{
+"org": "995064413",
+"name": "FOR MEN STORO AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:2/3']); tried: https://w"
+},
+{
+"org": "996066266",
+"name": "NORGES MUSIKKHØGSKOLES LEGAT TIL BESTE FOR MUSIKKSTUDERENDE STI",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_partial', 'tokens:4/7']); tried: https://w"
+},
+{
+"org": "997485335",
+"name": "METABITS AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_only']); tried: https://metabits.no/ (revi"
+},
+{
+"org": "998582628",
+"name": "SANDA BUTIKKDRIFT AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": null,
+"note": "the registry-listed website did not prove this exact entity (['name_not_found']); tried: https://www.rema.no/ "
+},
+{
+"org": "998617510",
+"name": "HÅNDVERKSENTERET EIENDOM AS",
+"site": null,
+"score": null,
+"reasons": null,
+"state": "ambiguous",
+"cand": "https://handverksenteret.no/",
+"note": "candidate matched the company name (name_only) but neither the organisation number nor the registered address "
+}
+]
+}
