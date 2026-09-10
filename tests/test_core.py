@@ -220,3 +220,36 @@ def test_a_bare_directory_listing_is_not_a_website():
     profile = {"organisation_number": "988878154", "name": "POCO LOCO AS", "municipality": "OSLO", "registry": {}}
     res = identity.assess(profile, _page("https://poco-loco.no/", html))
     assert res["status"] != "exact" and res["score"] <= 0.3
+
+
+def test_a_group_site_that_names_another_entity_is_not_ours():
+    """blaauw.no is titled "Home | Einar Blaauw AS" and links BLAAUW AS's own homepage elsewhere."""
+    from signalpost import identity
+    html = ("<html><head><title>Home | Einar Blaauw AS</title></head><body><p>For BLAAUW AS, our wholesale and "
+            "trading company, click here.</p><footer>Blaauw Holding AS, C. Sundtsgate 1, 5004 Bergen</footer></body></html>")
+    profile = {"organisation_number": "990348529", "name": "BLAAUW AS", "municipality": "BERGEN",
+               "registry": {"forretningsadresse": {"adresse": ["C. Sundtsgate 1"], "postnummer": "5004", "poststed": "BERGEN", "kommune": "BERGEN"}}}
+    res = identity.assess(profile, _page("https://www.blaauw.no/", html))
+    assert res["status"] != "exact"
+    assert "title_names_another_entity" in res["reasons"]
+
+
+def test_a_former_name_in_the_title_does_not_disqualify_us():
+    """SANDNES ELEKTRISKE AS was registered as SANDNES ELEKTRISKE FORRETNING AS; that is still its own site."""
+    from signalpost import identity
+    html = ("<html><head><title>Sandnes Elektriske Forretning AS</title></head><body><p>Sandnes Elektriske</p>"
+            "<footer>Strandgata 21, 4307 Sandnes</footer></body></html>")
+    profile = {"organisation_number": "810034882", "name": "SANDNES ELEKTRISKE AS", "municipality": "SANDNES",
+               "registry": {"forretningsadresse": {"adresse": ["Strandgata 21"], "postnummer": "4307", "poststed": "SANDNES", "kommune": "SANDNES"},
+                            "historiskeNavn": [{"navn": "SANDNES ELEKTRISKE FORRETNING AS"}]}}
+    res = identity.assess(profile, _page("https://sandneselektriske.no/", html))
+    assert res["status"] == "exact"
+
+
+def test_a_title_naming_us_exactly_settles_it():
+    from signalpost import identity
+    html = "<html><head><title>Elinsta AS</title></head><body><p>Elinsta AS</p><footer>Industriveien 6, 1461</footer></body></html>"
+    profile = {"organisation_number": "918453547", "name": "ELINSTA AS", "municipality": "LØRENSKOG",
+               "registry": {"forretningsadresse": {"adresse": ["Industriveien 6"], "postnummer": "1461", "poststed": "LØRENSKOG", "kommune": "LØRENSKOG"}}}
+    res = identity.assess(profile, _page("https://elinsta.no/", html))
+    assert res["status"] == "exact"

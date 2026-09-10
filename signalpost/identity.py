@@ -154,6 +154,39 @@ def other_org_numbers(full_text: str, our_org: str) -> list[str]:
     return found
 
 
+COMPANY_SUFFIX_RE = re.compile(
+    r"([A-ZÆØÅ][\w.&/-]*(?:\s+[A-ZÆØÅ0-9][\w.&/-]*){0,3})\s+(AS|ASA|ANS|DA|NUF|SA|BA|KS)\b")
+
+
+def title_names_another_entity(title_texts: Iterable[str], profile: dict) -> Optional[str]:
+    """A page whose own title names a DIFFERENT registered company that contains our name plus more.
+
+    blaauw.no is titled "Home | Einar Blaauw AS" and its text reads "For BLAAUW AS, our wholesale and trading
+    company, click here" — a holding company's site that points our company's real homepage somewhere else.
+    Name and registered address cannot separate the two: the group shares both, at C. Sundtsgate 1, 5004 Bergen.
+    What separates them is that the page introduces itself as the other entity.
+
+    A longer name that the registry lists as one of our own former names is not another entity, so
+    "Sandnes Elektriske Forretning AS" never disqualifies SANDNES ELEKTRISKE AS.
+    """
+    want = set(name_tokens(profile.get("name")))
+    if not want:
+        return None
+    former = {frozenset(name_tokens(h.get("navn")))
+              for h in ((profile.get("registry") or {}).get("historiskeNavn") or []) if isinstance(h, dict)}
+    supersets = []
+    for text in title_texts:
+        for m in COMPANY_SUFFIX_RE.finditer(text or ""):
+            cand = set(name_tokens(m.group(0)))
+            if not cand:
+                continue
+            if cand == want:
+                return None                                  # the title names us; question settled
+            if want < cand and frozenset(cand) not in former:
+                supersets.append(m.group(0).strip())
+    return supersets[0] if supersets else None
+
+
 def _norway_signal(folded_text: str, full_text: str, hostname: str = "") -> bool:
     """Does anything tie this page to Norway?
 
@@ -291,6 +324,12 @@ def assess(profile: dict, page, extra_text: str = "") -> dict:
         if others:
             result.update(score=0.8, reasons=["name_match_but_other_org_number", f"page_states:{others[0]}"],
                           claim_span=span_around(full_text, others[0], 90) or span)
+            return _finish(result)
+        # The page introduces itself as a different registered company in the same family.
+        other_entity = title_names_another_entity([title, meta.get("og:site_name", ""), meta.get("og:title", "")], profile)
+        if other_entity:
+            result.update(score=0.8, reasons=["title_names_another_entity", f"page_is:{other_entity}"],
+                          claim_span=span_around(full_text, other_entity, 120) or span)
             return _finish(result)
         if corr and (len(want) >= 2 or strong):
             result.update(score=0.95, reasons=["name_and_address", *corr], claim_span=span)

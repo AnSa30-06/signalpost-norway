@@ -105,3 +105,18 @@ returned by the official subunit endpoint for that entity in the same run. The l
 by name similarity, so this is still exact-entity attribution; the claim records which subunit posted it. Sister
 companies with near-identical names stay rejected: PREG BARNEHAGER AS matched four ads by name and published none,
 because "Preg Barnehager Askøy AS" and its siblings are separate legal entities, not its subunits.
+
+## A group's site is not the member company's site
+
+blaauw.no carries the right brand and the exact registered address of BLAAUW AS, because the whole Blaauw group
+sits at C. Sundtsgate 1, 5004 Bergen. Name and address cannot separate them. The page separates itself: it is
+titled "Home | Einar Blaauw AS" and its text reads "For BLAAUW AS, our wholesale and trading company, click here",
+pointing our company's real homepage somewhere else.
+
+So a page is not a verified website when its own title (or OpenGraph name) introduces a **different registered
+company** whose distinctive name tokens contain ours plus at least one more. A longer name that the registry
+lists among our own former names is exempt, so "Sandnes Elektriske Forretning AS" never disqualifies
+SANDNES ELEKTRISKE AS. A title naming us exactly settles the question in our favour and stops the check.
+
+Measured over the 196 published and ambiguous companies of the 2026-09-10 run, this rule fires on one company
+and changes no other verdict.
