@@ -109,36 +109,38 @@ not a measurement. See [docs/CRAWLERS.md](docs/CRAWLERS.md) for the per-company 
 
 ## Measured
 
-Final 1,000-company run, 2026-09-10 (`submission/run-report-1000.json`, `eval/report.json`):
+Submission run, 2026-09-10 (`submission/run-report-1000.json`, `eval/report.json`):
 
 | Measure | Value |
 |---|---|
 | envelopes / inputs | 1,000 / 1,000, zero validation problems |
-| requests | 8,996 total, 9.0 per company mean, plus 104 for the once-per-run NAV feed scan |
-| wall clock | 24 min for 1,000 companies on a degraded network; p50 15 s per company |
+| requests | 9,109 total, 9.1 per company mean, including 104 for the once-per-run NAV feed scan |
+| wall clock | 23 min for 1,000 companies on a degraded local network; p50 13 s per company |
 | third-party cost | $0 |
 | identity / accounts / leadership / workplaces / activity / hiring | 1,000 / 999 / 999 / 1,000 / 1,000 / 1,000 sections available |
-| web | 140 verified exact, 56 ambiguous, 782 no site found, 19 unreachable, 3 blocked |
-| NAV job feed | 9,870 active national ads scanned; every published ad confirmed by an organisation number in NAV's own record |
+| web | 142 verified exact, 57 ambiguous, 778 no site found, 20 unreachable, 3 blocked |
+| NAV job feed | 9,893 active national ads scanned; every published ad confirmed by an organisation number in NAV's own record |
 | evidence completeness | 100% of `available` claims carry evidence with a literal span |
 
-**Hand-audited accuracy**, against 46 companies labelled by reading the page (`eval/gold.jsonl`, method in
-[docs/EVAL.md](docs/EVAL.md)):
+**Hand-audited accuracy** over 230 companies across two rounds, 46 of them labelled from the page itself
+(`eval/gold.jsonl`, method in [docs/EVAL.md](docs/EVAL.md)):
 
 | Measure | Value |
 |---|---|
-| exact-website precision | 0.963 |
-| website recall on labelled rows | 0.929 |
+| exact-website precision | 1.000 |
+| website recall on labelled rows | 0.964 |
 | wrong-company publications | 0 |
 
-The single remaining false positive is `blaauw.no`, a group site that names BLAAUW AS as one of its companies.
-The audit covered 230 companies over two rounds and drove eight fixes to the identity gate; six wrong
-publications were removed and seven correct sites recovered.
+The audit drove nine fixes to the identity gate. It began at 0.80 precision: the legal-name tokens were being
+matched against the hostname and the same hostname counted again as corroboration, so a domain that merely spelled
+a company's name could publish a page identifying nobody. Nine wrong publications were removed and seven correct
+sites recovered.
 
-Recall against the evaluator's pooled union of every entrant's discoveries is **not measured**, because it cannot
-be computed locally. Website coverage of 14% reflects the population: a random draw from the registry is mostly
-holding companies and property entities with no website at all.
+Recall against the evaluator's pooled union of every entrant's discoveries is **not measured**; it cannot be
+computed locally, and nothing here substitutes for it. Website coverage of 14% reflects the population: a random
+draw from the registry is mostly holding companies and property entities with no website at all.
 
+## Secrets
 ## Secrets
 ## Secrets
 ## Secrets

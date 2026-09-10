@@ -1,69 +1,64 @@
 {
   "companies": 1000,
   "terminal_status": {
-    "completed": 980,
-    "completed_with_errors": 20
+    "completed": 979,
+    "completed_with_errors": 21
   },
   "family_company_coverage": {
-    "official_website": 0.14,
-    "social_profile": 0.088,
-    "contact": 0.354,
+    "official_website": 0.142,
+    "social_profile": 0.089,
+    "contact": 0.355,
     "site_leadership": 0.008,
     "site_locations": 0.023,
-    "jobs": 0.02,
+    "jobs": 0.019,
     "dated_activity": 1.0,
     "accounts": 0.999,
     "roles": 0.999,
     "workplaces": 0.757,
-    "description": 0.138
+    "description": 0.14
   },
   "family_claim_volume": {
     "accounts": 1793,
     "roles": 4022,
     "workplaces": 797,
-    "dated_activity": 14209,
-    "official_website": 140,
-    "description": 235,
-    "contact": 739,
+    "dated_activity": 14213,
+    "official_website": 142,
+    "description": 238,
+    "contact": 741,
     "social_profile": 173,
     "site_locations": 24,
-    "jobs": 25,
+    "jobs": 24,
     "site_leadership": 19
   },
   "availability_states": {
-    "available": 47099,
-    "not_available": 3308,
-    "ambiguous": 56,
-    "failed": 20,
+    "available": 47111,
+    "not_available": 3315,
+    "ambiguous": 57,
+    "failed": 21,
     "blocked": 3
   },
   "evidence_completeness": 1.0,
   "web_section_states": {
-    "not_available": 782,
-    "available": 140,
-    "ambiguous": 56,
-    "failed": 19,
+    "not_available": 778,
+    "available": 142,
+    "ambiguous": 57,
+    "failed": 20,
     "blocked": 3
   },
-  "requests_total": 8996,
+  "requests_total": 9005,
   "requests_mean": 9.0,
   "requests_max": 27,
-  "runtime_p50_ms": 14506,
-  "runtime_p95_ms": 96464,
+  "runtime_p50_ms": 13184,
+  "runtime_p95_ms": 94582,
   "changes_by_type": {
-    "new_registry_update": 1,
-    "availability_changed": 5,
-    "new_website": 17,
-    "new_role": 3,
-    "removed_role": 1,
-    "new_social_profile": 17,
-    "new_location": 1,
-    "new_news": 27
+    "new_website": 4,
+    "new_social_profile": 3,
+    "availability_changed": 2
   },
   "gold": {
     "rows": 46,
-    "website_precision": 0.963,
-    "website_recall": 0.929,
+    "website_precision": 1.0,
+    "website_recall": 0.964,
     "wrong_company_publications": 0
   }
 }
