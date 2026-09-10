@@ -109,26 +109,37 @@ not a measurement. See [docs/CRAWLERS.md](docs/CRAWLERS.md) for the per-company 
 
 ## Measured
 
-Final 1,000-company run, 2026-09-09, 24 workers, this laptop (`submission/run-report-1000.json`, `eval/report.json`):
+Final 1,000-company run, 2026-09-10 (`submission/run-report-1000.json`, `eval/report.json`):
 
 | Measure | Value |
 |---|---|
 | envelopes / inputs | 1,000 / 1,000, zero validation problems |
-| requests | 8,338 total, 8.3 per company mean; plus 103 for the once-per-run NAV feed scan |
-| wall clock | 11.4 min for 1,000 companies; p50 9 s, p95 45 s per company |
+| requests | 8,996 total, 9.0 per company mean, plus 104 for the once-per-run NAV feed scan |
+| wall clock | 24 min for 1,000 companies on a degraded network; p50 15 s per company |
 | third-party cost | $0 |
 | identity / accounts / leadership / workplaces / activity / hiring | 1,000 / 999 / 999 / 1,000 / 1,000 / 1,000 sections available |
-| web | 136 verified exact, 53 ambiguous (name matched, entity not proven), 779 no site found, 28 unreachable, 4 blocked |
-| NAV job feed | 9,608 active national ads scanned; 4 companies hiring, every one confirmed by an organisation number in NAV's own record |
+| web | 140 verified exact, 56 ambiguous, 782 no site found, 19 unreachable, 3 blocked |
+| NAV job feed | 9,870 active national ads scanned; every published ad confirmed by an organisation number in NAV's own record |
 | evidence completeness | 100% of `available` claims carry evidence with a literal span |
 
-Scaled to a 100-company evaluator batch: about 103 + 830 = 930 requests (cap 1,950) and roughly 4 minutes at 8 workers.
+**Hand-audited accuracy**, against 46 companies labelled by reading the page (`eval/gold.jsonl`, method in
+[docs/EVAL.md](docs/EVAL.md)):
 
-Two numbers are deliberately not claimed. Wrong-company publications and claim-span support are **not measured**,
-because no hand-labelled gold set exists yet; `eval/score.py` reports them only against a gold file you supply.
-Website coverage of 13.6% reflects the population: a random draw from the registry is mostly holding companies and
-property entities with no website at all, and the gate publishes only what it can prove.
+| Measure | Value |
+|---|---|
+| exact-website precision | 0.963 |
+| website recall on labelled rows | 0.929 |
+| wrong-company publications | 0 |
 
+The single remaining false positive is `blaauw.no`, a group site that names BLAAUW AS as one of its companies.
+The audit covered 230 companies over two rounds and drove eight fixes to the identity gate; six wrong
+publications were removed and seven correct sites recovered.
+
+Recall against the evaluator's pooled union of every entrant's discoveries is **not measured**, because it cannot
+be computed locally. Website coverage of 14% reflects the population: a random draw from the registry is mostly
+holding companies and property entities with no website at all.
+
+## Secrets
 ## Secrets
 ## Secrets
 

@@ -1,60 +1,69 @@
 {
   "companies": 1000,
   "terminal_status": {
-    "completed_with_errors": 29,
-    "completed": 971
+    "completed": 980,
+    "completed_with_errors": 20
   },
   "family_company_coverage": {
-    "official_website": 0.136,
-    "social_profile": 0.076,
-    "contact": 0.347,
+    "official_website": 0.14,
+    "social_profile": 0.088,
+    "contact": 0.354,
     "site_leadership": 0.008,
-    "site_locations": 0.021,
-    "jobs": 0.019,
+    "site_locations": 0.023,
+    "jobs": 0.02,
     "dated_activity": 1.0,
     "accounts": 0.999,
     "roles": 0.999,
     "workplaces": 0.757,
-    "description": 0.132
+    "description": 0.138
   },
   "family_claim_volume": {
     "accounts": 1793,
-    "roles": 4020,
+    "roles": 4022,
     "workplaces": 797,
-    "dated_activity": 14184,
-    "official_website": 136,
-    "description": 212,
-    "contact": 719,
-    "social_profile": 152,
-    "site_locations": 22,
-    "jobs": 24,
-    "site_leadership": 32
+    "dated_activity": 14209,
+    "official_website": 140,
+    "description": 235,
+    "contact": 739,
+    "social_profile": 173,
+    "site_locations": 24,
+    "jobs": 25,
+    "site_leadership": 19
   },
   "availability_states": {
-    "available": 47008,
-    "not_available": 3320,
-    "failed": 29,
-    "ambiguous": 53,
-    "blocked": 4
+    "available": 47099,
+    "not_available": 3308,
+    "ambiguous": 56,
+    "failed": 20,
+    "blocked": 3
   },
   "evidence_completeness": 1.0,
   "web_section_states": {
-    "failed": 28,
-    "not_available": 779,
-    "available": 136,
-    "ambiguous": 53,
-    "blocked": 4
+    "not_available": 782,
+    "available": 140,
+    "ambiguous": 56,
+    "failed": 19,
+    "blocked": 3
   },
-  "requests_total": 8235,
-  "requests_mean": 8.2,
-  "requests_max": 26,
-  "runtime_p50_ms": 9034,
-  "runtime_p95_ms": 45468,
+  "requests_total": 8996,
+  "requests_mean": 9.0,
+  "requests_max": 27,
+  "runtime_p50_ms": 14506,
+  "runtime_p95_ms": 96464,
   "changes_by_type": {
-    "availability_changed": 15,
-    "changed_website": 2,
-    "new_job": 1,
-    "new_website": 1,
-    "new_social_profile": 5
+    "new_registry_update": 1,
+    "availability_changed": 5,
+    "new_website": 17,
+    "new_role": 3,
+    "removed_role": 1,
+    "new_social_profile": 17,
+    "new_location": 1,
+    "new_news": 27
+  },
+  "gold": {
+    "rows": 46,
+    "website_precision": 0.963,
+    "website_recall": 0.929,
+    "wrong_company_publications": 0
   }
 }

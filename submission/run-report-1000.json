@@ -1,13 +1,13 @@
 {
-  "run_id": "2026-09-09-submission-1000-final",
-  "started_at": "2026-09-09T14:55:52Z",
-  "completed_at": "2026-09-09T15:07:13Z",
-  "agent_version": "1.0.0+7ca4683",
+  "run_id": "2026-09-10-submission-1000-final",
+  "started_at": "2026-09-10T15:09:20Z",
+  "completed_at": "2026-09-10T15:33:21Z",
+  "agent_version": "1.0.0+0a94f46",
   "inputs": 1000,
   "envelopes": 1000,
   "terminal_status_counts": {
-    "completed_with_errors": 29,
-    "completed": 971
+    "completed": 980,
+    "completed_with_errors": 20
   },
   "section_state_counts": {
     "identity": {
@@ -25,11 +25,11 @@
       "available": 1000
     },
     "web": {
-      "failed": 28,
-      "not_available": 779,
-      "available": 136,
-      "ambiguous": 53,
-      "blocked": 4
+      "not_available": 782,
+      "available": 140,
+      "ambiguous": 56,
+      "failed": 19,
+      "blocked": 3
     },
     "hiring": {
       "available": 1000
@@ -63,57 +63,57 @@
     "reporting_period": 999,
     "accounts_type": 999,
     "accounts_history": 999,
-    "role": 4020,
+    "role": 4022,
     "role_count": 999,
     "workplace": 797,
     "workplace_count": 1000,
-    "registry_update": 13897,
+    "registry_update": 13898,
     "active_job_count": 1000,
     "registry_employees": 149,
-    "official_website": 136,
-    "public_brand": 132,
-    "website_title": 134,
     "registry_mobile": 201,
-    "website_description": 80,
-    "contact_email": 182,
-    "contact_phone": 162,
+    "official_website": 140,
+    "public_brand": 138,
+    "website_title": 140,
+    "website_description": 97,
+    "contact_email": 194,
+    "contact_phone": 170,
     "former_names": 251,
     "registry_email": 208,
-    "sitemap_lastmod": 82,
-    "social_profile": 152,
-    "site_location": 22,
+    "sitemap_lastmod": 88,
+    "social_profile": 173,
+    "site_location": 24,
     "registry_phone": 167,
     "registry_website": 104,
-    "careers_page": 20,
-    "news_item": 205,
-    "job_posting": 4,
-    "site_leader": 32
+    "careers_page": 22,
+    "news_item": 223,
+    "job_posting": 3,
+    "site_leader": 19
   },
-  "requests": 8338,
-  "bytes": 194743378,
+  "requests": 9100,
+  "bytes": 213428172,
   "third_party_cost_usd": 0.0,
-  "runtime_ms": 681300,
-  "p50_ms": 9034,
-  "p95_ms": 45468,
-  "budget_exhausted_companies": [
-    "918412344",
-    "932770504"
-  ],
-  "previous_run_id": "2026-09-09-submission-1000-v3",
+  "runtime_ms": 1440914,
+  "p50_ms": 14506,
+  "p95_ms": 96464,
+  "budget_exhausted_companies": [],
+  "previous_run_id": "2026-09-10-submission-1000",
   "changes_by_type": {
-    "availability_changed": 15,
-    "changed_website": 2,
-    "new_job": 1,
-    "new_website": 1,
-    "new_social_profile": 5
+    "new_registry_update": 1,
+    "availability_changed": 5,
+    "new_website": 17,
+    "new_role": 3,
+    "removed_role": 1,
+    "new_social_profile": 17,
+    "new_location": 1,
+    "new_news": 27
   },
   "validation_problems": 0,
   "nav_feed": {
-    "pages": 102,
-    "ads_seen": 32510,
-    "active_ads": 9608,
+    "pages": 103,
+    "ads_seen": 33021,
+    "active_ads": 9870,
     "days": 60,
-    "built_at": "2026-09-09T14:57:35Z",
+    "built_at": "2026-09-10T15:11:41Z",
     "token_source": "public",
     "errors": []
   }
