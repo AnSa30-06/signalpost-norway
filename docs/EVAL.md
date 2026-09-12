@@ -179,3 +179,25 @@ and 7 of the withheld companies are promoted. No foreign namesake was promoted �
 
 **Still not measured.** Recall against the evaluator's pooled union of what every entrant found. That number
 cannot be produced locally, and no figure here should be read as a substitute for it.
+
+## Remediation audit, 2026-09-12 (after Builderr's first report)
+
+Builderr scored commit `78c4ee7` at 74.67/100 and blocked qualification on two wrong-company publications in
+their own 100-company batch. Their companies are not in our sample, so the gate was tightened on every route that
+could still publish a wrong site (`docs/REMEDIATION.md`), and then re-measured offline over the stored homepage
+snapshots of the previous submission run — 142 published sites and 57 withheld candidates.
+
+| Outcome | Count | Detail |
+|---|---|---|
+| publications that stand | 138 of 142 | 79 name + registered address, 44 organisation number on page, 9 full legal name as a phrase, 6 via the registry's own e-mail domain among those |
+| publications withdrawn | 4 | ikess.no (a group site: "Ikess består av Ikess kurs og Ikess Norge"); varmefag.no (a national chain's root page); erv.no (carries four other organisation numbers); ontime.no (a six-letter generic name, city corroboration only) |
+| withheld candidates promoted | 1 | wilsonship.no, because the registry holds WILSON MANAGEMENT AS's e-mail address on that domain |
+
+Every withdrawn site was read; each is a page that belongs to a group, a chain or a listing rather than to the
+legal entity, which is exactly the class of error the report described. No publication that a reader would call
+the company's own site was lost.
+
+Refresh: five regression tests in `tests/test_refresh_remediation.py` cover a renamed company, a no-revenue filer
+with a new period, address and status changes, one filing producing one record, and self-diff idempotence.
+
+Full-run numbers for this revision are in `README.md` under "Measured" and in `submission/run-report-1000.json`.

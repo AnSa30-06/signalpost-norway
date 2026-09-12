@@ -189,7 +189,7 @@ def test_our_own_org_number_still_wins_over_the_mismatch_rule():
             "<footer>Org.nr.: 918453547. Levert av Nettbyraa AS, org.nr 999 888 777</footer></body></html>")
     profile = {"organisation_number": "918453547", "name": "ELINSTA AS", "municipality": "LØRENSKOG", "registry": {}}
     res = identity.assess(profile, _page("https://elinsta.no/", html))
-    assert res["status"] == "exact" and res["reasons"] == ["org_number_on_page"]
+    assert res["status"] == "exact" and res["reasons"][0] == "org_number_on_page"
 
 
 def test_other_org_numbers_helper():
@@ -253,3 +253,73 @@ def test_a_title_naming_us_exactly_settles_it():
                "registry": {"forretningsadresse": {"adresse": ["Industriveien 6"], "postnummer": "1461", "poststed": "LØRENSKOG", "kommune": "LØRENSKOG"}}}
     res = identity.assess(profile, _page("https://elinsta.no/", html))
     assert res["status"] == "exact"
+
+
+# ---- remediation rules R1-R6 (docs/REMEDIATION.md) --------------------------------------------------------
+def _prof(org, name, street, pc, city):
+    return {"organisation_number": org, "name": name, "municipality": city,
+            "registry": {"forretningsadresse": {"adresse": [street], "postnummer": pc, "poststed": city, "kommune": city}}}
+
+
+def test_r1_org_number_among_many_is_a_listing_not_our_site():
+    """A group index or an auditor's client list carries our number beside many others."""
+    from signalpost import identity
+    html = ("<html><head><title>Konsernet Nordvest AS</title></head><body><h2>Våre selskaper</h2>"
+            "<p>Alfa Bygg AS, org.nr 911 111 111</p><p>Beta Rør AS, org.nr 922 222 222</p>"
+            "<p>Gamma Maskin AS, org.nr 933 333 333</p><p>Delta Transport AS, org.nr 944 444 444</p></body></html>")
+    res = identity.assess(_prof("933333333", "GAMMA MASKIN AS", "Verksveien 1", "6000", "ÅLESUND"), _page("https://nordvest.no/", html))
+    assert res["status"] != "exact" and res["reasons"][0] == "org_number_among_many"
+
+
+def test_r1_our_labelled_number_on_our_own_page_still_wins():
+    from signalpost import identity
+    html = "<html><head><title>Gamma Maskin AS</title></head><body><footer>Org.nr 933 333 333 · Verksveien 1, 6000 Ålesund</footer></body></html>"
+    res = identity.assess(_prof("933333333", "GAMMA MASKIN AS", "Verksveien 1", "6000", "ÅLESUND"), _page("https://gammamaskin.no/", html))
+    assert res["status"] == "exact" and res["reasons"][0] == "org_number_on_page"
+
+
+def test_r2_name_scattered_in_body_with_a_city_is_not_exact():
+    """'Nordic' and 'Bistro' in unrelated sentences plus the word Oslo must not verify NORDIC BISTRO AS."""
+    from signalpost import identity
+    html = ("<html><head><title>Byens beste mat</title></head><body><p>Nordic kitchen tradition meets a modern bistro."
+            "</p><p>Vi holder til i Oslo.</p></body></html>")
+    res = identity.assess(_prof("912345678", "NORDIC BISTRO AS", "Storgata 1", "0155", "OSLO"), _page("https://byensbeste.no/", html))
+    assert res["status"] != "exact"
+
+
+def test_r3_place_only_corroboration_never_reaches_exact():
+    from signalpost import identity
+    html = "<html><head><title>Nordic Bistro</title></head><body><p>Velkommen til oss i Oslo.</p></body></html>"
+    res = identity.assess(_prof("912345678", "NORDIC BISTRO AS", "Storgata 1", "0155", "OSLO"), _page("https://nb-mat.no/", html))
+    assert res["status"] != "exact" and res["score"] == 0.8
+
+
+def test_r4_a_third_partys_page_that_mentions_us_is_not_ours():
+    """A supplier writes 'our customers include Norfrag Tank og Silo AS': the supplier's site, not Norfrag's."""
+    from signalpost import identity
+    html = ("<html><head><title>Stålleverandøren AS</title></head><body><h1>Stålleverandøren AS</h1>"
+            "<p>Våre kunder inkluderer Norfrag Tank og Silo AS og mange flere.</p><footer>Stålleverandøren AS, 7000 Trondheim</footer></body></html>")
+    res = identity.assess(_prof("979476835", "NORFRAG TANK OG SILO AS", "Industriveien 5", "7300", "ORKANGER"), _page("https://staalleverandoren.no/", html))
+    assert res["status"] != "exact" and res["reasons"][0] == "page_belongs_to_another_company"
+
+
+def test_r4_the_companys_own_page_writing_its_name_out_still_passes():
+    from signalpost import identity
+    html = ("<html><head><title>Norfrag as</title></head><body><h1>Norfrag Tank og Silo as</h1>"
+            "<p>Norfrag Tank og Silo as tilbyr leveranse av tanker og siloer.</p><footer>post@norfrag.no</footer></body></html>")
+    res = identity.assess(_prof("979476835", "NORFRAG TANK OG SILO AS", "Industriveien 5", "7300", "ORKANGER"), _page("https://norfrag.no/", html))
+    assert res["status"] == "exact" and res["reasons"][0] == "legal_name_phrase_on_page"
+
+
+def test_r5_a_directory_page_naming_many_companies_is_not_ours():
+    from signalpost import identity
+    html = ("<html><head><title>Bedrifter i Ålesund</title></head><body><ul><li>Alfa Bygg AS</li><li>Beta Rør AS</li>"
+            "<li>Gamma Maskin AS</li><li>Delta Transport AS</li><li>Epsilon Elektro AS</li></ul></body></html>")
+    res = identity.assess(_prof("933333333", "GAMMA MASKIN AS", "Verksveien 1", "6000", "ÅLESUND"), _page("https://bedrifter-alesund.no/", html))
+    assert res["status"] != "exact" and res["reasons"][0] == "page_lists_many_companies"
+
+
+def test_r6_brand_is_never_another_companys_title():
+    from signalpost.identity import _pick_brand
+    assert _pick_brand(["Stålleverandøren AS"], "NORFRAG TANK OG SILO AS") is None
+    assert _pick_brand(["Norfrag"], "NORFRAG TANK OG SILO AS") == "Norfrag"

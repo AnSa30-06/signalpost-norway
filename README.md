@@ -107,6 +107,17 @@ Third-party cost is $0 without Brave. With `BRAVE_API_KEY` set, the cost is abou
 on Brave's paid plan (one search per company that has no registry website). The number is the plan's list price,
 not a measurement. See [docs/CRAWLERS.md](docs/CRAWLERS.md) for the per-company request plan.
 
+## Revision 2 (2026-09-12): response to the first evaluation report
+
+Builderr's provisional score for the first submission was 74.67/100 with qualification blocked by two
+wrong-company website publications. Every fault in that report is addressed in this revision, with a regression
+test per rule; the point-by-point response is in [docs/REMEDIATION.md](docs/REMEDIATION.md). In one line each:
+
+- **Website identity**: the page must name the company where a page names itself, plus one independent corroborator; a page that carries other organisation numbers, states another number as its own, introduces another registered company, or lists many companies is never published as verified.
+- **Name changes**: identity scalars are now diffed (`changed_name`, `changed_address`, `changed_status`, …).
+- **New filings without revenue**: the filing trigger moved from the revenue claim to the reporting period itself.
+- **More evidence and clearer answers**: up to three prior accounting periods, a trend, risk flags, a sentence saying why the website counts as verified, and eleven standard questions answered only from claims.
+
 ## Measured
 
 Submission run, 2026-09-10 (`submission/run-report-1000.json`, `eval/report.json`):

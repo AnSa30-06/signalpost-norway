@@ -32,6 +32,11 @@ PARKED_MARKERS = (
     "index of /", "directory listing for", "proudly served by litespeed web server",
 )
 NORWAY_MARKERS = ("norge", "noreg", "norway", "organisasjonsnummer", "org.nr", "orgnr", "org nr")
+CONSUMER_MAIL_DOMAINS = {
+    "gmail.com", "gmail.no", "googlemail.com", "hotmail.com", "hotmail.no", "outlook.com", "outlook.no", "live.no",
+    "live.com", "msn.com", "yahoo.com", "yahoo.no", "icloud.com", "me.com", "mac.com", "protonmail.com", "proton.me",
+    "online.no", "start.no", "frisurf.no", "c2i.net", "broadpark.no", "getmail.no", "sf-nett.no", "hotmail.co.uk",
+}
 TITLE_SEPARATORS = (" | ", " – ", " — ", " - ", " · ", " :: ", " » ")
 _FOLD = str.maketrans({"æ": "ae", "ø": "o", "å": "a", "Æ": "ae", "Ø": "o", "Å": "a"})
 
@@ -232,14 +237,70 @@ def _corroborators(profile: dict, folded_text: str) -> list[str]:
     return sorted(set(hits))
 
 
+def _identity_positions(soup: BeautifulSoup, title: str, meta: dict, ld_names: list[str], full_text: str) -> list[tuple[str, str]]:
+    """The places where a page names ITSELF, as (label, text). A mention elsewhere in the body is not one of them."""
+    footer = " ".join(t.get_text(" ", strip=True) for t in soup.find_all(["footer", "address"]))[:2000]
+    heads = " ".join(h.get_text(" ", strip=True) for h in soup.find_all(["h1", "h2"])[:8])[:800]
+    author = ""
+    for m in soup.find_all("meta"):
+        if (m.get("name") or "").lower() in ("author", "publisher", "copyright") and m.get("content"):
+            author += " " + m["content"].strip()
+    copyright_lines = " ".join(
+        span_around(full_text, mk.group(0), 140)
+        for mk in list(re.finditer(r"©|\(c\)\s*20\d\d|copyright|alle rettigheter|all rights reserved", full_text, re.I))[:3])
+    return [("title", title), ("og:site_name", meta.get("og:site_name", "")), ("og:title", meta.get("og:title", "")),
+            *[("json-ld", n) for n in ld_names], ("footer", footer), ("headings", heads), ("author", author.strip()),
+            ("copyright", copyright_lines)]
+
+
+def registered_company_names(text: str) -> list[str]:
+    """Every '<Name> AS|ASA|...' style company name written in the text, deduplicated by folded form."""
+    seen, out = set(), []
+    for m in COMPANY_SUFFIX_RE.finditer(text or ""):
+        key = fold(m.group(0)).strip()
+        if key not in seen:
+            seen.add(key)
+            out.append(m.group(0).strip())
+    return out
+
+
+def _labelled_org_present(full_text: str, our_org: str) -> bool:
+    """Is OUR organisation number written under an org-number label (Org.nr / organisasjonsnummer / MVA)?"""
+    ours = re.sub(r"\D", "", str(our_org or ""))
+    for m in ORG_LABEL_RE.finditer(full_text or ""):
+        if re.sub(r"\D", "", m.group(1)) == ours:
+            return True
+    # "NO 987 654 321 MVA" — the VAT form, which carries no word label
+    pat = _org_pattern(ours)
+    return bool(pat and re.search(r"\bNO\s*" + pat.pattern + r"\s*MVA\b", full_text or "", re.I))
+
+
 def assess(profile: dict, page, extra_text: str = "") -> dict:
+    """Does this fetched page belong to THIS legal entity? Returns score, status, reasons and the proving span.
+
+    Decision table (R1–R6 in docs/REMEDIATION.md). Only ``exact`` (>= 0.9) is ever published as a verified website.
+
+    | name evidence                                | strong corroborator                                    | result |
+    |----------------------------------------------|--------------------------------------------------------|--------|
+    | our org number, labelled or self-identified  | (the number is the proof)                              | 1.0    |
+    | self-identified (identity position or phrase)| postcode / street / domain spells multi-word name      | 0.95   |
+    | self-identified                              | place name only, or none                               | 0.8    |
+    | full name as a contiguous phrase in the body | postcode / street / domain, and no third party named   | 0.95   |
+    | name tokens scattered in the body            | anything                                               | 0.8    |
+    | partial or absent                            |                                                        | 0.3    |
+    A page that states another organisation number, introduces another registered company in its identity
+    positions, or lists many companies, is capped at 0.8 whatever else it carries.
+    """
     html = page.text or ""
     soup = BeautifulSoup(html, "lxml")
     text = html_text(html)
     full_text = (text + " " + (extra_text or "")).strip()
     hostname = (urllib.parse.urlsplit(page.final_url or page.url or "").hostname or "").lower()
+    try:
+        hostname = hostname.encode("ascii").decode("idna")   # "xn--pnerom-hua.no" is "åpnerom.no"
+    except Exception:
+        pass
 
-    # identity parts, in order of trust
     title = soup.title.get_text(" ", strip=True) if soup.title else ""
     meta = {}
     for m in soup.find_all("meta"):
@@ -250,101 +311,156 @@ def assess(profile: dict, page, extra_text: str = "") -> dict:
     for node in jsonld_nodes(jsonld_from_soup(soup)):
         if node_types(node) & ORG_TYPES:
             ld_names.extend(_str_values(node, ("name", "legalName", "alternateName")))
-    footer = " ".join(t.get_text(" ", strip=True) for t in soup.find_all(["footer", "address"]))[:2000]
-    parts = [("title", title), ("og:site_name", meta.get("og:site_name", "")), ("og:title", meta.get("og:title", "")),
-             *[("json-ld", n) for n in ld_names], ("footer", footer), ("hostname", hostname)]
+    positions = _identity_positions(soup, title, meta, ld_names, full_text)
+    identity_text = " ".join(v for _, v in positions if v)
+    identity_folded = fold(identity_text)
+    folded_all = fold(full_text)
+
+    want = name_tokens(profile.get("name"))
+    raw = [t for t in tokens(profile.get("name")) if t not in LEGAL_FORMS]
+    name_compact = "".join(raw)
+    phrase_re = re.compile(r"\b" + r"\s+".join(re.escape(t) for t in raw) + r"\b") if len(raw) >= 2 else None
+    in_identity = bool(want) and all(t in set(tokens(identity_text)) for t in want)
+    phrase_in_identity = bool(phrase_re and phrase_re.search(identity_folded))
+    phrase_in_body = bool(phrase_re and phrase_re.search(folded_all))
+    self_identified = in_identity or phrase_in_identity
 
     brand_candidates = [meta.get("og:site_name"), *ld_names, *clean_title(title)]
     public_brand = _pick_brand(brand_candidates, profile.get("name"))
     aliases = []
     for a in [*ld_names, meta.get("og:site_name"), meta.get("og:title"), *clean_title(title)]:
-        if a and a != public_brand and a not in aliases and len(a) <= 80:
+        if a and a != public_brand and a not in aliases and len(a) <= 80 and set(tokens(a)) & set(want):
             aliases.append(a)
-
     result = {"score": 0.3, "status": "related_or_uncertain", "reasons": [], "claim_span": "",
-              "public_brand": public_brand, "aliases": aliases[:5]}
+              "public_brand": public_brand, "aliases": aliases[:5], "self_identified": self_identified}
 
-    pat = _org_pattern(profile.get("organisation_number"))
-    m = pat.search(full_text) if pat else None
-    if m:
-        result.update(score=1.0, reasons=["org_number_on_page"], claim_span=span_around(full_text, m.group(0), 80))
-        return _finish(result)
-
-    folded_all = fold(full_text)
+    # 0. placeholders and parking pages -----------------------------------------------------------------------
     marker = next((mk for mk in PARKED_MARKERS if mk in folded_all), None)
     if marker:
         result.update(score=0.1, reasons=["parked"], claim_span=span_around(full_text, marker, 80) or marker)
         return _finish(result)
 
-    want = name_tokens(profile.get("name"))
-    # The company name must appear in the page's OWN content. Matching it against the hostname proves only that
-    # somebody registered that domain, and then counting the same domain again as corroboration counts one fact
-    # twice. That circularity published a hosting placeholder and a Californian namesake as verified websites.
-    content_parts = [(k, v) for k, v in parts if k != "hostname"]
-    have_content = set()
-    for _, part in content_parts:
-        have_content.update(tokens(part))
-    have_content.update(tokens(full_text))   # the page's own visible text is self-identification too
-    host_compact = re.sub(r"[^a-z0-9]", "", fold(hostname))
-    present = [t for t in want if t in have_content]
-    present_or_host = [t for t in want if t in have_content or (len(t) >= 4 and t in host_compact)]
-    best_part = max(content_parts, key=lambda p: (len(set(tokens(p[1])) & set(want)), -len(p[1] or "x")))[1] or title
-    span = re.sub(r"\s+", " ", best_part).strip()[:300]
-    if want and not set(want) & set(tokens(best_part)):
-        # the name is in the body rather than the title: quote where it actually appears
-        longest = max(want, key=len)
-        span = span_around(full_text, longest, 110) or span
-    if want and len(present) == len(want):
-        corr = _corroborators(profile, folded_all)
-        # A one-word name ("Semaphore", "Vitamat") plus a city name is not proof: cities appear on many pages.
-        # Single-token names need a postcode or street match; multi-token names may use any corroborator.
-        strong = [c for c in corr if c.startswith(("postcode:", "street:"))]
-        # A domain that spells out a MULTI-WORD legal name ("afgruppen.no" for AF GRUPPEN ASA) is itself strong:
-        # the company registered it. Single-word names are excluded, because "vit.no" or "skard.no" could be anyone.
-        raw = [t for t in tokens(profile.get("name")) if t not in LEGAL_FORMS]
-        name_compact = "".join(raw)
-        labels = [l for l in fold(hostname).split(".") if l and l != "www"]
-        norwegian = _norway_signal(folded_all, full_text, hostname)
-        if (len(raw) >= 2 and len(name_compact) >= 7 and labels
-                and re.sub(r"[^a-z0-9]", "", labels[0]) == name_compact and norwegian):
-            corr = sorted(set(corr) | {f"domain_is_legal_name:{labels[0]}"})
-            strong = strong or [f"domain_is_legal_name:{labels[0]}"]
-        # The full legal name written out as a phrase is itself strong: "Norfrag Tank og Silo as" is not a
-        # sentence a random site produces, unlike its separate tokens. Multi-word names only, and only with a
-        # Norway signal, so a foreign namesake writing its own identical name out cannot use this route.
-        phrase = " ".join(raw)
-        if len(raw) >= 2 and len(name_compact) >= 7 and norwegian and re.search(
-                r"\b" + r"\s+".join(re.escape(t) for t in raw) + r"\b", folded_all):
-            corr = sorted(set(corr) | {"legal_name_phrase_on_page"})
-            strong = strong or ["legal_name_phrase_on_page"]
-            span = span_around(full_text, phrase, 140) or span
-        # A different, self-declared organisation number means this page belongs to another legal entity.
-        # Keep it as a candidate, never as a verified website.
-        others = other_org_numbers(full_text, profile.get("organisation_number"))
-        if others:
-            result.update(score=0.8, reasons=["name_match_but_other_org_number", f"page_states:{others[0]}"],
-                          claim_span=span_around(full_text, others[0], 90) or span)
+    # 1. organisation numbers on the page ---------------------------------------------------------------------
+    pat = _org_pattern(profile.get("organisation_number"))
+    ours_match = pat.search(full_text) if pat else None
+    others = other_org_numbers(full_text, profile.get("organisation_number"))
+    if ours_match:
+        span_org = span_around(full_text, ours_match.group(0), 80)
+        if len(others) >= 2 and not self_identified:
+            # R1: a page carrying several other labelled numbers is a listing, a group index or a client list
+            result.update(score=0.8, reasons=["org_number_among_many", f"other_org_numbers:{len(others)}"], claim_span=span_org)
             return _finish(result)
-        # The page introduces itself as a different registered company in the same family.
+        detail = ("self_identified" if self_identified else
+                  "labelled" if _labelled_org_present(full_text, profile.get("organisation_number")) else "bare_digits")
+        result.update(score=1.0, reasons=["org_number_on_page", f"org_number:{detail}"] + ([f"other_org_numbers:{len(others)}"] if others else []),
+                      claim_span=span_org)
+        return _finish(result)
+    if others:
+        # R: a self-declared different organisation number means this page belongs to another legal entity
+        result.update(score=0.8, reasons=["name_match_but_other_org_number", f"page_states:{others[0]}"],
+                      claim_span=span_around(full_text, others[0], 90))
+        return _finish(result)
+
+    # 2. the page introduces itself as somebody else ------------------------------------------------------------
+    id_companies = registered_company_names(identity_text)
+    if want:
         other_entity = title_names_another_entity([title, meta.get("og:site_name", ""), meta.get("og:title", "")], profile)
         if other_entity:
             result.update(score=0.8, reasons=["title_names_another_entity", f"page_is:{other_entity}"],
-                          claim_span=span_around(full_text, other_entity, 120) or span)
+                          claim_span=span_around(full_text, other_entity, 120))
             return _finish(result)
-        if corr and (len(want) >= 2 or strong):
-            result.update(score=0.95, reasons=["name_and_address", *corr], claim_span=span)
+        strangers = [c for c in id_companies if not (set(name_tokens(c)) & set(want))]
+        if strangers and not self_identified:
+            # R4: a third party's site that merely mentions us (a supplier, an agency, a customer list)
+            result.update(score=0.8, reasons=["page_belongs_to_another_company", f"page_is:{strangers[0]}"],
+                          claim_span=span_around(full_text, strangers[0], 120))
+            return _finish(result)
+    all_companies = registered_company_names(full_text)
+    if len(all_companies) >= 3 and not self_identified:
+        # R5: a directory, a group index, a client list
+        result.update(score=0.8, reasons=["page_lists_many_companies", f"companies_named:{len(all_companies)}"],
+                      claim_span=span_around(full_text, all_companies[0], 120))
+        return _finish(result)
+
+    # 3. name presence and corroboration ------------------------------------------------------------------------
+    have_body = set(tokens(full_text))
+    present_body = [t for t in want if t in have_body]
+    host_compact = re.sub(r"[^a-z0-9]", "", fold(hostname))
+    present_or_host = [t for t in want if t in have_body or (len(t) >= 4 and t in host_compact)]
+    best_part = max(positions, key=lambda p: (len(set(tokens(p[1])) & set(want)), -len(p[1] or "x")))[1] or title
+    span = re.sub(r"\s+", " ", best_part).strip()[:300]
+    if want and not set(want) & set(tokens(best_part)):
+        span = span_around(full_text, max(want, key=len), 110) or span
+    if phrase_in_body and not phrase_in_identity:
+        span = span_around(full_text, " ".join(raw), 140) or span
+
+    if not want or len(present_body) < len(want):
+        if present_or_host:
+            result.update(score=0.3, reasons=["name_partial", f"tokens:{len(present_or_host)}/{len(want)}"], claim_span=span)
         else:
-            result.update(score=0.8, reasons=["name_only"], claim_span=span)
-    elif present_or_host:
-        result.update(score=0.3, reasons=["name_partial", f"tokens:{len(present_or_host)}/{len(want)}"], claim_span=span)
+            result.update(score=0.3, reasons=["name_not_found"], claim_span=span)
+        return _finish(result)
+
+    corr = _corroborators(profile, folded_all)
+    addr_strong = [c for c in corr if c.startswith(("postcode:", "street:"))]
+    strong = list(addr_strong)
+    norwegian = _norway_signal(folded_all, full_text, hostname)
+    host_sans_www = fold(hostname).removeprefix("www.")
+    labels = [l for l in host_sans_www.split(".") if l]
+    label0 = re.sub(r"[^a-z0-9]", "", labels[0]) if labels else ""
+    # The registry's own e-mail address for the company names a domain the company uses (official source).
+    reg_email = str((profile.get("registry") or {}).get("epostadresse") or "").strip().lower()
+    email_domain = reg_email.rsplit("@", 1)[-1] if "@" in reg_email else ""
+    cand_domain = ".".join(labels[-2:]) if len(labels) >= 2 else host_sans_www
+    if email_domain and cand_domain and email_domain == cand_domain and email_domain not in CONSUMER_MAIL_DOMAINS:
+        corr = sorted(set(corr) | {f"registry_email_domain:{email_domain}"})
+        strong.append(f"registry_email_domain:{email_domain}")
+    # A domain that spells the whole multi-word name; or the name itself carries its .no ("MITTELVERUM.NO AS").
+    name_with_tld = ".".join(raw)
+    domain_match = None
+    if labels and norwegian:
+        if len(raw) >= 2 and len(name_compact) >= 7 and label0 == name_compact:
+            domain_match = f"domain_is_legal_name:{labels[0]}"
+        elif len(raw) >= 2 and host_sans_www == name_with_tld:
+            domain_match = f"domain_is_legal_name:{host_sans_www}"
+        elif len(raw) == 1 and len(name_compact) >= 6 and label0 == name_compact and addr_strong:
+            # a one-word name spelled by the domain counts only beside a registered postcode or street
+            domain_match = f"domain_is_legal_name:{labels[0]}"
+    if domain_match:
+        corr = sorted(set(corr) | {domain_match})
+        strong.append(domain_match)
+    host_has_token = any(len(t) >= 4 and t in host_compact for t in want)
+    names_others = [c for c in registered_company_names(identity_text) if not (set(name_tokens(c)) & set(want))]
+
+    # R2/R3. Exact needs two INDEPENDENT facts: the page naming itself as us, and a corroborator the page could
+    # not produce merely by carrying our name (a registered postcode or street, or a domain that spells the
+    # whole multi-word name). The full legal name written out as a phrase is stronger name evidence than
+    # scattered tokens, so on a Norwegian page it may stand in for an identity position when the domain also
+    # carries a name token — but never for a foreign page, and never when the page names somebody else.
+    if self_identified and strong:
+        result.update(score=0.95, reasons=["name_and_address", "self_identified", *corr], claim_span=span)
+    elif phrase_in_identity and norwegian and (strong or host_has_token) and len(name_compact) >= 7:
+        result.update(score=0.95, reasons=["legal_name_phrase_on_page", "in_identity_position", *corr,
+                                           *(["host_carries_name_token"] if not strong else [])], claim_span=span)
+    elif phrase_in_body and norwegian and len(name_compact) >= 7 and (strong or (host_has_token and not names_others)):
+        # the whole name written out, on a Norwegian page whose domain carries part of it and which names no
+        # other registered company anywhere it names itself
+        result.update(score=0.95, reasons=["legal_name_phrase_on_page", *corr,
+                                           *(["host_carries_name_token"] if not strong else [])], claim_span=span)
+    elif len(present_body) == len(want) and domain_match and addr_strong and norwegian:
+        # one-word name: the domain spells it, the registered postcode or street is on the page, the name is on the page
+        result.update(score=0.95, reasons=["name_and_address", "domain_and_address", *corr], claim_span=span)
+    elif self_identified or phrase_in_body:
+        result.update(score=0.8, reasons=["name_only", *corr], claim_span=span)
     else:
-        result.update(score=0.3, reasons=["name_not_found"], claim_span=span)
+        result.update(score=0.8, reasons=["name_mentioned_only", *corr], claim_span=span)
     return _finish(result)
 
 
 def _pick_brand(candidates: list, legal_name: Any) -> Optional[str]:
+    """The public brand, only when it shares a token with the legal name (R6). Never another company's title."""
     want = set(name_tokens(legal_name))
-    best, best_score = None, -1
+    best, best_score = None, 0
     for c in candidates:
         if not c or len(c) > 80 or fold(c).strip() in ("hjem", "home", "forside", "velkommen", "welcome"):
             continue

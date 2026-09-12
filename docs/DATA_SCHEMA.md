@@ -150,3 +150,18 @@ The numbers above show the shape only. They are not measurements.
 - a claim's section or availability, or an evidence source class, is not one of the exact strings above;
 - an `available` claim has no evidence ids, or references an evidence id that does not exist;
 - a section state is not one of the six states.
+
+## Additions on 2026-09-12
+
+- Claim `accounts_prior_period` (section `accounts`): one per earlier filing returned by Regnskapsregisteret, up
+  to three, value `{reporting_period, revenue, operating_result, annual_result, total_assets, equity, total_debt,
+  currency}`, each with its own `reporting_period` and evidence span.
+- `synthesis.trend` — latest period against the newest prior period, in words.
+- `synthesis.risk_flags` — list of plain sentences for bankruptcy, winding-up, forced liquidation, negative equity.
+- `synthesis.verification` — one sentence saying *why* the website counts as verified, or why a candidate does not.
+- `synthesis.answers` — list of `{question, answerable, answer, claim_ids, evidence_ids}` for eleven standard
+  questions; `answerable: false` carries the fixed text "The evidence does not establish this."
+- `identity.website_identity.reasons` may now include `self_identified`, `org_number:labelled`,
+  `org_number:bare_digits`, `registry_email_domain:<domain>`, `host_carries_name_token`, and the cap codes listed
+  in `docs/IDENTITY_RESOLUTION.md`.
+- New change types in `changes[]`: see `docs/REFRESH.md`.

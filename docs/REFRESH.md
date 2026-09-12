@@ -96,3 +96,29 @@ The agent has no scheduler. The operator decides which previous file to diff aga
 full refresh of 100 companies against the previous day. For a larger corpus, the playbook's volatility rule applies:
 official accounts change yearly; roles and subunits change rarely; jobs, news and registry updates change often.
 All connectors run on every refresh in this version; there is no per-source skip.
+
+## Change types added after the first evaluation report (2026-09-12)
+
+Builderr's report said the agent "missed company-name changes and some new financial filings when revenue was
+absent". Both were true, and both are fixed here (see `docs/REMEDIATION.md`, R7 and R8).
+
+| Change type | Fires when | Materiality |
+|---|---|---|
+| `changed_name` | `legal_name` differs from the previous run; also when the registry's `former_names` gains an entry and the current name is unchanged | material |
+| `changed_legal_form` | the registered legal form differs | material |
+| `changed_address` | the business or registered address differs | material |
+| `changed_status` | a bankruptcy, winding-up or forced-liquidation flag flips | material |
+| `changed_registry_website` | the `hjemmeside` field in the registry differs | material |
+| `changed_industry` | the primary industry code differs | material |
+| `changed_employee_count` | the registered employee count differs | minor |
+| `changed_brand` | the public brand read from the verified site differs | minor |
+
+**Filings are detected from the period, not from a money field.** `new_filing` now fires when any of
+`reporting_period`, `accounts_history` or `latest_submitted_accounts_year` advances, whichever is compared first;
+one filing produces exactly one record. Before this change the trigger lived on the `revenue` claim, and only
+`available` claims were compared, so the 206 sampled companies that file accounts with no revenue line
+(holding and property entities) could never produce a `new_filing`. `changed_financials` is unchanged: one record
+per money field whose value differs within the same period.
+
+Every rule has a regression test in `tests/test_refresh_remediation.py`, including one that diffs an envelope
+against an exact copy of itself and asserts an empty result.

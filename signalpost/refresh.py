@@ -15,8 +15,38 @@ REMOVED = {"job_posting": "closed_job", "role": "removed_role", "workplace": "re
            "site_location": "removed_location"}
 ACCOUNT_FIELDS = ("revenue", "operating_result", "profit_before_tax", "annual_result", "total_assets", "equity",
                   "total_debt")
+# Identity scalars, compared value-for-value (R7 in docs/REMEDIATION.md). A renamed company used to produce no
+# change record at all, because only list-valued and financial fields were diffed.
+IDENTITY_SCALARS = {"legal_name": "changed_name", "legal_form": "changed_legal_form", "business_address": "changed_address",
+                    "registered_address": "changed_address", "status_flags": "changed_status",
+                    "registry_website": "changed_registry_website", "registry_employees": "changed_employee_count",
+                    "industry_code": "changed_industry", "public_brand": "changed_brand"}
+# Filing-period fields, compared independently of every money field (R8): a company that files accounts with no
+# revenue line still files, and 206 of 1,000 sampled companies do exactly that.
+FILING_FIELDS = ("reporting_period", "accounts_history", "latest_submitted_accounts_year")
 MATERIAL = {"new_filing", "changed_financials", "new_website", "changed_website", "new_role", "removed_role", "new_job",
-            "closed_job", "new_location", "removed_location"}
+            "closed_job", "new_location", "removed_location", "changed_name", "changed_legal_form", "changed_address",
+            "changed_status", "changed_registry_website", "changed_industry"}
+
+
+def _period_end(v) -> str:
+    """'2025-01-01..2025-12-31' | {'from':..,'to':..} | '2025' -> the comparable end marker."""
+    if isinstance(v, dict):
+        return str(v.get("to") or v.get("tilDato") or "")
+    if isinstance(v, str):
+        return v.split("..")[-1]
+    return str(v or "")
+
+
+def _scalar(v):
+    """Normalise a scalar or small dict for equality: whitespace/case-insensitive for strings."""
+    if isinstance(v, str):
+        return _fold(v)
+    if isinstance(v, dict):
+        return json.dumps({k: _scalar(x) for k, x in sorted(v.items())}, sort_keys=True, ensure_ascii=False)
+    if isinstance(v, list):
+        return json.dumps([_scalar(x) for x in v], ensure_ascii=False)
+    return v
 
 
 def norm_url(u) -> str:
@@ -93,6 +123,26 @@ def diff(previous: dict | None, current: dict) -> list[dict]:
                         "evidence_ids": list((cur_claim or {}).get("evidence_ids") or []),
                         "previous_evidence_ids": list((prev_claim or {}).get("evidence_ids") or [])})
 
+    filing_recorded = False
+
+    def _avail(env_keys, f):
+        return next((c for k, c in env_keys.items() if k[0] == f), None)
+
+    # R8: a new filing is detected from the period itself, before any money field is looked at, so that a
+    # company whose revenue line is absent still gets its new filing recorded.
+    for f in FILING_FIELDS:
+        pc, cc = _avail(p_keys, f), _avail(c_keys, f)
+        if not pc or not cc or filing_recorded:
+            continue
+        if f == "accounts_history":
+            new_periods = [x for x in (cc.get("value") or []) if x not in (pc.get("value") or [])]
+            if new_periods and max(_period_end(x) for x in new_periods) > max((_period_end(x) for x in (pc.get("value") or [])), default=""):
+                record(f, "new_filing", pc, cc, pc.get("value"), {"new_periods": new_periods})
+                filing_recorded = True
+        elif _period_end(cc.get("value")) > _period_end(pc.get("value")):
+            record(f, "new_filing", pc, cc)
+            filing_recorded = True
+
     fields = sorted(set(p_state) | set(c_state))
     for f in fields:
         ps, cs = p_state.get(f), c_state.get(f)
@@ -104,7 +154,22 @@ def diff(previous: dict | None, current: dict) -> list[dict]:
             continue
         pk = {k: c for k, c in p_keys.items() if k[0] == f}
         ck = {k: c for k, c in c_keys.items() if k[0] == f}
-        if f == "official_website":
+        if f in FILING_FIELDS:
+            continue  # handled above
+        if f in IDENTITY_SCALARS:
+            pc, cc = next(iter(pk.values()), None), next(iter(ck.values()), None)
+            if pc and cc and _scalar(pc.get("value")) != _scalar(cc.get("value")):
+                record(f, IDENTITY_SCALARS[f], pc, cc)
+        elif f == "former_names":
+            # only when legal_name itself did not change this run (that branch records the rename with both names)
+            pl, cl = _avail(p_keys, "legal_name"), _avail(c_keys, "legal_name")
+            if pl and cl and _scalar(pl.get("value")) != _scalar(cl.get("value")):
+                continue
+            pc, cc = next(iter(pk.values()), None), next(iter(ck.values()), None)
+            added = [x for x in (cc.get("value") or []) if x not in ((pc or {}).get("value") or [])] if cc else []
+            if added and not any(ch["change_type"] == "changed_name" for ch in changes):
+                record(f, "changed_name", pc, cc, (pc or {}).get("value"), {"former_names_added": added})
+        elif f == "official_website":
             pc, cc = next(iter(pk.values()), None), next(iter(ck.values()), None)
             if cc and not pc:
                 record(f, "new_website", None, cc)
@@ -119,9 +184,10 @@ def diff(previous: dict | None, current: dict) -> list[dict]:
             if pc and cc:
                 pp, cp = pc.get("reporting_period"), cc.get("reporting_period")
                 if pp != cp:
-                    if f == "revenue" or "revenue" not in c_state:
+                    if not filing_recorded:
                         record(f, "new_filing", pc, cc, {"reporting_period": pp, "value": pc.get("value")},
                                {"reporting_period": cp, "value": cc.get("value")})
+                        filing_recorded = True
                 elif pc.get("value") != cc.get("value"):
                     record(f, "changed_financials", pc, cc)
         else:
@@ -139,7 +205,7 @@ def diff(previous: dict | None, current: dict) -> list[dict]:
                     if src and _family(src) not in cur_sources:
                         continue  # that source failed or was not read this run: keep the last supported value, no removal
                     record(f, REMOVED[f], pk[k], None)
-        if ps is not None and ps != AVAILABLE and len(changes) == n_before:
+        if ps is not None and ps != AVAILABLE and len(changes) == n_before and f not in FILING_FIELDS:
             record(f, "availability_changed", p_first.get(f), c_first.get(f), ps, cs, section=c_first[f].get("section"))
     return changes
 

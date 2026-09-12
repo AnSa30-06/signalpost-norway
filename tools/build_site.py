@@ -314,9 +314,21 @@ def company_page(env: dict) -> str:
     head.append(f"<p>Website: <a href=\"{esc(s['web'])}\" rel=\"noopener\">{esc(s['web'])}</a></p>" if s["web"]
                 else f"<p>Website: <span class='st st-{esc(secs.get('web'))}'>{esc(secs.get('web') or 'unknown')}</span> (no verified official website is published)</p>")
     parts = ["".join(head), "<h2>Summary (from claims only)</h2>", f"<p>{esc(syn.get('summary') or 'No synthesis available.')}</p>"]
-    for key in ("what_it_does", "size", "leadership", "footprint", "hiring", "recent_activity", "what_changed"):
+    for key in ("what_it_does", "size", "trend", "leadership", "footprint", "hiring", "recent_activity", "what_changed", "verification"):
         if syn.get(key):
             parts.append(f"<p><b>{esc(key.replace('_', ' ').capitalize())}:</b> {esc(syn[key])}</p>")
+    flags = syn.get("risk_flags") or []
+    if flags:
+        parts.append("<p><b>Warning signs:</b> " + " ".join(f"<span class='st st-failed'>{esc(x)}</span>" for x in flags) + "</p>")
+    answers = syn.get("answers") or []
+    if answers:
+        rows = []
+        for a in answers:
+            ids = ", ".join(esc(i) for i in (a.get("claim_ids") or [])[:6])
+            cls = "" if a.get("answerable") else " class=muted"
+            rows.append(f"<dt><b>{esc(a.get('question'))}</b></dt><dd{cls}>{esc(a.get('answer'))}"
+                        + (f" <small class=muted>claims: {ids}</small>" if ids else "") + "</dd>")
+        parts.append("<h3>Questions the evidence answers</h3><dl>" + "".join(rows) + "</dl>")
     cannot = syn.get("cannot_establish") or []
     parts.append("<h3>What the evidence cannot establish</h3>")
     parts.append("<ul>" + "".join(f"<li>{esc(x)}</li>" for x in cannot) + "</ul>" if cannot else "<p class=muted>Nothing listed.</p>")

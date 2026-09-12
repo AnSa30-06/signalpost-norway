@@ -166,8 +166,7 @@ def test_synthesis_summary_and_cannot_establish():
     assert out["what_changed"] == "First run — no previous snapshot."
     assert any(e.startswith("No official website could be found (candidate found but") for e in out["cannot_establish"])
     assert any("registry update history could be retrieved" in e for e in out["cannot_establish"])
-    assert set(out) == {"summary", "what_it_does", "size", "leadership", "footprint", "hiring", "recent_activity",
-                        "what_changed", "cannot_establish"}
+    assert set(out.keys()) == {"summary", "what_it_does", "size", "trend", "risk_flags", "leadership", "footprint", "hiring", "recent_activity", "what_changed", "verification", "answers", "cannot_establish"}
     assert "Elektriker" in out["hiring"]
 
 

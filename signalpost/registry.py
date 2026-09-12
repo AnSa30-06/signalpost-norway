@@ -173,6 +173,28 @@ class Official:
         self._add("accounts", "accounts_type", {"type": latest.get("regnskapstype"), "layout": latest.get("oppstillingsplan"),
                   "small_company": (latest.get("regnkapsprinsipper") or {}).get("smaaForetak"), "consolidated_parent": (latest.get("virksomhet") or {}).get("morselskap"),
                   "audited": not (latest.get("revisjon") or {}).get("ikkeRevidertAarsregnskap", False)}, [ev], reporting_period=period)
+        # R9: prior periods, one claim each. The API returns several filings; publishing only the latest hid the
+        # history and left the synthesis without a trend. Each carries its own reporting period and evidence span.
+        for prior in records[1:4]:
+            pp = prior.get("regnskapsperiode") or {}
+            pperiod = f"{pp.get('fraDato')}..{pp.get('tilDato')}"
+            pres = prior.get("resultatregnskapResultat") or {}
+            pdrift = pres.get("driftsresultat") or {}
+            pek = prior.get("egenkapitalGjeld") or {}
+            pval = {"reporting_period": pperiod,
+                    "revenue": (pdrift.get("driftsinntekter") or {}).get("sumDriftsinntekter"),
+                    "operating_result": pdrift.get("driftsresultat"),
+                    "annual_result": pres.get("aarsresultat"),
+                    "total_assets": (prior.get("eiendeler") or {}).get("sumEiendeler"),
+                    "equity": (pek.get("egenkapital") or {}).get("sumEgenkapital"),
+                    "total_debt": (pek.get("gjeldOversikt") or {}).get("sumGjeld"),
+                    "currency": prior.get("valuta") or "NOK"}
+            pval = {k: (float(v) if isinstance(v, (int, float)) and k not in ("reporting_period", "currency") else v) for k, v in pval.items()}
+            pspan = _span({"regnskapsperiode": pp, "aarsresultat": pres.get("aarsresultat"),
+                           "sumDriftsinntekter": (pdrift.get("driftsinntekter") or {}).get("sumDriftsinntekter")})
+            self._add("accounts", "accounts_prior_period", pval,
+                      [self._ev(r, "official_accounts", pspan, "brreg_regnskap_api", reporting_period=pperiod)],
+                      reporting_period=pperiod, effective_date=pp.get("tilDato"))
         hist = [f"{(x.get('regnskapsperiode') or {}).get('fraDato')}..{(x.get('regnskapsperiode') or {}).get('tilDato')}" for x in records]
         self._add("accounts", "accounts_history", hist, [self._ev(r, "official_accounts", _span([x.get("regnskapsperiode") for x in records]), "brreg_regnskap_api")],
                   note="periods returned by the normalised accounts API; older filings exist as PDF copies at "

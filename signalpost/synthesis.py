@@ -29,8 +29,17 @@ CHANGE_PHRASES = {"new_job": ("new job ad", "new job ads"), "closed_job": ("job 
                   "new_news": ("new news item", "new news items"), "changed_description": ("changed website description",) * 2,
                   "new_registry_update": ("new registry update", "new registry updates"),
                   "availability_changed": ("availability change", "availability changes")}
-EMPTY = {"summary": "", "what_it_does": None, "size": None, "leadership": None, "footprint": None, "hiring": None,
-         "recent_activity": None, "what_changed": None, "cannot_establish": []}
+EMPTY = {"summary": "", "what_it_does": None, "size": None, "trend": None, "risk_flags": [], "leadership": None,
+         "footprint": None, "hiring": None, "recent_activity": None, "what_changed": None, "verification": None,
+         "answers": [], "cannot_establish": []}
+
+IDENTITY_REASON_TEXT = {
+    "org_number_on_page": "the company's organisation number is printed on the page",
+    "name_and_address": "the page names the company and carries its registered address",
+    "self_identified": "the page names the company in its title, heading, footer or structured data",
+    "legal_name_phrase_on_page": "the page writes the company's full legal name out",
+    "domain_and_address": "the domain spells the name and the registered address is on the page",
+}
 
 
 def _s(v):
@@ -154,6 +163,58 @@ def _build(env: dict) -> dict:
     if extra:
         size_parts.append("It reported " + _join(extra) + ".")
     size = " ".join(size_parts) or None
+
+    # --- trend (R10): latest period against the newest prior period ------------------------------------------
+    trend = None
+    priors = sorted([p for p in dicts("accounts_prior_period") if _s(p.get("reporting_period"))],
+                    key=lambda p: _s(p["reporting_period"]), reverse=True)
+    if priors:
+        prev = priors[0]
+        prev_year = _s(prev["reporting_period"]).split("..")[-1][:4]
+        cur_year = (period or "").split("..")[-1][:4]
+        bits = []
+        for fld, label in (("revenue", "Revenue"), ("annual_result", "The annual result"), ("equity", "Equity")):
+            cur, old_v = _num(first(fld)), _num(prev.get(fld))
+            if cur is None or old_v is None:
+                continue
+            if old_v == 0:
+                direction = "was zero in the prior year and is now"
+            elif fld == "annual_result" and (cur < 0) != (old_v < 0):
+                direction = "moved from a loss to a profit," if cur > 0 else "moved from a profit to a loss,"
+            else:
+                pct = (cur - old_v) / abs(old_v) * 100
+                direction = (f"rose {pct:.0f}% from" if pct >= 0.5 else f"fell {abs(pct):.0f}% from" if pct <= -0.5 else "was flat at") \
+                    if abs(old_v) > 0 else "is"
+            if direction.endswith("from"):
+                bits.append(f"{label} {direction} {money(old_v)} ({prev_year}) to {money(cur)} ({cur_year})")
+            elif direction.startswith("moved"):
+                bits.append(f"{label} {direction} {money(old_v)} ({prev_year}) to {money(cur)} ({cur_year})")
+            elif direction == "was flat at":
+                bits.append(f"{label} was flat at about {money(cur)} between {prev_year} and {cur_year}")
+            else:
+                bits.append(f"{label} {direction} {money(cur)} ({cur_year})")
+        if bits:
+            trend = _join(bits) + "."
+        elif len(priors) >= 1:
+            trend = f"Accounts are on file for {len(priors) + 1} periods; the latest is {period}."
+
+    # --- risk flags and age ------------------------------------------------------------------------------------
+    risk_flags = []
+    flags = first("status_flags")
+    if isinstance(flags, dict):
+        if flags.get("bankrupt"):
+            risk_flags.append("The registry marks the company as bankrupt.")
+        if flags.get("liquidating"):
+            risk_flags.append("The registry marks the company as being wound up (under avvikling).")
+        if flags.get("forced_liquidation"):
+            risk_flags.append("The registry marks the company as under forced liquidation or dissolution.")
+    eq = _num(first("equity"))
+    if eq is not None and eq < 0:
+        risk_flags.append(f"Equity is negative ({money(eq)}) in the latest filed accounts.")
+    founded = _s(first("founded")) or _s(first("registration_date"))
+    if founded and founded[:4].isdigit():
+        age = 2026 - int(founded[:4])
+        size = ((size + " ") if size else "") + f"It was founded in {founded[:4]}, so it is about {age} year{'s' if age != 1 else ''} old."
 
     # --- leadership ----------------------------------------------------------------------------------------
     by_role: dict[str, list[str]] = {}
@@ -286,5 +347,59 @@ def _build(env: dict) -> dict:
         if st in STATE_PHRASES and sec not in covered:
             cannot.append(f"No {sec} information {STATE_PHRASES[st]}.")
 
-    return {"summary": summary, "what_it_does": what, "size": size, "leadership": leadership, "footprint": footprint,
-            "hiring": hiring, "recent_activity": recent_activity, "what_changed": what_changed, "cannot_establish": cannot}
+    # --- how the website was verified (R10) --------------------------------------------------------------------
+    verification = None
+    wi = ident.get("website_identity") if isinstance(ident.get("website_identity"), dict) else {}
+    reasons = [str(r) for r in (wi.get("reasons") or [])]
+    if site and reasons:
+        texts = [IDENTITY_REASON_TEXT[r] for r in reasons if r in IDENTITY_REASON_TEXT]
+        extras = [r for r in reasons if r.startswith(("postcode:", "street:", "domain_is_legal_name:", "registry_email_domain:"))]
+        human_extras = []
+        for r in extras:
+            k, _, v = r.partition(":")
+            human_extras.append({"postcode": f"registered postcode {v}", "street": f"registered street {v}",
+                                 "domain_is_legal_name": f"the domain {v} spells the legal name",
+                                 "registry_email_domain": f"the e-mail domain the company filed with the registry, {v}"}[k])
+        verification = "Website verified because " + _join(texts[:2] + human_extras[:2]) + "." if (texts or human_extras) else None
+    elif not site:
+        ow = next((c for c in claims if c.get("field") == "official_website"), None)
+        if ow and ow.get("availability") == "ambiguous" and _s(ow.get("value")):
+            verification = f"A candidate website ({_s(ow['value'])}) matched the name but could not be tied to this exact legal entity, so it is not published as verified."
+
+    # --- answers (R10): standard questions, answered only from available claims, with the claim ids -----------
+    def _claim_ids(field):
+        return [str(c.get("id")) for c in by.get(field, []) if c.get("id")]
+
+    def _ev_ids(field):
+        out = []
+        for c in by.get(field, []):
+            out.extend(str(x) for x in (c.get("evidence_ids") or []))
+        return out
+
+    answers = []
+
+    def answer(q, text, fields):
+        ok = bool(text)
+        answers.append({"question": q, "answerable": ok,
+                        "answer": text if ok else "The evidence does not establish this.",
+                        "claim_ids": [i for f in fields for i in _claim_ids(f)] if ok else [],
+                        "evidence_ids": sorted(set(i for f in fields for i in _ev_ids(f))) if ok else []})
+
+    answer("What does the company do?", what, ["legal_name", "industry_code", "industry_label", "website_description"])
+    answer("Who leads it?", lead_summary, ["role"])
+    answer("How big is it?", (size_parts[0] if emp is not None else None) or acc_sentence, ["registry_employees", "revenue", "annual_result"])
+    answer("What did its latest accounts show?", acc_sentence, ["revenue", "annual_result", "reporting_period"])
+    answer("Is it growing?", trend, ["accounts_prior_period", "revenue", "annual_result"])
+    answer("Where is it?", footprint, ["business_address", "workplace", "site_location"])
+    answer("Is it hiring?", count_sentence or (hire[0] if hire else None), ["active_job_count", "job_posting"])
+    answer("What is its website?", site, ["official_website"])
+    answer("What has happened recently?", latest, ["news_item", "registry_update", "job_posting", "sitemap_lastmod"])
+    answer("What changed since the last run?", None if refresh.get("baseline") else what_changed, [])
+    answer("Are there warning signs?", " ".join(risk_flags) if risk_flags else ("No bankruptcy, winding-up or forced-liquidation flag is set in the registry." if isinstance(flags, dict) else None), ["status_flags", "equity"])
+    if refresh.get("baseline"):
+        answers[-2]["answer"] = "First run — there is no previous snapshot to compare."
+
+    summary = " ".join(x for x in (summary, trend, " ".join(risk_flags) if risk_flags else None) if x)
+    return {"summary": summary, "what_it_does": what, "size": size, "trend": trend, "risk_flags": risk_flags,
+            "leadership": leadership, "footprint": footprint, "hiring": hiring, "recent_activity": recent_activity,
+            "what_changed": what_changed, "verification": verification, "answers": answers, "cannot_establish": cannot}

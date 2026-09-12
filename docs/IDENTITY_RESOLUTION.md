@@ -120,3 +120,35 @@ SANDNES ELEKTRISKE AS. A title naming us exactly settles the question in our fav
 
 Measured over the 196 published and ambiguous companies of the 2026-09-10 run, this rule fires on one company
 and changes no other verdict.
+
+## Rules added after the first evaluation report (2026-09-12)
+
+The report found two wrong-company publications in Builderr's own 100-company batch. Those two companies are not
+in our sample, so every route by which the gate at `78c4ee7` could still publish a wrong site was closed
+(`docs/REMEDIATION.md`, R1–R6). The decision table now reads:
+
+| Name evidence on the page | Independent corroborator | Result |
+|---|---|---|
+| our organisation number (labelled, or bare nine digits) | the number is the proof | 1.0 exact |
+| the page names itself as us: title, OpenGraph, JSON-LD, footer, h1/h2, copyright line | registered postcode or street; a domain that spells the whole multi-word name; the e-mail domain the company filed with the registry | 0.95 exact |
+| the page names itself as us | a place name only, or nothing | 0.8, published as `ambiguous` |
+| the full legal name written out as a phrase, on a Norwegian page | postcode, street or domain; or the domain carries a name token and the page names no other company | 0.95 exact |
+| name tokens scattered through the body | anything | 0.8 |
+| partial or absent | — | 0.3 |
+
+Caps that override everything above, each published as `ambiguous` with a reason code:
+
+- `org_number_among_many` — our number is on the page beside two or more other labelled organisation numbers: a group index, an auditor's client list, a directory.
+- `name_match_but_other_org_number` — the page states a different organisation number as its own.
+- `title_names_another_entity` — the title introduces a different registered company whose name contains ours plus more (a holding company's site).
+- `page_belongs_to_another_company` — the page's identity positions name a registered company sharing no token with ours, and we appear only in the body (a supplier's customer list).
+- `page_lists_many_companies` — three or more registered-company names on a page whose title is not ours.
+
+Two things the name in a title can no longer do: count as its own corroboration, and prove a `.com` page belongs to
+a Norwegian company without a Norway signal. A punycode hostname is decoded before comparison, so `xn--pnerom-hua.no`
+is judged as `åpnerom.no`. The public brand is published only when it shares a token with the legal name.
+
+Measured offline over the 199 published-or-ambiguous companies of the previous submission run: 138 of 142
+publications stand; the four withdrawn are a group site, a national chain's root page, a page carrying four other
+organisation numbers, and a one-word namesake; one previously withheld site is recovered through the registry's
+e-mail domain.
