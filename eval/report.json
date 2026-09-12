@@ -8,9 +8,9 @@
     "official_website": 0.145,
     "social_profile": 0.089,
     "contact": 0.351,
-    "site_leadership": 0.007,
+    "site_leadership": 0.006,
     "site_locations": 0.022,
-    "jobs": 0.019,
+    "jobs": 0.02,
     "dated_activity": 1.0,
     "accounts": 0.999,
     "roles": 0.999,
@@ -27,12 +27,12 @@
     "contact": 748,
     "social_profile": 180,
     "site_locations": 23,
-    "jobs": 24,
-    "site_leadership": 16
+    "jobs": 25,
+    "site_leadership": 7
   },
   "availability_states": {
-    "available": 50119,
-    "not_available": 3279,
+    "available": 50111,
+    "not_available": 3280,
     "ambiguous": 109,
     "failed": 21,
     "blocked": 2
@@ -45,20 +45,14 @@
     "failed": 20,
     "blocked": 2
   },
-  "requests_total": 9863,
-  "requests_mean": 9.9,
-  "requests_max": 28,
-  "runtime_p50_ms": 41732,
-  "runtime_p95_ms": 116989,
+  "requests_total": 10121,
+  "requests_mean": 10.1,
+  "requests_max": 32,
+  "runtime_p50_ms": 41550,
+  "runtime_p95_ms": 117112,
   "changes_by_type": {
-    "changed_address": 1,
-    "new_registry_update": 5,
-    "new_role": 1,
-    "new_website": 10,
-    "new_social_profile": 17,
-    "new_news": 14,
-    "availability_changed": 8,
-    "changed_status": 1
+    "new_news": 3,
+    "availability_changed": 1
   },
   "gold": {
     "rows": 46,

@@ -1,8 +1,8 @@
 {
-  "run_id": "2026-09-12-revision-2",
-  "started_at": "2026-09-12T17:51:11Z",
-  "completed_at": "2026-09-12T18:28:31Z",
-  "agent_version": "1.0.0+54b1fc5",
+  "run_id": "2026-09-13-revision-2",
+  "started_at": "2026-09-12T19:07:41Z",
+  "completed_at": "2026-09-12T19:44:51Z",
+  "agent_version": "1.0.0+dbb5b1b",
   "inputs": 1000,
   "envelopes": 1000,
   "terminal_status_counts": {
@@ -87,36 +87,32 @@
     "site_location": 23,
     "registry_phone": 167,
     "registry_website": 104,
-    "careers_page": 21,
+    "careers_page": 22,
     "news_item": 215,
     "job_posting": 3,
-    "site_leader": 16
+    "site_leader": 7
   },
-  "requests": 9967,
-  "bytes": 232104698,
+  "requests": 10225,
+  "bytes": 230859301,
   "third_party_cost_usd": 0.0,
-  "runtime_ms": 2239830,
-  "p50_ms": 41732,
-  "p95_ms": 116989,
-  "budget_exhausted_companies": [],
-  "previous_run_id": "2026-09-10-submission",
+  "runtime_ms": 2229799,
+  "p50_ms": 41550,
+  "p95_ms": 117112,
+  "budget_exhausted_companies": [
+    "914217989"
+  ],
+  "previous_run_id": "2026-09-12-revision-2",
   "changes_by_type": {
-    "changed_address": 1,
-    "new_registry_update": 5,
-    "new_role": 1,
-    "new_website": 10,
-    "new_social_profile": 17,
-    "new_news": 14,
-    "availability_changed": 8,
-    "changed_status": 1
+    "new_news": 3,
+    "availability_changed": 1
   },
   "validation_problems": 0,
   "nav_feed": {
     "pages": 103,
-    "ads_seen": 33192,
-    "active_ads": 9936,
+    "ads_seen": 33188,
+    "active_ads": 9935,
     "days": 60,
-    "built_at": "2026-09-12T17:53:01Z",
+    "built_at": "2026-09-12T19:09:20Z",
     "token_source": "public",
     "errors": []
   }

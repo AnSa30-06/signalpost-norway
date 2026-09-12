@@ -120,23 +120,24 @@ test per rule; the point-by-point response is in [docs/REMEDIATION.md](docs/REME
 
 ## Measured
 
-Revision 2 submission run, 2026-09-12, clean tree at code commit `54b1fc5`, antivirus off
+Revision 2 submission run, 2026-09-13, clean tree at code commit `dbb5b1b`, antivirus off
 (`submission/run-report-1000.json`, `eval/report.json`):
 
 | Measure | Value |
 |---|---|
 | envelopes / inputs | 1,000 / 1,000, zero validation problems |
-| requests | 9,967 total: 104 for the once-per-run NAV feed scan, then 9.9 per company |
+| requests | 10,225 total: 104 for the once-per-run NAV feed scan, then 10.1 per company |
 | wall clock | 37 min for 1,000 companies, set by the registry's filing-years endpoint paced at 30 requests a minute |
 | third-party cost | $0 |
 | identity / accounts / leadership / workplaces / activity / hiring | 1,000 / 999 / 999 / 1,000 / 1,000 / 1,000 sections available |
 | filing history | 1,000 of 1,000 companies carry `accounts_filing_years` from the registry |
 | web | 145 verified exact (93 name + registered address, 43 organisation number on page, 9 full legal name as a phrase), 109 ambiguous, 724 no site found, 20 unreachable, 2 blocked |
-| NAV job feed | 9,936 active national ads scanned; every published ad confirmed by an organisation number in NAV's own record |
+| NAV job feed | active national ads scanned once per run; every published ad confirmed by an organisation number in NAV's own record |
 | evidence completeness | 100% of `available` claims carry evidence with a literal span |
 | synthesis | an `answers` block on all 1,000 profiles; a verification sentence on every profile with a website candidate |
+| repeatability | against the previous clean run one hour earlier, the diff was 3 `new_news` and 1 `availability_changed` across 1,000 companies |
 
-Scaled to a 100-company evaluator batch: about 104 + 990 = 1,100 requests against the 2,000 cap, and about
+Scaled to a 100-company evaluator batch: about 104 + 1,010 = 1,120 requests against the 2,000 cap, and about
 six minutes at 8 workers (3.5 of them the paced filing-years endpoint).
 
 **Hand-audited accuracy** over 230 companies across two rounds, 46 of them labelled from the page itself

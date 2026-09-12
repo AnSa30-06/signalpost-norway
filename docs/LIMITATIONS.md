@@ -129,3 +129,18 @@ resolver hiccup is not recorded as "this domain does not exist".
   co-op's own organisation number.
 - **Recall against the evaluator's pooled union is not measurable locally.** Every coverage figure in this
   repository is coverage of what this agent found, not of what exists.
+
+## What "blocked" and "unreachable" were, measured (2026-09-13)
+
+On the 1,000-company run of 2026-09-12, 395 website candidate probes failed. Each class was checked:
+
+| Class | Probes | Finding |
+|---|---|---|
+| timeout or connection refused | 291 | 40 re-probed from a clean network with a 15 s timeout: none answered. Dead servers and parked names. |
+| robots.txt with `Disallow` | 51 | the host's stated wish; respected |
+| robots.txt answering 401/403 | 17 | the agent's earlier rule read this as "disallow everything", stricter than RFC 9309. Fixed. Re-run, every one of the 17 then refused the page itself with 403/401 — bot walls on namesake domains — so the recorded state is now the site's own answer. |
+| page answering 403 | 13 | our user agent and a browser user agent both receive 403: a WAF or JavaScript challenge, not agent-string blocking. Not bypassed. |
+| TLS hostname mismatch or incomplete chain | 6 | server misconfiguration; the agent does not fetch missing intermediates |
+
+None of the 395 is a site the agent could have read by behaving differently and honestly. Each is recorded with
+its cause in `identity.website_candidates_probed` and in the `official_website` claim note.
