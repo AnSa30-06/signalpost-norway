@@ -202,10 +202,35 @@ with a new period, address and status changes, one filing producing one record, 
 
 Full-run numbers for this revision are in `README.md` under "Measured" and in `submission/run-report-1000.json`.
 
-### Full-run numbers for revision 2 (2026-09-12, `out/run-final2`, code commit `54b1fc5`)
+### Full-run numbers for revision 2 (2026-09-13, `out/run-final5`, code commit `b1e87d7`)
 
-1,000 of 1,000 envelopes, zero validation problems; 145 verified websites, 109 ambiguous, 724 no site, 20
-unreachable, 2 blocked; BLAAUW AS withheld; every one of the 1,000 companies carries its filing-year history;
-change records now include `changed_address` and `changed_status`; the `answers` block is present on all 1,000
-profiles. Gold: precision 1.000, recall 0.964, zero wrong-company publications on the 46 labelled rows.
-Requests 9,967; 37 minutes, paced by the filing-years endpoint.
+1,000 of 1,000 envelopes, zero validation problems; 144 verified websites (92 name + registered address, 43
+organisation number on page, 9 full legal name as a phrase), 108 ambiguous, 725 no site, 21 unreachable, 2
+blocked; BLAAUW AS withheld; every one of the 1,000 companies carries its filing-year history; the `answers`
+block is present on all 1,000 profiles. Gold: precision 1.000, recall 0.964, zero wrong-company publications on
+the 46 labelled rows. Requests 10,218; 37.3 minutes at 24 workers, paced by the filing-years endpoint.
+
+Evidence audit (`python eval/audit_artifact.py --run out/run-final5`): 44,099 evidence records checked, 0 spans
+not verbatim in their snapshot; all 144 published websites re-checked from the stored homepage for another
+organisation number, another entity in the title, a many-company listing and a foreign brand: 0 hits; the current
+gate re-run on every stored homepage still says `exact` for all 144. The same audit over the previous packaging
+(`out/run-final3`) had found 27,391 of 48,240 spans not verbatim, which is what led to the verbatim-span change
+(docs/REMEDIATION.md, R11).
+
+Refresh against the previous full run (`out/run-final4`, 40 minutes earlier, same code but for the two evidence
+fixes): 3 `availability_changed` on `municipality` caused by the fix, 1 website unreachable this run (recorded as
+`failed`, not removed), 1 `new_social_profile`; the other 143 verified websites identical. End-to-end refresh
+scenarios through `signalpost run --previous` on real companies: a renamed company yields exactly one
+`changed_name`; a revenue-absent filer whose period moved yields exactly one `new_filing` and no revenue change;
+an unchanged company yields no change records.
+
+### Judge-shaped run (2026-09-13, `out/judge-100`, the evaluator command itself)
+
+`./run.sh work/judge-100.jsonl out/judge-100 out/run-final5/envelopes.jsonl` on a fixed random 100 of the 1,000
+(seed 20261013), with the packaged envelopes as the previous day, `uv sync --frozen` included: 100 of 100
+envelopes, zero validation problems; 1,180 requests (105 feed scan + 10.8 per company; three companies reached the
+26-request cap, one of them with 24 used because a further website candidate needs three, and each says so in
+`operations.budget_exhausted`); 570 s of agent time plus 58 s of `uv sync` at 8
+workers; p50 11.6 s, p95 111.3 s; $0. Zero change records against the packaged output and identical section
+states on all 100, which is the false-change rate the promotion rule requires. Evidence audit: 4,227 records, 0
+non-verbatim spans, all 10 published websites clean.

@@ -1,58 +1,58 @@
 {
   "companies": 1000,
   "terminal_status": {
-    "completed": 979,
-    "completed_with_errors": 21
+    "completed": 978,
+    "completed_with_errors": 22
   },
   "family_company_coverage": {
-    "official_website": 0.145,
-    "social_profile": 0.089,
+    "official_website": 0.144,
+    "social_profile": 0.088,
     "contact": 0.351,
     "site_leadership": 0.006,
     "site_locations": 0.022,
-    "jobs": 0.02,
+    "jobs": 0.019,
     "dated_activity": 1.0,
     "accounts": 0.999,
     "roles": 0.999,
     "workplaces": 0.757,
-    "description": 0.14
+    "description": 0.139
   },
   "family_claim_volume": {
     "accounts": 1793,
     "roles": 4023,
     "workplaces": 797,
     "dated_activity": 14208,
-    "official_website": 145,
-    "description": 235,
-    "contact": 748,
-    "social_profile": 180,
+    "official_website": 144,
+    "description": 233,
+    "contact": 746,
+    "social_profile": 177,
     "site_locations": 23,
-    "jobs": 25,
+    "jobs": 24,
     "site_leadership": 7
   },
   "availability_states": {
-    "available": 50111,
-    "not_available": 3280,
-    "ambiguous": 109,
-    "failed": 21,
+    "available": 50096,
+    "not_available": 3283,
+    "ambiguous": 108,
+    "failed": 22,
     "blocked": 2
   },
   "evidence_completeness": 1.0,
   "web_section_states": {
-    "not_available": 724,
-    "ambiguous": 109,
-    "available": 145,
-    "failed": 20,
+    "not_available": 725,
+    "ambiguous": 108,
+    "available": 144,
+    "failed": 21,
     "blocked": 2
   },
-  "requests_total": 10121,
+  "requests_total": 10114,
   "requests_mean": 10.1,
   "requests_max": 32,
-  "runtime_p50_ms": 41550,
-  "runtime_p95_ms": 117112,
+  "runtime_p50_ms": 41678,
+  "runtime_p95_ms": 116599,
   "changes_by_type": {
-    "new_news": 3,
-    "availability_changed": 1
+    "availability_changed": 4,
+    "new_social_profile": 1
   },
   "gold": {
     "rows": 46,
