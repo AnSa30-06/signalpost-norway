@@ -58,6 +58,14 @@ def literal_span(raw: str, span: str) -> str:
     for alt in (span.replace("/", "\\/"), html.escape(span, quote=False), html.escape(span)):
         if alt != span and alt in raw:
             return alt
+    if any(ord(c) > 127 for c in span):
+        # JSON in the page may write "å" as å or å; match either and return the page's own form
+        pat = "".join(re.escape(c) if ord(c) < 128 else
+                      "(?:%s|\\\\u%s)" % (re.escape(c), "".join("[%s%s]" % (h, h.upper()) if h.isalpha() else h for h in "%04x" % ord(c)))
+                      for c in span)
+        m = re.search(pat, raw)
+        if m:
+            return raw[m.start():m.end()]
     if span[:1] not in "{[":
         return span
     try:

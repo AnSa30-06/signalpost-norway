@@ -76,7 +76,8 @@ class Official:
             if ent.get("postadresse"):
                 add("registered_address", _addr(ent.get("postadresse")), _span(ent.get("postadresse")))
             ba = ent.get("forretningsadresse") or ent.get("postadresse") or {}
-            add("municipality", ba.get("kommune") or self.row.get("municipality"), _span({"kommune": ba.get("kommune"), "kommunenummer": ba.get("kommunenummer")}))
+            # only the record can support this claim: a foreign or missing business address has no municipality
+            add("municipality", ba.get("kommune") or None, _span({"kommune": ba.get("kommune"), "kommunenummer": ba.get("kommunenummer")}))
             n1 = ent.get("naeringskode1") or {}
             add("industry_code", n1.get("kode"), _span(n1))
             add("industry_label", n1.get("beskrivelse"), _span(n1))

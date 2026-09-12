@@ -157,7 +157,7 @@ def _clean_url(url: str) -> str:
 
 def _addr_text(addr) -> str:
     if isinstance(addr, str):
-        return addr.strip()
+        return re.sub(r"\s*\n\s*", ", ", addr.strip())   # a multi-line string address becomes one line; its first part is the street
     if isinstance(addr, dict):
         keys = ("streetAddress", "postalCode", "addressLocality", "addressCountry")
         return ", ".join(str(addr[k]).strip() for k in keys if addr.get(k))

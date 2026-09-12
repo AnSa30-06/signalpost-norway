@@ -3,9 +3,10 @@ from __future__ import annotations
 
 import json
 
-from signalpost.models import IdGen, new_evidence
+from signalpost.models import IdGen, literal_span, new_evidence
 from signalpost.net import FetchResult
 from signalpost.registry import Official
+from signalpost.site import _addr_text
 
 
 def fetch(text: str) -> FetchResult:
@@ -18,18 +19,27 @@ def squash(t: str) -> str:
 
 
 def test_a_non_breaking_space_in_the_record_does_not_break_the_verbatim_lookup():
-    raw = '{"navn":"X AS","vedtektsfestetFormaal":["Salg av varer","og tjenester"]}'
+    raw = '{"navn":"X AS","vedtektsfestetFormaal":["Salg av varer","og tjenester"]}'
     ev = new_evidence(IdGen(), fetch(raw), "official_registry",
-                      json.dumps({"vedtektsfestetFormaal": ["Salg av varer", "og tjenester"]}, ensure_ascii=False, separators=(",", ":")),
+                      json.dumps({"vedtektsfestetFormaal": ["Salg av varer", "og tjenester"]}, ensure_ascii=False, separators=(",", ":")),
                       "brreg_enheter_api")
     assert ev["claim_span"].startswith('"vedtektsfestetFormaal"') and squash(ev["claim_span"]) in squash(raw)
 
 
-def test_absent_registry_flags_are_not_available_not_false():
-    """A record without konkurs/underAvvikling/MVA fields says nothing; the old code published False."""
+def test_a_page_that_writes_a_as_a_unicode_escape_yields_the_pages_own_form():
+    """Squarespace JSON-LD: "address":"H\\u00E5landsvegen 33 \\nBryne". The span must be findable in those bytes."""
+    raw = r'{"@type":"LocalBusiness","address":"H\u00E5landsvegen 33 \nBryne, Rogaland, 4344\nNorway"}'
+    assert literal_span(raw, "Hålandsvegen 33") == r"H\u00E5landsvegen 33"
+    assert literal_span(raw, "Bryne, Rogaland") == "Bryne, Rogaland"                    # plain text stays plain
+    assert _addr_text("Hålandsvegen 33 \nBryne, Rogaland, 4344\nNorway") == "Hålandsvegen 33, Bryne, Rogaland, 4344, Norway"
+
+
+def test_absent_registry_fields_are_not_available_not_false_or_borrowed():
+    """A record without konkurs/underAvvikling/MVA fields says nothing (the old code published False); a foreign
+    business address has no municipality (the old code borrowed the universe row's value and cited the record)."""
     org = "829255812"
     body = json.dumps({"organisasjonsnummer": org, "navn": "TOM AS", "organisasjonsform": {"kode": "AS", "beskrivelse": "Aksjeselskap"},
-                       "forretningsadresse": {"adresse": ["Gata 1"], "postnummer": "0150", "poststed": "OSLO", "kommune": "OSLO", "kommunenummer": "0301"},
+                       "forretningsadresse": {"land": "Danmark", "landkode": "DK", "adresse": ["Bredgade 30"], "poststed": "DK-1260 KØBENHAVN K"},
                        "registreringsdatoEnhetsregisteret": "2020-01-01"})
 
     class S:
@@ -39,12 +49,14 @@ def test_absent_registry_flags_are_not_available_not_false():
         def remaining(self, company):
             return 99
 
-    o = Official(S(), IdGen(), org, {"organisation_number": org, "name": "TOM AS", "legal_form": "AS"})
+    o = Official(S(), IdGen(), org, {"organisation_number": org, "name": "TOM AS", "legal_form": "AS", "municipality": "OSLO"})
     o.identity()
     by = {c["field"]: c for c in o.claims}
     assert by["vat_registered"]["availability"] == "not_available" and by["vat_registered"]["value"] is None
     assert by["status_flags"]["availability"] == "not_available" and by["status_flags"]["value"] is None
+    assert by["municipality"]["availability"] == "not_available" and by["municipality"]["value"] is None
     assert by["legal_name"]["availability"] == "available"
+    assert by["business_address"]["value"]["country"] == "DK"
     for c in o.claims:
         if c["availability"] == "available":
             for eid in c["evidence_ids"]:
