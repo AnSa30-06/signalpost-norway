@@ -360,3 +360,18 @@ def test_one_word_name_needs_domain_and_address_together():
     assert identity.assess(prof, _page("https://lindkjenn.no/", with_addr))["status"] == "exact"
     no_addr = "<html><head><title>Hjem</title></head><body><p>Lindkjenn – vi står på for deg.</p></body></html>"
     assert identity.assess(prof, _page("https://lindkjenn.no/", no_addr))["status"] != "exact"
+
+
+
+def test_filing_years_are_published_and_paced_endpoint_404_is_not_available():
+    org = "938702675"
+    s = FakeSession({f"https://data.brreg.no/regnskapsregisteret/regnskap/aarsregnskap/kopi/{org}/aar": (200, json.dumps(["2023", "2024", "2025"]))})
+    o = Official(s, IdGen(), org, {"legal_form": "ASA"})
+    o.filing_years()
+    by = {c["field"]: c for c in o.claims}
+    assert by["accounts_filing_years"]["value"] == ["2023", "2024", "2025"] and by["accounts_filing_years"]["evidence_ids"]
+    assert by["first_filing_year"]["value"] == "2023" and by["filings_on_file"]["value"] == 3
+    s2 = FakeSession({})
+    o2 = Official(s2, IdGen(), "999999999", {"legal_form": "AS"})
+    o2.filing_years()
+    assert [c for c in o2.claims if c["field"] == "accounts_filing_years"][0]["availability"] == "not_available"

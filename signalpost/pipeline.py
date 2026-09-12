@@ -64,7 +64,7 @@ def process_company(org: str, row: Optional[dict], session: Session, run_id: str
 
     # 1. official anchor ------------------------------------------------------------------------------------
     off = Official(session, ids, org, row)
-    for step in (off.identity, off.accounts, off.roles, off.workplaces):
+    for step in (off.identity, off.accounts, off.filing_years, off.roles, off.workplaces):
         try:
             step()
         except Exception as exc:  # never lose a company to one module

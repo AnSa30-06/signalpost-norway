@@ -58,9 +58,13 @@ yields one change. `changed_financials` remains per field for the same period.
 
 ## Also improved in this revision
 
-- **Prior periods (R9):** the accounts API returns several periods; the agent now publishes up to three prior
-  periods' revenue, annual result, total assets and equity as separate claims with their own reporting period.
-  More supported claims, a real filing history, and a trend for the synthesis.
+- **Filing history (R9):** the normalised accounts endpoint returns the latest period only (measured: one record
+  for every company checked, including a listed ASA), so prior-year figures cannot come from it. The agent now
+  reads the registry's filing-years endpoint (`/regnskapsregisteret/regnskap/aarsregnskap/kopi/{org}/aar`, one
+  paced request per company, about 30 a minute) and publishes `accounts_filing_years`, `first_filing_year` and
+  `filings_on_file`. A new year in that list is a `new_filing` in its own right. Prior-year *figures* exist only as
+  PDF copies and are not fetched; the code path for `accounts_prior_period` remains, and fires if the endpoint
+  ever returns more than one period.
 - **Synthesis (R10):** adds a financial trend sentence, risk flags (bankrupt / liquidating / forced liquidation),
   company age, and a plain statement of *how* the website was verified. A machine-readable `answers` block lists
   standard questions with the claim and evidence ids that answer them, and says explicitly when the evidence

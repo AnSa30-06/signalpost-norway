@@ -88,3 +88,17 @@ def test_one_new_filing_not_three():
     cur = _env("910000005", _holding_company("Y AS", "2025-12-31", "2025", ["2025-01-01..2025-12-31", "2024-01-01..2024-12-31"]),
                run_id="r2", completed="2026-09-12T10:00:00Z")
     assert sum(1 for c in refresh.diff(prev, cur) if c["change_type"] == "new_filing") == 1
+
+
+
+def test_a_new_filing_year_is_a_new_filing_even_when_nothing_else_moved():
+    """The years endpoint lists a new year before the normalised accounts for it appear."""
+    ids = IdGen()
+    base = [new_claim(ids, "identity", "legal_name", "Z AS", "available", []),
+            new_claim(ids, "accounts", "revenue", None, "not_available", [], reporting_period="2024-01-01..2024-12-31")]
+    prev = _env("910000006", base + [new_claim(ids, "accounts", "accounts_filing_years", ["2023", "2024"], "available", [])])
+    cur = _env("910000006", base + [new_claim(ids, "accounts", "accounts_filing_years", ["2023", "2024", "2025"], "available", [])],
+               run_id="r2", completed="2026-09-12T10:00:00Z")
+    changes = refresh.diff(prev, cur)
+    assert sum(1 for c in changes if c["change_type"] == "new_filing") == 1
+    assert changes[0]["current_value"] == {"new_periods": ["2025"]}

@@ -23,7 +23,7 @@ IDENTITY_SCALARS = {"legal_name": "changed_name", "legal_form": "changed_legal_f
                     "industry_code": "changed_industry", "public_brand": "changed_brand"}
 # Filing-period fields, compared independently of every money field (R8): a company that files accounts with no
 # revenue line still files, and 206 of 1,000 sampled companies do exactly that.
-FILING_FIELDS = ("reporting_period", "accounts_history", "latest_submitted_accounts_year")
+FILING_FIELDS = ("reporting_period", "accounts_history", "accounts_filing_years", "latest_submitted_accounts_year")
 MATERIAL = {"new_filing", "changed_financials", "new_website", "changed_website", "new_role", "removed_role", "new_job",
             "closed_job", "new_location", "removed_location", "changed_name", "changed_legal_form", "changed_address",
             "changed_status", "changed_registry_website", "changed_industry"}
@@ -134,7 +134,7 @@ def diff(previous: dict | None, current: dict) -> list[dict]:
         pc, cc = _avail(p_keys, f), _avail(c_keys, f)
         if not pc or not cc or filing_recorded:
             continue
-        if f == "accounts_history":
+        if f in ("accounts_history", "accounts_filing_years"):
             new_periods = [x for x in (cc.get("value") or []) if x not in (pc.get("value") or [])]
             if new_periods and max(_period_end(x) for x in new_periods) > max((_period_end(x) for x in (pc.get("value") or [])), default=""):
                 record(f, "new_filing", pc, cc, pc.get("value"), {"new_periods": new_periods})

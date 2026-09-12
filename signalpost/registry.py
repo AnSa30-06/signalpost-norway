@@ -6,6 +6,8 @@ Every claim carries evidence pointing at the exact API response snapshot. A 404 
 from __future__ import annotations
 
 import json
+import threading
+import time
 from typing import Optional
 
 from .models import (AMBIGUOUS, AVAILABLE, FAILED, NOT_APPLICABLE, NOT_AVAILABLE, IdGen, new_claim, new_error,
@@ -17,6 +19,20 @@ UNIVERSE_SHA = "b82d6a3e7231d1759a958c282bc4366b80ec2fab8095053d8ed7fa9cd01bc838
 # Legal forms that are not obliged to file annual accounts (sole proprietorships etc.). The universe is a
 # 2025-filer universe, so every entity in it has filed; this only matters for inputs outside the universe.
 NON_FILING_FORMS = {"ENK", "PERS", "UTLA", "PK", "KIRK"}
+# The filing-years endpoint is rate-limited to about 30 requests a minute (measured by the starter kit). One
+# process-wide pacer keeps every worker under that, without slowing the other registry endpoints.
+HISTORY_INTERVAL = 2.1
+_HISTORY_LOCK = threading.Lock()
+_HISTORY_NEXT = [0.0]
+
+
+def _history_slot() -> None:
+    with _HISTORY_LOCK:
+        now = time.monotonic()
+        wait = _HISTORY_NEXT[0] - now
+        _HISTORY_NEXT[0] = max(now, _HISTORY_NEXT[0]) + HISTORY_INTERVAL
+    if wait > 0:
+        time.sleep(wait)
 
 
 def _addr(a: Optional[dict]) -> Optional[dict]:
@@ -200,6 +216,33 @@ class Official:
                   note="periods returned by the normalised accounts API; older filings exist as PDF copies at "
                        f"{BRREG}/regnskapsregisteret/regnskap/aarsregnskap/kopi/{self.org}/<year> (rate-limited, not fetched)")
         self.sections["accounts"] = AVAILABLE
+
+    # ---- filing years ----------------------------------------------------------------------------------------
+    def filing_years(self) -> None:
+        """Every year for which an annual-account copy is on file. The normalised accounts endpoint returns only
+        the latest period, so this is the only official view of the filing history without fetching PDFs."""
+        if self.sections.get("accounts") == NOT_APPLICABLE:
+            return
+        _history_slot()
+        r = self.s.get(f"{BRREG}/regnskapsregisteret/regnskap/aarsregnskap/kopi/{self.org}/aar", company=self.org, kind="json", robots=False)
+        data = r.json() if r.ok else None
+        if not r.ok or not isinstance(data, list):
+            if r.status == 404:
+                self._add("accounts", "accounts_filing_years", None, [self._ev(r, "official_accounts", f"HTTP {r.status}", "brreg_aarsregnskap_kopi_years")],
+                          availability=NOT_AVAILABLE, note="no annual-account copies on file for this organisation")
+            else:
+                st = state_from_fetch(r)
+                self.errors.append(new_error("filing_years", r.error or f"http_{r.status}", st, r.url))
+                self._add("accounts", "accounts_filing_years", None, [self._ev(r, "official_accounts", f"HTTP {r.status}", "brreg_aarsregnskap_kopi_years")] if r.status else [],
+                          availability=st, note=f"filing-years endpoint failed: {r.error or r.status}")
+            return
+        years = sorted({str(y) for y in data if str(y).strip().isdigit()})
+        ev = self._ev(r, "official_accounts", _span(years), "brreg_aarsregnskap_kopi_years")
+        self._add("accounts", "accounts_filing_years", years, [ev],
+                  note=f"years with an annual-account copy on file; copies at {BRREG}/regnskapsregisteret/regnskap/aarsregnskap/kopi/{self.org}/<year> (not fetched)")
+        if years:
+            self._add("accounts", "first_filing_year", years[0], [ev], effective_date=f"{years[0]}-12-31")
+            self._add("accounts", "filings_on_file", len(years), [ev])
 
     # ---- roles --------------------------------------------------------------------------------------------
     def roles(self) -> None:

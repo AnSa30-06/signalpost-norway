@@ -114,7 +114,7 @@ absent". Both were true, and both are fixed here (see `docs/REMEDIATION.md`, R7 
 | `changed_brand` | the public brand read from the verified site differs | minor |
 
 **Filings are detected from the period, not from a money field.** `new_filing` now fires when any of
-`reporting_period`, `accounts_history` or `latest_submitted_accounts_year` advances, whichever is compared first;
+`reporting_period`, `accounts_history`, `accounts_filing_years` or `latest_submitted_accounts_year` advances, whichever is compared first;
 one filing produces exactly one record. Before this change the trigger lived on the `revenue` claim, and only
 `available` claims were compared, so the 206 sampled companies that file accounts with no revenue line
 (holding and property entities) could never produce a `new_filing`. `changed_financials` is unchanged: one record

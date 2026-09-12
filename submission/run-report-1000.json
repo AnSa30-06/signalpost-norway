@@ -1,13 +1,13 @@
 {
-  "run_id": "2026-09-10-submission",
-  "started_at": "2026-09-10T17:29:25Z",
-  "completed_at": "2026-09-10T17:52:50Z",
-  "agent_version": "1.0.0+125f7e2",
+  "run_id": "2026-09-12-revision-2",
+  "started_at": "2026-09-12T16:38:01Z",
+  "completed_at": "2026-09-12T16:54:37Z",
+  "agent_version": "1.0.0+f0792c2",
   "inputs": 1000,
   "envelopes": 1000,
   "terminal_status_counts": {
-    "completed": 979,
-    "completed_with_errors": 21
+    "completed": 977,
+    "completed_with_errors": 23
   },
   "section_state_counts": {
     "identity": {
@@ -25,11 +25,11 @@
       "available": 1000
     },
     "web": {
-      "not_available": 778,
-      "available": 142,
-      "ambiguous": 57,
-      "failed": 20,
-      "blocked": 3
+      "not_available": 721,
+      "ambiguous": 109,
+      "available": 146,
+      "failed": 22,
+      "blocked": 2
     },
     "hiring": {
       "available": 1000
@@ -63,53 +63,59 @@
     "reporting_period": 999,
     "accounts_type": 999,
     "accounts_history": 999,
-    "role": 4022,
+    "role": 4023,
     "role_count": 999,
     "workplace": 797,
     "workplace_count": 1000,
-    "registry_update": 13898,
+    "registry_update": 13899,
     "active_job_count": 1000,
-    "registry_employees": 149,
+    "registry_employees": 148,
     "registry_mobile": 201,
-    "official_website": 142,
-    "public_brand": 140,
-    "website_title": 142,
+    "official_website": 146,
+    "public_brand": 139,
+    "website_title": 146,
     "website_description": 98,
-    "contact_email": 195,
-    "contact_phone": 171,
+    "contact_email": 200,
+    "contact_phone": 175,
     "former_names": 251,
     "registry_email": 208,
-    "sitemap_lastmod": 92,
-    "social_profile": 173,
-    "site_location": 24,
+    "sitemap_lastmod": 95,
+    "social_profile": 181,
+    "site_location": 23,
     "registry_phone": 167,
     "registry_website": 104,
-    "careers_page": 21,
-    "news_item": 223,
+    "careers_page": 22,
+    "news_item": 215,
     "job_posting": 3,
-    "site_leader": 19
+    "site_leader": 16
   },
-  "requests": 9109,
-  "bytes": 214110497,
+  "requests": 8979,
+  "bytes": 231540982,
   "third_party_cost_usd": 0.0,
-  "runtime_ms": 1404523,
-  "p50_ms": 13184,
-  "p95_ms": 94582,
+  "runtime_ms": 996132,
+  "p50_ms": 7827,
+  "p95_ms": 87290,
   "budget_exhausted_companies": [],
-  "previous_run_id": "2026-09-10-submission-1000-final",
+  "previous_run_id": "2026-09-10-submission",
   "changes_by_type": {
-    "new_website": 4,
-    "new_social_profile": 3,
-    "availability_changed": 2
+    "changed_address": 1,
+    "new_registry_update": 5,
+    "new_role": 1,
+    "new_website": 10,
+    "new_social_profile": 17,
+    "new_news": 14,
+    "availability_changed": 7,
+    "changed_status": 1
   },
   "validation_problems": 0,
   "nav_feed": {
     "pages": 103,
-    "ads_seen": 33045,
-    "active_ads": 9893,
+    "ads_seen": 33191,
+    "active_ads": 9934,
     "days": 60,
-    "built_at": "2026-09-10T17:31:34Z",
+    "built_at": "2026-09-12T16:39:53Z",
     "token_source": "public",
     "errors": []
-  }
+  },
+  "agent_version_note": "every envelope was produced by the signalpost/ package as committed at f0792c2; the run started before that commit was made, so per-company stamps read {'1.0.0+f0792c2': 48, '1.0.0+a303039': 908, '1.0.0+3a0447d': 44} and were unified"
 }

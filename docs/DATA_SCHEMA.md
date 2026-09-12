@@ -153,9 +153,11 @@ The numbers above show the shape only. They are not measurements.
 
 ## Additions on 2026-09-12
 
-- Claim `accounts_prior_period` (section `accounts`): one per earlier filing returned by Regnskapsregisteret, up
-  to three, value `{reporting_period, revenue, operating_result, annual_result, total_assets, equity, total_debt,
-  currency}`, each with its own `reporting_period` and evidence span.
+- Claims `accounts_filing_years` (list of years with an annual-account copy on file), `first_filing_year` and
+  `filings_on_file` (section `accounts`), from the registry's filing-years endpoint, one evidence span each.
+- Claim `accounts_prior_period` (section `accounts`): one per earlier filing returned by the normalised accounts
+  endpoint. In practice that endpoint returns the latest period only, so this claim is rarely present; the
+  filing history is `accounts_filing_years`.
 - `synthesis.trend` — latest period against the newest prior period, in words.
 - `synthesis.risk_flags` — list of plain sentences for bankruptcy, winding-up, forced liquidation, negative equity.
 - `synthesis.verification` — one sentence saying *why* the website counts as verified, or why a candidate does not.

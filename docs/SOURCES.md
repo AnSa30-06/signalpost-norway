@@ -14,6 +14,7 @@ Provider: Brønnøysundregistrene. Licence: Norwegian Licence for Open Governmen
 | `official_roles` | `https://data.brreg.no/enhetsregisteret/api/enheter/{org}/roller` | daglig leder, board roles, other registered roles |
 | `official_subunits` | `https://data.brreg.no/enhetsregisteret/api/underenheter?overordnetEnhet={org}` | registered workplaces (subunits) with addresses |
 | `official_updates` | `https://data.brreg.no/enhetsregisteret/api/oppdateringer/enheter?organisasjonsnummer={org}&size=200` | dated registry change events |
+| `official_accounts` | `https://data.brreg.no/regnskapsregisteret/regnskap/aarsregnskap/kopi/{org}/aar` | years with an annual-account copy on file; one request per company, paced to about 30 a minute across the whole run |
 
 Official data anchors identity. It does not, by itself, identify the public brand or website.
 The universe file supplied by Builderr (`signalpost-company-universe-2025.jsonl.gz`) is the frozen registry snapshot

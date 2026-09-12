@@ -197,6 +197,14 @@ def _build(env: dict) -> dict:
             trend = _join(bits) + "."
         elif len(priors) >= 1:
             trend = f"Accounts are on file for {len(priors) + 1} periods; the latest is {period}."
+    years = first("accounts_filing_years")
+    history = None
+    if isinstance(years, list) and years:
+        ys = sorted(str(y) for y in years)
+        history = (f"Annual accounts are on file for {len(ys)} year{'s' if len(ys) != 1 else ''}, {ys[0]} to {ys[-1]}."
+                   if len(ys) > 1 else f"One annual-account filing is on file, for {ys[0]}.")
+        if not trend:
+            trend = history + " The registry's normalised endpoint publishes figures for the latest period only, so no year-on-year comparison is made."
 
     # --- risk flags and age ------------------------------------------------------------------------------------
     risk_flags = []
@@ -389,7 +397,8 @@ def _build(env: dict) -> dict:
     answer("Who leads it?", lead_summary, ["role"])
     answer("How big is it?", (size_parts[0] if emp is not None else None) or acc_sentence, ["registry_employees", "revenue", "annual_result"])
     answer("What did its latest accounts show?", acc_sentence, ["revenue", "annual_result", "reporting_period"])
-    answer("Is it growing?", trend, ["accounts_prior_period", "revenue", "annual_result"])
+    answer("Is it growing?", _join(bits) + "." if priors and bits else None, ["accounts_prior_period", "revenue", "annual_result"])
+    answer("How long has it filed accounts?", history, ["accounts_filing_years", "first_filing_year", "filings_on_file"])
     answer("Where is it?", footprint, ["business_address", "workplace", "site_location"])
     answer("Is it hiring?", count_sentence or (hire[0] if hire else None), ["active_job_count", "job_posting"])
     answer("What is its website?", site, ["official_website"])
