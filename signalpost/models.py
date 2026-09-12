@@ -1,7 +1,9 @@
 """Claim / evidence / error helpers and the envelope validator. Plain dicts, validated with pydantic at the end."""
 from __future__ import annotations
 
+import html
 import itertools
+import json
 import re
 import threading
 from typing import Any, Optional
@@ -42,11 +44,64 @@ def new_claim(ids: IdGen, section: str, field: str, value: Any, availability: st
             "reporting_period": reporting_period, "effective_date": effective_date, "note": note}
 
 
+def literal_span(raw: str, span: str) -> str:
+    """The verbatim form of `span` inside `raw`, so a checker can find the proof in the snapshot.
+
+    Returns `span` itself when it already occurs in `raw`. A value the source escaped (``\\/`` in JSON-LD,
+    ``&amp;`` in markup) comes back in the escaped form. A span that is JSON but not a verbatim excerpt of the
+    record (a selection of its fields) is replaced by the raw excerpt, at most 300 characters, that starts at the
+    first of its fields found in the record and runs over the following fields that fit. Anything else is returned
+    unchanged: text cut from a rendered page is checked against the page's visible text, not its markup.
+    """
+    if not raw or not span or span in raw:
+        return span
+    for alt in (span.replace("/", "\\/"), html.escape(span, quote=False), html.escape(span)):
+        if alt != span and alt in raw:
+            return alt
+    if span[:1] not in "{[":
+        return span
+    try:
+        obj = json.loads(span)
+    except ValueError:
+        return span
+    leaves: list[tuple[str, Any]] = []
+
+    def walk(o, key=None):
+        if isinstance(o, dict):
+            for k, v in o.items():
+                walk(v, k)
+        elif isinstance(o, list):
+            if key is not None and all(not isinstance(v, (dict, list)) for v in o):
+                leaves.append((key, o))            # a list of scalars is one value: "navn":["FIRMA AS"]
+            else:
+                for v in o:
+                    walk(v, key)
+        elif key is not None:
+            leaves.append((key, o))
+
+    walk(obj)
+    hits = []
+    for key, val in leaves:
+        pat = (re.escape(json.dumps(key.rsplit(".", 1)[-1], ensure_ascii=False)) + r"\s*:\s*"
+               + re.escape(json.dumps(val, ensure_ascii=False, separators=(",", ":"))))
+        m = re.search(pat, raw)
+        if m:
+            hits.append((m.start(), m.end()))
+    if not hits:
+        return span
+    start, end = hits[0]                            # the first field named is the anchor
+    for a, b in sorted(hits):
+        if a >= start and b - start <= 300:
+            end = max(end, b)
+    return raw[start:end]
+
+
 def new_evidence(ids: IdGen, fetch, source_class: str, claim_span: str, extraction_method: str,
                  reporting_period: Optional[str] = None, prefix: str = "ev") -> dict:
-    """Build an evidence record from a FetchResult."""
+    """Build an evidence record from a FetchResult. The span is made verbatim against the fetched bytes."""
     assert source_class in SOURCE_CLASSES, source_class
-    span = re.sub(r"\s+", " ", (claim_span or "")).strip()[:300]
+    span = literal_span(getattr(fetch, "text", "") or "", (claim_span or "").strip())   # before any whitespace change
+    span = re.sub(r"\s+", " ", span).strip()[:300]
     return {"id": ids.next(prefix), "source_url": fetch.url, "final_url": fetch.final_url or fetch.url,
             "source_class": source_class, "retrieved_at": fetch.retrieved_at, "http_status": fetch.status,
             "content_sha256": fetch.sha256 or None, "snapshot_path": fetch.snapshot_path or None,

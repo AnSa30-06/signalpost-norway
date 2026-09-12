@@ -76,6 +76,21 @@ def span_around(text: str, needle: str, width: int = 80) -> str:
     return re.sub(r"\s+", " ", text[max(0, i - half): i + len(needle) + half]).strip()[:300]
 
 
+def _excerpt(text: str, pattern, width: int = 140) -> str:
+    """A verbatim window of `text` around the first match of `pattern` in fold(text); '' when there is none."""
+    pieces, back = [], []
+    for i, ch in enumerate(text or ""):
+        f = fold(ch)
+        pieces.append(f)
+        back.extend([i] * len(f))
+    m = pattern.search("".join(pieces))
+    if not m or m.end() == m.start():
+        return ""
+    a, b = back[m.start()], back[m.end() - 1] + 1
+    half = max(0, (width - (b - a)) // 2)
+    return re.sub(r"\s+", " ", text[max(0, a - half): b + half]).strip()[:300]
+
+
 def jsonld_nodes(data: Any) -> list[dict]:
     """Every dict carrying an @type inside a JSON-LD structure (handles @graph and nesting)."""
     out: list[dict] = []
@@ -393,6 +408,12 @@ def assess(profile: dict, page, extra_text: str = "") -> dict:
         span = span_around(full_text, max(want, key=len), 110) or span
     if phrase_in_body and not phrase_in_identity:
         span = span_around(full_text, " ".join(raw), 140) or span
+    if span and span not in full_text and span not in html:
+        # A position joined from several elements (every footer, every heading) is not an excerpt of the page.
+        # The proof must be verbatim, so cut it from the page text around the name instead.
+        span = ((_excerpt(full_text, phrase_re) if phrase_re else "")
+                or (_excerpt(full_text, re.compile(r"\b" + re.escape(max(want, key=len)) + r"\b")) if want else "")
+                or re.sub(r"\s+", " ", full_text[:200]).strip())
 
     if not want or len(present_body) < len(want):
         if present_or_host:

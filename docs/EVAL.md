@@ -27,7 +27,7 @@ The daily 100-company evaluation batch is the hidden exam. Its scores and labels
 
 1. **Wrong-company publications**: count of published claims whose evidence belongs to a different legal entity. Must be zero.
 2. **Supported-claim precision**: published `available` claims whose span supports the value, over all published claims.
-3. **Evidence validity**: every `available` claim points to an existing snapshot whose bytes hash to `content_sha256` and contain `claim_span`.
+3. **Evidence validity**: every `available` claim points to an existing snapshot whose bytes hash to `content_sha256` and contain `claim_span` (raw bytes for JSON and XML; visible text or markup for HTML; whitespace collapsed). `python eval/audit_artifact.py --run <dir>` checks this for every evidence record and exits non-zero on any failure.
 4. **Coverage and recall** per field family (website, social profile, leaders, locations, jobs, news), as company recall and claim recall.
 5. **Refresh correctness**: real changes found, and the false-change rate on a re-run against the same previous file (must be zero).
 6. **Runtime, requests and cost**: p50 and p95 per company, requests per company, third-party cost per 100 companies.

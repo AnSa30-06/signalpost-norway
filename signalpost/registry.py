@@ -42,8 +42,9 @@ def _addr(a: Optional[dict]) -> Optional[dict]:
             "city": a.get("poststed"), "municipality": a.get("kommune"), "country": a.get("landkode") or a.get("land")}
 
 
-def _span(obj, limit: int = 300) -> str:
-    return json.dumps(obj, ensure_ascii=False, separators=(",", ":"))[:limit]
+def _span(obj) -> str:
+    """Compact JSON of the fields a claim rests on; new_evidence turns it into a verbatim excerpt of the record."""
+    return json.dumps(obj, ensure_ascii=False, separators=(",", ":"))
 
 
 class Official:
@@ -88,10 +89,14 @@ class Official:
                 effective_date=ent.get("registreringsdatoEnhetsregisteret"))
             if ent.get("stiftelsesdato"):
                 add("founded", ent.get("stiftelsesdato"), _span({"stiftelsesdato": ent.get("stiftelsesdato")}), effective_date=ent.get("stiftelsesdato"))
-            add("vat_registered", bool(ent.get("registrertIMvaregisteret")), _span({"registrertIMvaregisteret": ent.get("registrertIMvaregisteret")}))
-            flags = {"bankrupt": bool(ent.get("konkurs")), "liquidating": bool(ent.get("underAvvikling")),
-                     "forced_liquidation": bool(ent.get("underTvangsavviklingEllerTvangsopplosning"))}
-            add("status_flags", flags, _span({k: ent.get(k) for k in ("konkurs", "underAvvikling", "underTvangsavviklingEllerTvangsopplosning")}))
+            # a field the record does not carry is not_available, never False
+            vat = ent.get("registrertIMvaregisteret")
+            add("vat_registered", None if vat is None else bool(vat), _span({"registrertIMvaregisteret": vat}))
+            raw_flags = {k: ent.get(k) for k in ("konkurs", "underAvvikling", "underTvangsavviklingEllerTvangsopplosning")}
+            flags = ({"bankrupt": bool(raw_flags["konkurs"]), "liquidating": bool(raw_flags["underAvvikling"]),
+                      "forced_liquidation": bool(raw_flags["underTvangsavviklingEllerTvangsopplosning"])}
+                     if any(v is not None for v in raw_flags.values()) else None)
+            add("status_flags", flags, _span(raw_flags))
             if ent.get("sisteInnsendteAarsregnskap"):
                 add("latest_submitted_accounts_year", ent.get("sisteInnsendteAarsregnskap"), _span({"sisteInnsendteAarsregnskap": ent.get("sisteInnsendteAarsregnskap")}))
             if ent.get("vedtektsfestetFormaal"):
@@ -174,7 +179,7 @@ class Official:
                  "annual_result": "resultatregnskapResultat.aarsresultat", "total_assets": "eiendeler.sumEiendeler",
                  "equity": "egenkapitalGjeld.egenkapital.sumEgenkapital", "total_debt": "egenkapitalGjeld.gjeldOversikt.sumGjeld"}
         for field, val in values.items():
-            span = _span({"regnskapsperiode": per, paths[field]: val})
+            span = _span({paths[field]: val, "regnskapsperiode": per})   # the value first: it anchors the excerpt
             ev = self._ev(r, "official_accounts", span, "brreg_regnskap_api", reporting_period=period)
             if val is None:
                 self._add("accounts", field, None, [ev], availability=NOT_AVAILABLE, reporting_period=period,
@@ -277,7 +282,10 @@ class Official:
                     continue
                 value = {"name": name, "role": t.get("beskrivelse"), "role_code": t.get("kode"), "since": since,
                          "organisation_number": holder_org, "holder_type": "entity" if enhet else "person"}
-                span = f"{t.get('beskrivelse')} ({t.get('kode')}): {name}; sistEndret {since}"
+                # the holder's name anchors the excerpt; a person's birth date precedes the name in the record
+                # and so never enters the span
+                span = _span({"navn": (person or {}).get("navn") if person else (enhet or {}).get("navn"),
+                              "organisasjonsnummer": holder_org, "type": {"kode": t.get("kode"), "beskrivelse": t.get("beskrivelse")}})
                 self._add("leadership", "role", value, [self._ev(r, "official_roles", span, "brreg_roller_api")], effective_date=since)
                 n += 1
         if n == 0:

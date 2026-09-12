@@ -106,7 +106,8 @@ def test_updates_parse_newest_first():
     assert c["id"].startswith("upd-") and c["availability"] == "available"
     ev = out["evidence"][0]
     assert ev["id"] == c["evidence_ids"][0] and ev["id"].startswith("evu-")
-    assert ev["extraction_method"] == "brreg_updates_api" and '"endringstype":"Endring"' in ev["claim_span"]
+    assert ev["extraction_method"] == "brreg_updates_api" and '"endringstype":"Endring"' in ev["claim_span"].replace(" ", "")
+    assert "".join(ev["claim_span"].split()) in "".join(body.split())   # verbatim in the record, whitespace aside
     assert ev["source_class"] == "official_updates"
 
 

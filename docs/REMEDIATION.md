@@ -69,13 +69,30 @@ yields one change. `changed_financials` remains per field for the same period.
   company age, and a plain statement of *how* the website was verified. A machine-readable `answers` block lists
   standard questions with the claim and evidence ids that answer them, and says explicitly when the evidence
   cannot answer.
+- **Verbatim evidence spans (R11, 2026-09-13):** an audit of the first revision-2 artifact with the new
+  `eval/audit_artifact.py` found 27,391 of 48,240 evidence spans not verbatim in the snapshot they cited.
+  Registry spans were compact re-serialisations of selected fields (`{"navn":"VIT AS"}` where the record reads
+  `"navn":"VIT AS"` inside a larger object), role spans were a human rendering, and eight website proof spans were
+  joins of several page elements. No value was wrong, but `docs/DATA_SCHEMA.md` promised a literal span and the
+  artifact did not deliver one. `new_evidence` now makes every span verbatim against the fetched bytes
+  (`models.literal_span`): a field selection becomes the record's own excerpt anchored on the first field named,
+  an escaped value is kept in the form the page uses, and a joined identity position is replaced by an excerpt of
+  the page text around the legal name. Two computed counts (`active_job_count`, `role_count`) carry a description
+  instead, and the schema says so. A registry field the record does not carry (`registrertIMvaregisteret`, the
+  status flags) is now `not_available` rather than `false`.
 
 ## Verification
 
 1. Regression tests for every rule (`tests/`).
 2. Offline re-assessment of the fixed gate over every stored homepage snapshot from the previous submission run:
    every verdict that changed was read and recorded in `eval/gold.jsonl`.
-3. A synthetic refresh test with a renamed company and a no-revenue filer with a new period.
+3. A synthetic refresh test with a renamed company and a no-revenue filer with a new period, and the same three
+   scenarios end to end through `signalpost run --previous` on real companies (`changed_name`, exactly one
+   `new_filing` with revenue absent, no change on the unchanged company).
 4. A full 1,000-company run, validated, scored against the gold set, packaged in `submission/`.
+5. `python eval/audit_artifact.py --run <dir>` over that run: every evidence span verbatim in its snapshot; every
+   published website re-checked from its stored homepage for the four traps (another organisation number,
+   another entity in the title, a many-company listing, a foreign brand) and re-gated with the current code.
+   Exit code 1 on any failure.
 
 Numbers from step 2 and 4 are in `docs/EVAL.md` under "Remediation audit".

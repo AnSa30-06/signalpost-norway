@@ -400,3 +400,64 @@ def test_robots_401_403_means_unavailable_not_disallowed(tmp_path):
     calls["https://open.no/robots.txt"] = (200, "User-agent: *\nDisallow: /private\n")
     assert s.robots_allowed("https://open.no/", "c") is True
     assert s.robots_allowed("https://open.no/private/x", "c") is False
+
+
+def test_literal_span_turns_a_field_selection_into_a_record_excerpt():
+    """The proof must be findable in the snapshot: a compact re-serialisation of chosen fields is not."""
+    from signalpost.models import literal_span
+    raw = '{"organisasjonsnummer": "812686542", "navn": "VIT AS", "forretningsadresse": {"kommune": "OSLO", "kommunenummer": "0301"}}'
+    assert literal_span(raw, '{"navn":"VIT AS"}') == '"navn": "VIT AS"'
+    assert literal_span(raw, '{"kommune":"OSLO","kommunenummer":"0301"}') == '"kommune": "OSLO", "kommunenummer": "0301"'
+    assert literal_span(raw, '{"hjemmeside":null}') == '{"hjemmeside":null}'      # an absent field: unchanged, proof of absence
+    assert literal_span(raw, '"navn": "VIT AS"') == '"navn": "VIT AS"'            # already verbatim: unchanged
+    assert literal_span(r'{"sameAs":["https:\/\/x.com\/a"]}', "https://x.com/a") == r"https:\/\/x.com\/a"
+    assert literal_span('<a href="?a=1&amp;b=2">', "?a=1&b=2") == "?a=1&amp;b=2"
+    assert literal_span("<p>Visible text</p>", "Visible text") == "Visible text"
+
+
+def test_registry_evidence_spans_are_verbatim_excerpts_of_the_record():
+    """Every accounts and roles evidence span is found in the record bytes, whitespace aside, even on spaced JSON."""
+    org = "938702675"
+    accounts = json.dumps([{"regnskapsperiode": {"fraDato": "2025-01-01", "tilDato": "2025-12-31"}, "valuta": "NOK", "regnskapstype": "SELSKAP",
+                            "resultatregnskapResultat": {"aarsresultat": 853000000.0, "ordinaertResultatFoerSkattekostnad": 846000000.0,
+                                                         "driftsresultat": {"driftsresultat": 876000000.0, "driftsinntekter": {"sumDriftsinntekter": 914000000.0}}},
+                            "egenkapitalGjeld": {"egenkapital": {"sumEgenkapital": 968000000.0}, "gjeldOversikt": {"sumGjeld": 3217000000.0}},
+                            "eiendeler": {"sumEiendeler": 4184000000.0}}])
+    roles = json.dumps({"rollegrupper": [{"type": {"kode": "DAGL", "beskrivelse": "Daglig leder"}, "sistEndret": "2020-09-14",
+                                          "roller": [{"type": {"kode": "DAGL", "beskrivelse": "Daglig leder"},
+                                                      "person": {"fodselsdato": "1970-01-01", "navn": {"fornavn": "Amund", "etternavn": "Tøftum"}}, "fratraadt": False},
+                                                     {"type": {"kode": "MEDL", "beskrivelse": "Styremedlem"},
+                                                      "enhet": {"organisasjonsnummer": "999888777", "navn": ["EIER AS"]}, "fratraadt": False}]}]})
+    s = FakeSession({f"https://data.brreg.no/regnskapsregisteret/regnskap/{org}": (200, accounts),
+                     f"https://data.brreg.no/enhetsregisteret/api/enheter/{org}/roller": (200, roles)})
+    o = Official(s, IdGen(), org, {"legal_form": "ASA"})
+    o.accounts()
+    o.roles()
+    squash = lambda t: "".join(t.split())  # noqa: E731
+    bodies = squash(accounts) + squash(roles)
+    computed = {c["evidence_ids"][0] for c in o.claims if c["field"] == "role_count"}
+    for ev in o.evidence:
+        if ev["id"] in computed:
+            continue
+        assert squash(ev["claim_span"]) in bodies, ev
+    by = {c["field"]: c for c in o.claims}
+    rev_span = next(e for e in o.evidence if e["id"] == by["revenue"]["evidence_ids"][0])["claim_span"]
+    assert rev_span.startswith('"sumDriftsinntekter": 914000000.0')
+    role_spans = [next(e for e in o.evidence if e["id"] == c["evidence_ids"][0])["claim_span"] for c in o.claims if c["field"] == "role"]
+    assert any('"fornavn": "Amund"' in sp for sp in role_spans) and any('"navn": ["EIER AS"]' in sp for sp in role_spans)
+    assert "1970" not in json.dumps(o.evidence)
+
+
+def test_the_proof_span_is_verbatim_page_text_even_when_the_footer_is_split():
+    """Two footers (desktop and mobile) with content between: their joined text is not on the page, an excerpt is."""
+    from signalpost import identity
+    html = ("<html><head><title>Ferra Consult</title></head><body><h1>Velkommen</h1>"
+            "<footer><p>Ferra Consult AS</p><p>Klubbholmen 3, 9485 Harstad</p></footer>"
+            "<div>Kontakt oss for et tilbud.</div>"
+            "<footer class='mobile'><p>Tlf 902 65 000</p><p>Copyright 2026 Ferra Consult AS</p></footer></body></html>")
+    profile = {"organisation_number": "913266013", "name": "FERRA CONSULT AS", "municipality": "HARSTAD",
+               "registry": {"forretningsadresse": {"adresse": ["Klubbholmen 3"], "postnummer": "9485", "poststed": "HARSTAD", "kommune": "HARSTAD"}}}
+    res = identity.assess(profile, _page("https://www.ferra.no/", html))
+    assert res["status"] == "exact"
+    assert res["claim_span"] and res["claim_span"] in identity.html_text(html)
+    assert "Ferra Consult" in res["claim_span"]

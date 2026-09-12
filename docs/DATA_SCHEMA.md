@@ -77,7 +77,7 @@ one claim with `value: null`, `availability: "not_available"` and a `note`. Zero
 
 - `source_url` is the URL that was requested. `final_url` is where the request ended after redirects.
 - `content_sha256` is the hash of the raw bytes. `snapshot_path` is relative to the run directory and holds those bytes.
-- `claim_span` is the literal text, at most 300 characters, that supports the claim. It is always set.
+- `claim_span` is verbatim text from the snapshot, at most 300 characters, whitespace collapsed. For JSON and XML sources it is an excerpt of the raw bytes. For HTML pages it is an excerpt of the visible text, or of the markup for a value read from an attribute, a `<meta>` tag or JSON-LD (kept in the escaped form the page uses). It is always set. Two computed counts carry a description of the computation instead of an excerpt: `active_job_count` from the NAV feed scan (`nav_feed_scan`) and `role_count`. `eval/audit_artifact.py --run <dir>` checks every evidence record of a run against its snapshot.
 - `extraction_method` names the extractor (for example `json_ld`, `og`, `footer_regex`, `api_field`).
 
 Source classes, exact strings: `official_registry`, `official_accounts`, `official_roles`, `official_subunits`,

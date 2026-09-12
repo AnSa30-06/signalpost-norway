@@ -441,7 +441,7 @@ class _Crawl:
                     self.links.setdefault(cu, (classify(cu), ""))
             d = iso_date(lm.get_text()) if lm else None
             if d and (best is None or d > best[0]):
-                best = (d, re.sub(r"\s+", " ", str(u)))
+                best = (d, span_around(r.text, loc_txt or lm.get_text(strip=True), 220))   # the file's own bytes, not a re-serialisation
         if best:
             self.claim("activity", "sitemap_lastmod", best[0], r, best[1], "sitemap_lastmod")
 
