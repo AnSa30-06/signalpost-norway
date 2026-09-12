@@ -265,9 +265,10 @@ class Session:
             if r.ok:
                 rp = urllib.robotparser.RobotFileParser()
                 rp.parse(r.text.splitlines())
-            elif r.status in (401, 403):
-                rp = urllib.robotparser.RobotFileParser()
-                rp.parse(["User-agent: *", "Disallow: /"])
+            # A robots.txt that answers 401, 403, 404 or nothing at all is "unavailable" under RFC 9309 §2.3.1.3,
+            # and Google documents the same: unavailable means no restrictions. An earlier rule here read 401/403
+            # as "Disallow: /" and refused 17 hosts on one 1,000-company run that the standard permits. A site that
+            # truly refuses this crawler still refuses the page fetch itself, and that is recorded as blocked.
             with self._lock:
                 self._robots[origin] = rp
         rp = self._robots.get(origin)
@@ -368,6 +369,14 @@ class Session:
                     except UnsafeURL as u:
                         res.error = f"unsafe_redirect: {u}"
                         break
+                    # A redirect onto another host is a fetch from that host: its robots.txt applies too.
+                    if robots and (urllib.parse.urlsplit(nxt).hostname or "").lower() != host.lower():
+                        if self.robots_allowed(nxt, company) is False:
+                            res.blocked = True
+                            res.error = "blocked_by_robots_after_redirect"
+                            res.redirects.append(nxt)
+                            res.final_url = nxt
+                            break
                     res.redirects.append(nxt)
                     current = nxt
                     hops += 1
@@ -403,6 +412,7 @@ class Session:
                 break
             except (urllib.error.URLError, socket.timeout, TimeoutError, ConnectionError, OSError, ValueError) as exc:
                 msg = str(getattr(exc, "reason", exc))[:200]
+                res.status = None   # a status from an earlier redirect hop must not describe this failed hop
                 if res.attempts < 2 and self.remaining(company) > 0 and ("timed out" in msg.lower() or "reset" in msg.lower()):
                     time.sleep(0.5)
                     continue

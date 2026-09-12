@@ -22,8 +22,10 @@ body to `snapshots/<sha256>.<ext>`, and logs every attempt to `requests.jsonl`.
 ## robots.txt
 
 Fetched once per origin and cached for the run. A URL is fetched only if both the agent's user agent and `*` are allowed.
-If robots.txt returns 401 or 403, the origin is treated as `Disallow: /` (fail closed). If robots.txt cannot be
-fetched for another reason (network error, 404), the fetch proceeds and the attempt is recorded in `requests.jsonl`.
+If robots.txt cannot be fetched (401, 403, 404, network error), it is "unavailable" in the sense of RFC 9309
+§2.3.1.3 and imposes no restrictions; the fetch proceeds and the attempt is recorded in `requests.jsonl`. A site
+that refuses this crawler refuses the page itself, and that answer is recorded as `blocked`. A redirect onto a
+different host is checked against that host's robots.txt before it is followed.
 Official APIs (data.brreg.no, arbeidsplassen.nav.no) are fetched with the robots check on as well.
 
 ## Connectors

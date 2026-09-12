@@ -49,7 +49,7 @@ Source class `company_owned`. Only a site that passed the exact-entity gate (IDE
 
 Access rules, all enforced in `signalpost/net.py`:
 
-- `robots.txt` fetched once per host and obeyed for both the agent's user agent and `*`. If robots returns 401 or 403, the host is treated as fully disallowed (fail closed).
+- `robots.txt` fetched once per host and obeyed for both the agent's user agent and `*`. A robots.txt that cannot be fetched (401, 403, 404) is unavailable under RFC 9309 and imposes no restrictions; a redirect onto another host is checked against that host's robots.txt too.
 - Identified user agent: `signalpost-norway-agent/1.0 (+https://github.com/AnSa30-06/signalpost-norway; research crawler; contact via repo)`.
 - 12 second timeout, 2 MB per response, at most 5 redirect hops, one retry on 5xx or timeout, a 90 s host cooldown after three consecutive 429s.
 - About 10 pages per site: homepage, sitemap, up to 7 targeted pages (about, contact, team, careers, news, press), RSS.

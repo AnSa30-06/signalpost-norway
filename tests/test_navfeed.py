@@ -124,3 +124,11 @@ def test_unbuilt_index_is_failed():
     assert not ix.build()
     res = navfeed.fetch({"organisation_number": "810034882", "name": "SANDNES ELEKTRISKE AS"}, s, ix)
     assert res["claims"][0]["availability"] == "failed" and res["errors"]
+
+
+
+def test_a_short_employer_name_does_not_match_by_substring():
+    """"Nav" must not become a candidate for NAVIGATOR MARITIME AS just because "nav" is inside "navigator"."""
+    s, ix = build_index({navfeed.FEED_URL: (200, page([item("u7", "Nav", "Rådgiver"), item("u8", "Navigator Maritime AS", "Skipper")]))})
+    names = [c["businessName"] for c in ix.candidates("NAVIGATOR MARITIME AS")]
+    assert names == ["Navigator Maritime AS"]

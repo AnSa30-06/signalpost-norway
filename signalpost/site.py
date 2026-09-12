@@ -363,7 +363,10 @@ class _Crawl:
                     name = node.get("name") if isinstance(node.get("name"), str) else self.brand
                     self.locations.setdefault(addr, ({"name": name or self.brand, "address": addr[:200]}, page,
                                                      sp(addr.split(",")[0]), "jsonld_address", 1.0))
-            if "Person" in types and isinstance(node.get("name"), str) and isinstance(node.get("jobTitle"), str):
+            # A structured Person is a leader only when the title is a leadership title: JSON-LD also carries
+            # article authors ("Content Writer") and testimonial givers, and TITLE_RE already guards the text route.
+            if ("Person" in types and isinstance(node.get("name"), str) and isinstance(node.get("jobTitle"), str)
+                    and TITLE_RE.search(node["jobTitle"])):
                 self.add_leader(node["name"], node["jobTitle"], page, sp(node["name"]), "jsonld_person", 1.0)
             if "JobPosting" in types and isinstance(node.get("title"), str):
                 loc = node.get("jobLocation")

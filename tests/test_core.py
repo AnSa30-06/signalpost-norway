@@ -375,3 +375,28 @@ def test_filing_years_are_published_and_paced_endpoint_404_is_not_available():
     o2 = Official(s2, IdGen(), "999999999", {"legal_form": "AS"})
     o2.filing_years()
     assert [c for c in o2.claims if c["field"] == "accounts_filing_years"][0]["availability"] == "not_available"
+
+
+
+def test_robots_401_403_means_unavailable_not_disallowed(tmp_path):
+    """RFC 9309 §2.3.1.3: an unavailable robots.txt imposes no restrictions. A 200 with Disallow still does."""
+    from signalpost.net import Session
+    s = Session(tmp_path, max_total_requests=10, per_company_cap=10)
+    calls = {}
+
+    def fake_get(url, company, kind="html", **kw):
+        status, body = calls.get(url, (404, ""))
+        r = FetchResult(url=url, final_url=url, status=status, body=body.encode(), text=body, retrieved_at="t")
+        if status >= 400:
+            r.error = f"http_{status}"
+            r.blocked = status in (401, 403)
+        return r
+
+    s.get = fake_get
+    calls["https://forbidden.no/robots.txt"] = (403, "")
+    assert s.robots_allowed("https://forbidden.no/", "c") is None          # unavailable -> allowed
+    calls["https://closed.no/robots.txt"] = (200, "User-agent: *\nDisallow: /\n")
+    assert s.robots_allowed("https://closed.no/", "c") is False           # explicit disallow still blocks
+    calls["https://open.no/robots.txt"] = (200, "User-agent: *\nDisallow: /private\n")
+    assert s.robots_allowed("https://open.no/", "c") is True
+    assert s.robots_allowed("https://open.no/private/x", "c") is False

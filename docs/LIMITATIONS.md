@@ -42,8 +42,10 @@ get `not_applicable` or `not_available`. No value is ever estimated or carried o
 
 ## robots.txt that cannot be fetched
 
-When robots.txt returns 401 or 403 the host is treated as fully disallowed. When robots.txt is unreachable for another
-reason (network error, 404), the fetch proceeds and the attempt is logged. This follows the common reading of the
+When robots.txt cannot be fetched (401, 403, 404 or a network error) it is treated as unavailable, which under
+RFC 9309 §2.3.1.3 means no restrictions; the page fetch then decides, and a refusal there is recorded as `blocked`.
+Until 2026-09-13 a 401/403 robots.txt was read as "Disallow: /", stricter than the standard; that refused 17 hosts
+on one 1,000-company run. A redirect onto another host is checked against that host's robots.txt before it is followed.
 robots convention, but it is a policy choice and it is recorded per host in `requests.jsonl`.
 
 ## Refresh

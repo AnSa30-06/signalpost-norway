@@ -246,3 +246,18 @@ def test_budget_exhaustion_is_clean():
     assert len(s.calls) <= 2
     assert any("budget" in e["message"] for e in res["errors"])
     assert by_field(res, "official_website") and all(e["stage"] == "site" for e in res["errors"])
+
+
+
+def test_structured_person_needs_a_leadership_title():
+    """A JSON-LD Person with jobTitle "Content Writer" is an author, not a leader; "Daglig leder" is."""
+    html = ("<html><head><title>Sandnes Elektriske AS</title>"
+            "<script type='application/ld+json'>{\"@context\":\"https://schema.org\",\"@graph\":["
+            "{\"@type\":\"Person\",\"name\":\"Kari Skribent\",\"jobTitle\":\"Content Writer\"},"
+            "{\"@type\":\"Person\",\"name\":\"Ola Nordmann\",\"jobTitle\":\"Daglig leder\"}]}</script></head>"
+            "<body><p>Org.nr 987 654 321</p></body></html>")
+    s = FakeSession({ORIGIN + "/": html})
+    home = page(ORIGIN + "/", html)
+    res = site.crawl(PROFILE, s, home, identity.assess(PROFILE, home), page_budget=0)
+    leaders = {c["value"]["name"]: c["value"]["title"] for c in by_field(res, "site_leader")}
+    assert leaders == {"Ola Nordmann": "Daglig leder"}

@@ -167,7 +167,7 @@ class FeedIndex:
                     continue
                 hit = (bname == target or bname == stripped
                        or (len(stripped) >= 6 and stripped in bname)
-                       or (len(stripped) >= 6 and bname in stripped)
+                       or (len(stripped) >= 6 and len(bname) >= 6 and bname in stripped)
                        or (len(want) >= 2 and set(want) <= set(bname.split())))
                 if hit:
                     for u in uuids:
