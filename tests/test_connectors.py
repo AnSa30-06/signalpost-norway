@@ -275,3 +275,24 @@ def test_synthesis_answers_are_claim_backed_or_explicitly_unanswerable():
     assert questions["Is it growing?"]["answerable"] and "Revenue rose 20% from NOK 20 million (2024) to NOK 24.1 million (2025)" in out["trend"]
     assert questions["Who leads it?"]["answerable"] is False
     assert any("wound up" in f for f in out["risk_flags"]) and "wound up" in out["summary"]
+
+
+def test_growth_answer_is_not_shadowed_by_the_change_list():
+    """Prior periods AND changes present at once: the growth answer must speak of revenue, never of job counts."""
+    env = envelope([
+        claim("legal_name", "Vekst AS"), claim("legal_form", "AS"),
+        claim("revenue", 24_100_000, section="accounts", period="2025-01-01..2025-12-31"),
+        claim("reporting_period", {"from": "2025-01-01", "to": "2025-12-31"}, section="accounts", period="2025-01-01..2025-12-31"),
+        claim("accounts_prior_period", {"reporting_period": "2024-01-01..2024-12-31", "revenue": 20_000_000.0, "annual_result": None,
+                                        "total_assets": None, "equity": None, "total_debt": None, "currency": "NOK"},
+              section="accounts", period="2024-01-01..2024-12-31"),
+    ])
+    env["run"]["refresh"] = {"baseline": False}
+    env["changes"] = [{"field": "job_posting", "change_type": "new_job", "materiality": "material", "previous_value": None,
+                       "current_value": {"title": "x"}, "first_observed": "2026-09-12T00:00:00Z", "last_observed": "2026-09-12T00:00:00Z",
+                       "evidence_ids": [], "previous_evidence_ids": []}]
+    out = synthesis.build(env)
+    growing = {a["question"]: a for a in out["answers"]}["Is it growing?"]
+    assert growing["answerable"] and growing["answer"].startswith("Revenue rose 20%")
+    assert "job" not in growing["answer"]
+    assert "1 new job ad" in out["what_changed"]

@@ -172,7 +172,7 @@ def _build(env: dict) -> dict:
         prev = priors[0]
         prev_year = _s(prev["reporting_period"]).split("..")[-1][:4]
         cur_year = (period or "").split("..")[-1][:4]
-        bits = []
+        trend_bits = []
         for fld, label in (("revenue", "Revenue"), ("annual_result", "The annual result"), ("equity", "Equity")):
             cur, old_v = _num(first(fld)), _num(prev.get(fld))
             if cur is None or old_v is None:
@@ -186,15 +186,15 @@ def _build(env: dict) -> dict:
                 direction = (f"rose {pct:.0f}% from" if pct >= 0.5 else f"fell {abs(pct):.0f}% from" if pct <= -0.5 else "was flat at") \
                     if abs(old_v) > 0 else "is"
             if direction.endswith("from"):
-                bits.append(f"{label} {direction} {money(old_v)} ({prev_year}) to {money(cur)} ({cur_year})")
+                trend_bits.append(f"{label} {direction} {money(old_v)} ({prev_year}) to {money(cur)} ({cur_year})")
             elif direction.startswith("moved"):
-                bits.append(f"{label} {direction} {money(old_v)} ({prev_year}) to {money(cur)} ({cur_year})")
+                trend_bits.append(f"{label} {direction} {money(old_v)} ({prev_year}) to {money(cur)} ({cur_year})")
             elif direction == "was flat at":
-                bits.append(f"{label} was flat at about {money(cur)} between {prev_year} and {cur_year}")
+                trend_bits.append(f"{label} was flat at about {money(cur)} between {prev_year} and {cur_year}")
             else:
-                bits.append(f"{label} {direction} {money(cur)} ({cur_year})")
-        if bits:
-            trend = _join(bits) + "."
+                trend_bits.append(f"{label} {direction} {money(cur)} ({cur_year})")
+        if trend_bits:
+            trend = _join(trend_bits) + "."
         elif len(priors) >= 1:
             trend = f"Accounts are on file for {len(priors) + 1} periods; the latest is {period}."
     years = first("accounts_filing_years")
@@ -397,7 +397,7 @@ def _build(env: dict) -> dict:
     answer("Who leads it?", lead_summary, ["role"])
     answer("How big is it?", (size_parts[0] if emp is not None else None) or acc_sentence, ["registry_employees", "revenue", "annual_result"])
     answer("What did its latest accounts show?", acc_sentence, ["revenue", "annual_result", "reporting_period"])
-    answer("Is it growing?", _join(bits) + "." if priors and bits else None, ["accounts_prior_period", "revenue", "annual_result"])
+    answer("Is it growing?", _join(trend_bits) + "." if priors and trend_bits else None, ["accounts_prior_period", "revenue", "annual_result"])
     answer("How long has it filed accounts?", history, ["accounts_filing_years", "first_filing_year", "filings_on_file"])
     answer("Where is it?", footprint, ["business_address", "workplace", "site_location"])
     answer("Is it hiring?", count_sentence or (hire[0] if hire else None), ["active_job_count", "job_posting"])

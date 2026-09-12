@@ -201,3 +201,11 @@ Refresh: five regression tests in `tests/test_refresh_remediation.py` cover a re
 with a new period, address and status changes, one filing producing one record, and self-diff idempotence.
 
 Full-run numbers for this revision are in `README.md` under "Measured" and in `submission/run-report-1000.json`.
+
+### Full-run numbers for revision 2 (2026-09-12, `out/run-final2`, code commit `54b1fc5`)
+
+1,000 of 1,000 envelopes, zero validation problems; 145 verified websites, 109 ambiguous, 724 no site, 20
+unreachable, 2 blocked; BLAAUW AS withheld; every one of the 1,000 companies carries its filing-year history;
+change records now include `changed_address` and `changed_status`; the `answers` block is present on all 1,000
+profiles. Gold: precision 1.000, recall 0.964, zero wrong-company publications on the 46 labelled rows.
+Requests 9,967; 37 minutes, paced by the filing-years endpoint.
