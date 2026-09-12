@@ -110,3 +110,20 @@ own fault, and none of the three is ever published as a verified website.
 DNS on this machine also failed intermittently under 32 concurrent workers, including for hosts that plainly
 exist. `assert_public_url` now retries a temporary resolver failure once and caches only stable results, so a
 resolver hiccup is not recorded as "this domain does not exist".
+
+## Known limits after revision 2 (2026-09-12)
+
+- **A same-country namesake without a stated organisation number** cannot be separated from the company by any
+  page content: two Norwegian firms called Nordic Bistro AS, each on its own site, each naming itself, only one
+  carrying its number. The gate then depends on the registered postcode or street being on the page. Where
+  neither is, the site is `ambiguous`, which costs recall rather than precision.
+- **A group domain that the registry itself ties to the subsidiary** is accepted: WILSON MANAGEMENT AS filed an
+  e-mail address on wilsonship.no, so that domain is published for it with the reason
+  `registry_email_domain:wilsonship.no`. A reader who wants only the subsidiary's own pages should treat that
+  reason code as a group signal.
+- **The published URL is the page that proved identity**, which for a platform-hosted page can be the platform
+  root: vibbo.no for a housing co-op, varmefag.no for a chain store. After revision 2 the chain root is no longer
+  published (the page does not name itself as the operator); the co-op page still is, because it carries the
+  co-op's own organisation number.
+- **Recall against the evaluator's pooled union is not measurable locally.** Every coverage figure in this
+  repository is coverage of what this agent found, not of what exists.
