@@ -323,3 +323,40 @@ def test_r6_brand_is_never_another_companys_title():
     from signalpost.identity import _pick_brand
     assert _pick_brand(["Stålleverandøren AS"], "NORFRAG TANK OG SILO AS") is None
     assert _pick_brand(["Norfrag"], "NORFRAG TANK OG SILO AS") == "Norfrag"
+
+
+# ---- recovery rules that keep correct sites after the remediation tightening ----------------------------------
+def test_registry_filed_email_domain_is_official_corroboration():
+    """WILSON MANAGEMENT AS filed an address on wilsonship.no with the registry; the page names the company."""
+    from signalpost import identity
+    html = "<html><head><title>Wilson Management AS</title></head><body><h1>Wilson Management AS</h1><p>Ship management, Bergen.</p></body></html>"
+    prof = _prof("910000010", "WILSON MANAGEMENT AS", "Bradbenken 1", "5003", "BERGEN")
+    prof["registry"]["epostadresse"] = "post@wilsonship.no"
+    res = identity.assess(prof, _page("https://wilsonship.no/", html))
+    assert res["status"] == "exact" and any(r.startswith("registry_email_domain:") for r in res["reasons"])
+    prof["registry"]["epostadresse"] = "someone@gmail.com"          # a consumer provider is nobody's domain
+    assert identity.assess(prof, _page("https://gmail.com/", html))["status"] != "exact"
+
+
+def test_punycode_hostname_is_decoded_before_the_domain_test():
+    from signalpost import identity
+    html = "<html><head><title>Åpne rom AS</title></head><body><p>Åpne rom AS – helsebygg og private hjem. post@åpnerom.no</p></body></html>"
+    res = identity.assess(_prof("915437959", "ÅPNE ROM AS", "Torggata 1", "0181", "OSLO"), _page("https://xn--pnerom-hua.no/", html))
+    assert res["status"] == "exact" and any(r.startswith("domain_is_legal_name:") for r in res["reasons"])
+
+
+def test_a_name_that_carries_its_own_tld_matches_the_host():
+    from signalpost import identity
+    html = "<html><head><title>Mittelverum.no</title></head><body><h1>Mittelverum.no</h1><p>Elverum sentrum.</p></body></html>"
+    res = identity.assess(_prof("999000111", "MITTELVERUM.NO AS", "Storgata 5", "2408", "ELVERUM"), _page("https://mittelverum.no/", html))
+    assert res["status"] == "exact"
+
+
+def test_one_word_name_needs_domain_and_address_together():
+    """lindkjenn.no: the surname is spelled by the domain, and the registered postcode is on the page."""
+    from signalpost import identity
+    with_addr = "<html><head><title>Hjem</title></head><body><p>Lindkjenn – vi står på for deg. Øyekastvegen 32, 3925 Porsgrunn</p></body></html>"
+    prof = _prof("866526362", "LINDKJENN AS", "Øyekastvegen 32", "3925", "PORSGRUNN")
+    assert identity.assess(prof, _page("https://lindkjenn.no/", with_addr))["status"] == "exact"
+    no_addr = "<html><head><title>Hjem</title></head><body><p>Lindkjenn – vi står på for deg.</p></body></html>"
+    assert identity.assess(prof, _page("https://lindkjenn.no/", no_addr))["status"] != "exact"

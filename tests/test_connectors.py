@@ -248,3 +248,30 @@ def test_load_previous(tmp_path):
     out = refresh.load_previous(p)
     assert set(out) == {"1", "2"} and out["1"]["run"] == 2
     assert refresh.load_previous(tmp_path / "missing.jsonl") == {}
+
+
+def test_synthesis_answers_are_claim_backed_or_explicitly_unanswerable():
+    """R10: every answer either cites claim ids that exist on the envelope, or says the evidence cannot answer."""
+    env = envelope([
+        claim("legal_name", "Sandnes Elektriske AS"), claim("legal_form", "AS"), claim("municipality", "SANDNES"),
+        claim("industry_code", "43.210"), claim("industry_label", "Elektrisk installasjonsarbeid"),
+        claim("revenue", 24_100_000, section="accounts", period="2025-01-01..2025-12-31"),
+        claim("reporting_period", {"from": "2025-01-01", "to": "2025-12-31"}, section="accounts", period="2025-01-01..2025-12-31"),
+        claim("accounts_prior_period", {"reporting_period": "2024-01-01..2024-12-31", "revenue": 20_000_000.0, "annual_result": 500_000.0,
+                                        "total_assets": None, "equity": None, "total_debt": None, "currency": "NOK"},
+              section="accounts", period="2024-01-01..2024-12-31"),
+        claim("status_flags", {"bankrupt": False, "liquidating": True, "forced_liquidation": False}),
+    ])
+    out = synthesis.build(env)
+    ids = {c["id"] for c in env["claims"]}
+    questions = {a["question"]: a for a in out["answers"]}
+    assert len(out["answers"]) >= 10
+    for a in out["answers"]:
+        if a["answerable"]:
+            assert a["answer"] and all(i in ids for i in a["claim_ids"]), a
+        else:
+            assert a["claim_ids"] == [] and a["answer"] in ("The evidence does not establish this.",
+                                                            "First run — there is no previous snapshot to compare.")
+    assert questions["Is it growing?"]["answerable"] and "Revenue rose 20% from NOK 20 million (2024) to NOK 24.1 million (2025)" in out["trend"]
+    assert questions["Who leads it?"]["answerable"] is False
+    assert any("wound up" in f for f in out["risk_flags"]) and "wound up" in out["summary"]
