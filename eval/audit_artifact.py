@@ -120,13 +120,14 @@ def audit_websites(envs, root: Path, failures: list[str]) -> int:
                 failures.append(f"{org} {name[:30]}: page states another organisation number {others[0]}")
         soup_title = re.search(r"<title[^>]*>(.*?)</title>", html, re.I | re.S)
         title = re.sub(r"\s+", " ", soup_title.group(1)).strip() if soup_title else ""
-        ba = next((c["value"] for c in e["claims"] if c["field"] == "business_address" and c["availability"] == "available"), None) or {}
-        former = next((c["value"] for c in e["claims"] if c["field"] == "former_names" and c["availability"] == "available"), []) or []
-        email = next((c["value"] for c in e["claims"] if c["field"] == "registry_email" and c["availability"] == "available"), None)
+        claim = lambda f: next((c["value"] for c in e["claims"] if c["field"] == f and c["availability"] == "available"), None)  # noqa: E731
+        ba, pa = claim("business_address") or {}, claim("registered_address") or {}
+        addr = lambda a: {"adresse": [a.get("street") or ""], "postnummer": a.get("postcode"), "poststed": a.get("city"), "kommune": a.get("municipality")}  # noqa: E731
+        # the profile the gate saw: both registered addresses, the former names, the registry's e-mail and website
         prof = {"organisation_number": org, "name": name, "municipality": e["identity"].get("municipality"),
-                "registry": {"forretningsadresse": {"adresse": [ba.get("street") or ""], "postnummer": ba.get("postcode"),
-                                                    "poststed": ba.get("city"), "kommune": ba.get("municipality")},
-                             "historiskeNavn": [{"navn": n} for n in former], "epostadresse": email}}
+                "registry": {"forretningsadresse": addr(ba), "postadresse": addr(pa) if pa else {},
+                             "historiskeNavn": [{"navn": n} for n in (claim("former_names") or [])],
+                             "epostadresse": claim("registry_email"), "hjemmeside": claim("registry_website")}}
         if identity.title_names_another_entity([title], prof):
             failures.append(f"{org} {name[:30]}: title introduces another entity: {title[:60]!r}")
         want = set(identity.name_tokens(name))

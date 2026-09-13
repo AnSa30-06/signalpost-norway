@@ -5,59 +5,62 @@
     "completed_with_errors": 22
   },
   "family_company_coverage": {
-    "official_website": 0.144,
-    "social_profile": 0.088,
-    "contact": 0.351,
+    "official_website": 0.118,
+    "social_profile": 0.078,
+    "contact": 0.328,
     "site_leadership": 0.006,
-    "site_locations": 0.022,
-    "jobs": 0.019,
+    "site_locations": 0.019,
+    "jobs": 0.02,
     "dated_activity": 1.0,
     "accounts": 0.999,
     "roles": 0.999,
     "workplaces": 0.757,
-    "description": 0.139
+    "description": 0.114
   },
   "family_claim_volume": {
     "accounts": 1793,
     "roles": 4023,
     "workplaces": 797,
-    "dated_activity": 14208,
-    "official_website": 144,
-    "description": 233,
-    "contact": 746,
-    "social_profile": 177,
-    "site_locations": 23,
-    "jobs": 24,
+    "dated_activity": 14173,
+    "contact": 707,
+    "official_website": 118,
+    "description": 198,
+    "site_locations": 20,
+    "social_profile": 160,
+    "jobs": 25,
     "site_leadership": 7
   },
   "availability_states": {
-    "available": 50096,
-    "not_available": 3283,
-    "ambiguous": 108,
+    "available": 49916,
+    "not_available": 3177,
+    "ambiguous": 133,
     "failed": 22,
     "blocked": 2
   },
   "evidence_completeness": 1.0,
   "web_section_states": {
-    "not_available": 725,
-    "ambiguous": 108,
-    "available": 144,
+    "not_available": 726,
+    "ambiguous": 133,
+    "available": 118,
     "failed": 21,
     "blocked": 2
   },
-  "requests_total": 10114,
+  "requests_total": 10115,
   "requests_mean": 10.1,
   "requests_max": 32,
-  "runtime_p50_ms": 41678,
-  "runtime_p95_ms": 116599,
+  "runtime_p50_ms": 40876,
+  "runtime_p95_ms": 117838,
   "changes_by_type": {
-    "availability_changed": 4,
-    "new_social_profile": 1
+    "availability_changed": 29,
+    "new_registry_update": 1,
+    "new_website": 3,
+    "new_news": 1,
+    "new_social_profile": 3
   },
   "gold": {
     "rows": 46,
     "website_precision": 1.0,
-    "website_recall": 0.964,
+    "website_recall": 0.643,
     "wrong_company_publications": 0
   }
 }

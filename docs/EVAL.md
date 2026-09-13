@@ -224,6 +224,25 @@ scenarios through `signalpost run --previous` on real companies: a renamed compa
 `changed_name`; a revenue-absent filer whose period moved yields exactly one `new_filing` and no revenue change;
 an unchanged company yields no change records.
 
+### Full-run numbers for revision 3 (2026-09-13, `out/run-final6`, code commit `a6b044a`)
+
+1,000 of 1,000 envelopes, zero validation problems; 118 verified websites (42 organisation number on page, 48
+exact legal name with a registered address element, 28 registry-linked domain), 133 ambiguous, 726 no site, 21
+unreachable, 2 blocked. Requests 10,217; 37.3 minutes at 24 workers. Evidence audit: 43,919 records, 0
+non-verbatim; all 118 published websites clean on the four traps and re-gated `exact`. Gold: precision 1.000,
+recall 0.643 (revision 2: 0.964), zero wrong-company publications; the recall drop is the measured cost of
+publishing only on the organisation number, the exact legal name with an address element, or a registry-linked
+domain. Refresh against `out/run-final5`: 29 `availability_changed` on `official_website` (the rule change,
+recorded honestly), 3 `new_website` via the registry's `hjemmeside`, 1 `new_news`, 3 `new_social_profile`.
+
+### Judge-shaped run, revision 3 (2026-09-13, `out/judge-100-r3`)
+
+The same fixed random 100 through `./run.sh`, with the packaged revision-3 envelopes as the previous day: 100 of 100
+envelopes, zero validation problems; 1,185 requests; 585 s of agent time plus `uv sync` at 8 workers; p50 12.1 s,
+p95 117.8 s; $0; three companies at the 26-request cap, each saying so. Zero change records and identical section
+states against the package: the false-change rate the promotion rule requires. 7 verified websites among the 100
+(10 under revision 2). Evidence audit: 4,216 records, 0 non-verbatim, all 7 published websites clean.
+
 ### Judge-shaped run (2026-09-13, `out/judge-100`, the evaluator command itself)
 
 `./run.sh work/judge-100.jsonl out/judge-100 out/run-final5/envelopes.jsonl` on a fixed random 100 of the 1,000

@@ -131,30 +131,35 @@ bare place name never reach `exact`. Details and the measured cost are in
 
 ## Measured
 
-Revision 2 submission run, 2026-09-13, clean tree at code commit `b1e87d7`, antivirus off
+Revision 3 submission run, 2026-09-13, clean tree at code commit `a6b044a`, antivirus off
 (`submission/run-report-1000.json`, `eval/report.json`):
 
 | Measure | Value |
 |---|---|
 | envelopes / inputs | 1,000 / 1,000, zero validation problems |
-| requests | 10,218 total: 104 for the once-per-run NAV feed scan, then 10.1 per company |
-| wall clock | 37.3 min for 1,000 companies at 24 workers, set by the registry's filing-years endpoint paced at 30 requests a minute; p50 41.7 s, p95 116.6 s per company |
+| requests | 10,217 total: 104 for the once-per-run NAV feed scan, then 10.1 per company |
+| wall clock | 37.3 min for 1,000 companies at 24 workers, set by the registry's filing-years endpoint paced at 30 requests a minute; p50 40.9 s, p95 117.8 s per company |
 | third-party cost | $0 |
 | identity / accounts / leadership / workplaces / activity / hiring | 1,000 / 999 / 999 / 1,000 / 1,000 / 1,000 sections available |
 | filing history | 1,000 of 1,000 companies carry `accounts_filing_years` from the registry |
-| web | 144 verified exact (92 name + registered address, 43 organisation number on page, 9 full legal name as a phrase), 108 ambiguous, 725 no site found, 21 unreachable, 2 blocked |
+| web | 118 verified exact (42 organisation number on page, 48 exact legal name with the registered address, 28 registry-linked domain), 133 ambiguous, 726 no site found, 21 unreachable, 2 blocked |
 | NAV job feed | active national ads scanned once per run; every published ad confirmed by an organisation number in NAV's own record |
-| evidence | `eval/audit_artifact.py`: 44,099 evidence records checked, 0 spans not verbatim in their snapshot; all 144 published websites re-checked from the stored page for another organisation number, another entity in the title, a many-company listing and a foreign brand: 0 hits |
+| evidence | `eval/audit_artifact.py`: 43,919 evidence records checked, 0 spans not verbatim in their snapshot; all 118 published websites re-checked from the stored page for another organisation number, another entity in the title, a many-company listing and a foreign brand, and re-gated with the current code: 0 failures |
 | synthesis | an `answers` block on all 1,000 profiles; a verification sentence on every profile with a website candidate |
-| repeatability | against the previous full run 40 minutes earlier (same code but for two evidence fixes): 3 `availability_changed` on `municipality` caused by the fix, 1 website unreachable this run, 1 `new_social_profile`; the other 143 verified websites identical |
+| gold set (46 hand-labelled rows) | precision 1.000, recall 0.643, zero wrong-company publications; recall fell from 0.964 in revision 2 because the stricter gate withholds sites the labels call right but that carry no address, number or registry link |
+| refresh against the revision-2 run | 28 websites `available` to `ambiguous` and 1 to `not_available`, each recorded as `availability_changed` (the rule change); 3 `new_website` through the registry's own `hjemmeside`; 1 `new_news`, 3 `new_social_profile` |
 
-**Judge-shaped run, measured** (2026-09-13, `./run.sh work/judge-100.jsonl out/judge-100 <previous>`, a fixed
-random 100 of the 1,000 with the packaged envelopes as the previous day): 100 of 100 envelopes, zero validation
-problems; 1,180 requests against the 1,950 cap (105 for the feed scan, then 10.8 per company, at most 26 for any
-one company); 9.5 minutes at 8 workers plus one minute for `uv sync`, against the 45-minute cap; p50 11.6 s, p95
-111 s per company; $0. Refresh against the packaged output: **zero change records on all 100 companies** (no
-false changes), and every section state identical. `eval/audit_artifact.py` on that run: 4,227 evidence
-records, 0 spans not verbatim, all 10 published websites clean.
+**Judge-shaped run, revision 2, measured** (2026-09-13, `./run.sh` on a fixed random 100 with the packaged
+envelopes as the previous day, from a fresh clone with no seed file): 100 of 100 envelopes, zero validation
+problems, 1,179 requests against the 1,950 cap, 9.6 minutes at 8 workers against the 45-minute cap, $0; a
+second day against the first: zero change records.
+
+**Judge-shaped run, revision 3, measured** (2026-09-13, `./run.sh work/judge-100.jsonl out/judge-100-r3 <revision-3
+envelopes>`, the same fixed random 100 with the packaged revision-3 envelopes as the previous day): 100 of 100
+envelopes, zero validation problems; 1,185 requests against the 1,950 cap; 9.8 minutes at 8 workers plus one minute of
+`uv sync`, against the 45-minute cap; p50 12.1 s, p95 117.8 s; $0. **Zero change records** and every section state
+identical to the package. 7 of the 100 carry a verified website under the revision-3 gate (10 under revision 2).
+`eval/audit_artifact.py` on that run: 4,216 evidence records, 0 spans not verbatim, all 7 published websites clean.
 
 **Hand-audited accuracy** over 230 companies across two rounds, 46 of them labelled from the page itself
 (`eval/gold.jsonl`, method in [docs/EVAL.md](docs/EVAL.md)):
