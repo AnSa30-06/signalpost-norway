@@ -100,16 +100,23 @@ def _page(url, html):
                        content_type="text/html; charset=utf-8")
 
 
-def test_domain_spelling_a_multiword_name_is_corroboration():
-    """afgruppen.no for "AF GRUPPEN ASA": the company registered a domain that spells out its legal name."""
+def test_r12_a_domain_spelling_the_name_is_not_corroboration():
+    """afgruppen.no for "AF GRUPPEN ASA": a domain anyone can register proves nothing (Builderr, revision 3). The
+    same page with the registered street and number, or with the registry's own e-mail domain, is exact."""
     from signalpost import identity
     html = ("<html><head><title>AF Gruppen</title></head><body><p>AF Gruppen bygger i Oslo.</p>"
             "<footer>Kontakt: post@afgruppen.no, tlf +47 22 89 11 00</footer></body></html>")
     profile = {"organisation_number": "938702675", "name": "AF GRUPPEN ASA", "municipality": "OSLO",
                "registry": {"forretningsadresse": {"adresse": ["Standardveien 1"], "postnummer": "0581", "poststed": "OSLO", "kommune": "OSLO"}}}
     res = identity.assess(profile, _page("https://www.afgruppen.no/", html))
-    assert res["status"] == "exact"
-    assert any(r.startswith("domain_is_legal_name:") for r in res["reasons"])
+    assert res["status"] != "exact" and res["reasons"][0] == "name_only"
+    with_street = html.replace("<footer>", "<footer>AF Gruppen ASA, Standardveien 1, 0581 Oslo. ")
+    res = identity.assess(profile, _page("https://www.afgruppen.no/", with_street))
+    assert res["status"] == "exact" and res["reasons"][0] == "legal_name_and_registered_address"
+    assert "street_with_number:standardveien 1" in res["reasons"] and "postcode_with_city:0581 oslo" in res["reasons"]
+    linked = dict(profile, registry=dict(profile["registry"], epostadresse="post@afgruppen.no"))
+    res = identity.assess(linked, _page("https://www.afgruppen.no/", html))
+    assert res["status"] == "exact" and res["reasons"][0] == "registry_linked_domain" and "registry_email_domain:afgruppen.no" in res["reasons"]
 
 
 def test_hosting_placeholder_is_never_the_official_website():
@@ -303,12 +310,16 @@ def test_r4_a_third_partys_page_that_mentions_us_is_not_ours():
     assert res["status"] != "exact" and res["reasons"][0] == "page_belongs_to_another_company"
 
 
-def test_r4_the_companys_own_page_writing_its_name_out_still_passes():
+def test_r4_the_companys_own_page_writing_its_name_out_needs_its_address_too():
+    """The full legal name written out is name evidence; since revision 3 it still needs a registered address element."""
     from signalpost import identity
     html = ("<html><head><title>Norfrag as</title></head><body><h1>Norfrag Tank og Silo as</h1>"
             "<p>Norfrag Tank og Silo as tilbyr leveranse av tanker og siloer.</p><footer>post@norfrag.no</footer></body></html>")
-    res = identity.assess(_prof("979476835", "NORFRAG TANK OG SILO AS", "Industriveien 5", "7300", "ORKANGER"), _page("https://norfrag.no/", html))
-    assert res["status"] == "exact" and res["reasons"][0] == "legal_name_phrase_on_page"
+    prof = _prof("979476835", "NORFRAG TANK OG SILO AS", "Industriveien 5", "7300", "ORKANGER")
+    res = identity.assess(prof, _page("https://norfrag.no/", html))
+    assert res["status"] != "exact" and res["reasons"][0] == "name_only"
+    res = identity.assess(prof, _page("https://norfrag.no/", html.replace("post@norfrag.no", "Industriveien 5, 7300 Orkanger. post@norfrag.no")))
+    assert res["status"] == "exact" and res["reasons"][0] == "legal_name_and_registered_address"
 
 
 def test_r5_a_directory_page_naming_many_companies_is_not_ours():
@@ -338,28 +349,77 @@ def test_registry_filed_email_domain_is_official_corroboration():
     assert identity.assess(prof, _page("https://gmail.com/", html))["status"] != "exact"
 
 
-def test_punycode_hostname_is_decoded_before_the_domain_test():
+def test_punycode_hostname_is_decoded_before_the_registry_link_test():
+    """The registry lists https://åpnerom.no; the candidate host is its punycode form. That is a registry-linked domain."""
     from signalpost import identity
     html = "<html><head><title>Åpne rom AS</title></head><body><p>Åpne rom AS – helsebygg og private hjem. post@åpnerom.no</p></body></html>"
-    res = identity.assess(_prof("915437959", "ÅPNE ROM AS", "Torggata 1", "0181", "OSLO"), _page("https://xn--pnerom-hua.no/", html))
-    assert res["status"] == "exact" and any(r.startswith("domain_is_legal_name:") for r in res["reasons"])
+    prof = _prof("915437959", "ÅPNE ROM AS", "Torggata 1", "0181", "OSLO")
+    assert identity.assess(prof, _page("https://xn--pnerom-hua.no/", html))["status"] != "exact"
+    prof["registry"]["hjemmeside"] = "https://åpnerom.no/"
+    res = identity.assess(prof, _page("https://xn--pnerom-hua.no/", html))
+    assert res["status"] == "exact" and res["reasons"][0] == "registry_linked_domain" and "registry_website_domain:apnerom.no" in res["reasons"]
 
 
-def test_a_name_that_carries_its_own_tld_matches_the_host():
+def test_a_domain_matching_the_name_needs_the_registry_to_link_it():
     from signalpost import identity
     html = "<html><head><title>Mittelverum.no</title></head><body><h1>Mittelverum.no</h1><p>Elverum sentrum.</p></body></html>"
-    res = identity.assess(_prof("999000111", "MITTELVERUM.NO AS", "Storgata 5", "2408", "ELVERUM"), _page("https://mittelverum.no/", html))
+    prof = _prof("999000111", "MITTELVERUM.NO AS", "Storgata 5", "2408", "ELVERUM")
+    assert identity.assess(prof, _page("https://mittelverum.no/", html))["status"] != "exact"
+    prof["registry"]["epostadresse"] = "post@mittelverum.no"
+    assert identity.assess(prof, _page("https://mittelverum.no/", html))["status"] == "exact"
+
+
+def test_one_word_name_needs_the_full_name_or_an_identity_position_plus_the_address():
+    """lindkjenn.no: "Lindkjenn AS" written out with the registered street and postcode is exact; the surname alone
+    in the body with the address is not; the name without any address element is not."""
+    from signalpost import identity
+    prof = _prof("866526362", "LINDKJENN AS", "Øyekastvegen 32", "3925", "PORSGRUNN")
+    full = "<html><head><title>Hjem</title></head><body><p>Lindkjenn AS – vi står på for deg. Øyekastvegen 32, 3925 Porsgrunn</p></body></html>"
+    res = identity.assess(prof, _page("https://lindkjenn.no/", full))
+    assert res["status"] == "exact" and "street_with_number:oyekastvegen 32" in res["reasons"] and "postcode_with_city:3925 porsgrunn" in res["reasons"]
+    in_title = "<html><head><title>Lindkjenn</title></head><body><p>Vi står på for deg. Øyekastvegen 32, 3925 Porsgrunn</p></body></html>"
+    assert identity.assess(prof, _page("https://lindkjenn.no/", in_title))["status"] == "exact"
+    body_only = "<html><head><title>Hjem</title></head><body><p>Lindkjenn – vi står på for deg. Øyekastvegen 32, 3925 Porsgrunn</p></body></html>"
+    assert identity.assess(prof, _page("https://lindkjenn.no/", body_only))["status"] != "exact"
+    no_addr = "<html><head><title>Lindkjenn AS</title></head><body><p>Lindkjenn AS – vi står på for deg.</p></body></html>"
+    assert identity.assess(prof, _page("https://lindkjenn.no/", no_addr))["status"] != "exact"
+
+
+def test_r12_the_fjords_travel_guide_is_not_the_ferry_company():
+    """fjords.com was published for THE FJORDS DA (Builderr, revision 2 report). The registered street is the village
+    "Flåm"; the page is a travel guide that names Flåm and Aurland, and its title carries the domain. None of that is
+    entity evidence: no organisation number, no exact legal name with an address element, no registry link."""
+    from signalpost import identity
+    html = ("<html><head><title>Fjordene på Vestlandet – Reiseguide til norske fjorder | fjords.com</title></head><body>"
+            "<h1>Fjordene på Vestlandet</h1><p>Utsikt fra Stegastein mot Aurland og Aurlandsfjorden. Flåm, som er endestasjonen "
+            "på Flåmsbana, ligger bak fjellryggen. The fjords of Norway are a UNESCO site.</p><footer>© fjords.com</footer></body></html>")
+    prof = _prof("914922941", "THE FJORDS DA", "Flåm", "5742", "FLÅM")
+    res = identity.assess(prof, _page("https://fjords.com/", html))
+    assert res["status"] != "exact"
+    assert not any(r.startswith(("street_with_number:", "postcode_with_city:")) for r in res["reasons"])
+    # the same company on a page that carries its postcode with its town is a different matter
+    res = identity.assess(prof, _page("https://fjords.com/", html.replace("<footer>", "<footer>The Fjords DA, 5742 Flåm. ")))
     assert res["status"] == "exact"
 
 
-def test_one_word_name_needs_domain_and_address_together():
-    """lindkjenn.no: the surname is spelled by the domain, and the registered postcode is on the page."""
+def test_r12_a_bare_postcode_or_a_bare_village_is_not_an_address():
     from signalpost import identity
-    with_addr = "<html><head><title>Hjem</title></head><body><p>Lindkjenn – vi står på for deg. Øyekastvegen 32, 3925 Porsgrunn</p></body></html>"
-    prof = _prof("866526362", "LINDKJENN AS", "Øyekastvegen 32", "3925", "PORSGRUNN")
-    assert identity.assess(prof, _page("https://lindkjenn.no/", with_addr))["status"] == "exact"
-    no_addr = "<html><head><title>Hjem</title></head><body><p>Lindkjenn – vi står på for deg.</p></body></html>"
-    assert identity.assess(prof, _page("https://lindkjenn.no/", no_addr))["status"] != "exact"
+    prof = _prof("810034882", "SANDNES ELEKTRISKE AS", "Storgata 12", "4306", "SANDNES")
+    bare = "<html><head><title>Sandnes Elektriske AS</title></head><body><p>Ring 4306 for tilbud.</p></body></html>"
+    res = identity.assess(prof, _page("https://x.no/", bare))
+    assert res["status"] != "exact" and "postcode_bare:4306" in res["reasons"]
+    with_town = "<html><head><title>Sandnes Elektriske AS</title></head><body><p>Besøk oss i 4306 Sandnes.</p></body></html>"
+    assert identity.assess(prof, _page("https://x.no/", with_town))["status"] == "exact"
+
+
+def test_r12_hyphens_and_connector_words_inside_the_legal_name():
+    from signalpost import identity
+    eli = _prof("924303824", "ELI REN AS", "Kvernhusveien 1", "4324", "SANDNES")
+    html = "<html><head><title>Eli-Ren – profesjonell rengjøring</title></head><body><p>Eli-Ren, Kvernhusveien 1, 4324 Sandnes</p></body></html>"
+    assert identity.assess(eli, _page("https://eliren.no/", html))["status"] == "exact"
+    sagelv = _prof("932194937", "SAGELV RÅDGIVNING & KOMPETANSE AS", "Altaveien 101", "9515", "ALTA")
+    html = "<html><head><title>Sagelv</title></head><body><h1>Sagelv Rådgivning og Kompetanse AS</h1><p>Altaveien 101, 9515 Alta</p></body></html>"
+    assert identity.assess(sagelv, _page("https://sagelv.no/", html))["status"] == "exact"
 
 
 

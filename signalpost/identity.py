@@ -38,6 +38,9 @@ CONSUMER_MAIL_DOMAINS = {
     "online.no", "start.no", "frisurf.no", "c2i.net", "broadpark.no", "getmail.no", "sf-nett.no", "hotmail.co.uk",
 }
 TITLE_SEPARATORS = (" | ", " – ", " — ", " - ", " · ", " :: ", " » ")
+# Between two words of a legal name a page may write a space, a hyphen ("Eli-Ren"), or "og"/"and"/"&" where the
+# registry wrote the other ("Sagelv Rådgivning & Kompetanse" on a page that says "og").
+NAME_JOIN = r"(?:[\s\-]+(?:og|and|&)[\s\-]+|[\s\-]+)"
 _FOLD = str.maketrans({"æ": "ae", "ø": "o", "å": "a", "Æ": "ae", "Ø": "o", "Å": "a"})
 
 
@@ -207,27 +210,6 @@ def title_names_another_entity(title_texts: Iterable[str], profile: dict) -> Opt
     return supersets[0] if supersets else None
 
 
-def _norway_signal(folded_text: str, full_text: str, hostname: str = "") -> bool:
-    """Does anything tie this page to Norway?
-
-    This guards the domain-spells-the-name corroborator against a foreign namesake: hoainvest.com spells
-    HOA INVEST AS exactly and is a California investment firm.
-
-    Every signal here must be unambiguous. A "4 digits then a capitalised word" test for a Norwegian postcode
-    was tried and removed: it read the Californian street address "2300 Palm" as a Norwegian postcode and let
-    that namesake through. A .no domain, a +47 number and the country's name cannot be produced by accident.
-    """
-    if fold(hostname).rstrip(".").endswith(".no"):
-        return True
-    if any(m in folded_text for m in NORWAY_MARKERS):
-        return True
-    if re.search(r"\+\s?47[\s\d]{6,}", full_text):                 # Norwegian dialling code
-        return True
-    if re.search(r"@[\w.-]+\.no\b", full_text) or re.search(r"https?://[\w.-]+\.no\b", full_text):
-        return True
-    return False
-
-
 def _corroborators(profile: dict, folded_text: str) -> list[str]:
     reg = profile.get("registry") or {}
     hits = []
@@ -235,13 +217,20 @@ def _corroborators(profile: dict, folded_text: str) -> list[str]:
     addresses = [reg.get("forretningsadresse") or {}, reg.get("postadresse") or {}]
     for addr in addresses:
         pc = str(addr.get("postnummer") or "").strip()
-        if re.fullmatch(r"\d{4}", pc) and re.search(rf"(?<!\d){pc}(?!\d)", folded_text):
-            hits.append(f"postcode:{pc}")
+        city = fold(addr.get("poststed")).strip()
+        if re.fullmatch(r"\d{4}", pc):
+            # "5742 Flåm": the postcode written with its town, as a Norwegian address is written. Four bare digits
+            # can be a price or a year; a town name alone is on every page about the region (THE FJORDS DA).
+            if city and re.search(rf"(?<!\d){pc}\s+{re.escape(city)}\b", folded_text):
+                hits.append(f"postcode_with_city:{pc} {city}")
+            elif re.search(rf"(?<!\d){pc}(?!\d)", folded_text):
+                hits.append(f"postcode_bare:{pc}")
         for line in addr.get("adresse") or []:
-            m = re.match(r"([^\d,]+)", fold(line))
-            street = m.group(1).strip() if m else ""
-            if len(street) >= 4 and re.search(rf"\b{re.escape(street)}\b", folded_text):
-                hits.append(f"street:{street}")
+            street = re.sub(r"\s+", " ", fold(line)).strip(" ,")
+            if re.search(r"\d", street) and len(street) >= 4 and re.search(rf"\b{re.escape(street)}\b", folded_text):
+                hits.append(f"street_with_number:{street}")     # "klubbholmen 3", "postboks 12"; never a bare village name
+            elif len(street) >= 4 and re.search(rf"\b{re.escape(street)}\b", folded_text):
+                hits.append(f"street_name:{street}")
         for place in (addr.get("poststed"), addr.get("kommune")):
             p = fold(place).strip()
             if len(p) >= 3 and p not in in_name and re.search(rf"\b{re.escape(p)}\b", folded_text):
@@ -327,14 +316,18 @@ def assess(profile: dict, page, extra_text: str = "") -> dict:
         if node_types(node) & ORG_TYPES:
             ld_names.extend(_str_values(node, ("name", "legalName", "alternateName")))
     positions = _identity_positions(soup, title, meta, ld_names, full_text)
+    # A page's own domain in its title or copyright line ("… | fjords.com", "© fjords.com") is not the page naming
+    # a company. Strip it before asking whether the identity positions carry the name.
+    host_forms = sorted({h for h in (hostname, hostname.removeprefix("www.")) if h}, key=len, reverse=True)
     identity_text = " ".join(v for _, v in positions if v)
+    if host_forms:
+        identity_text = re.sub("|".join(re.escape(h) for h in host_forms), " ", identity_text, flags=re.I)
     identity_folded = fold(identity_text)
     folded_all = fold(full_text)
 
     want = name_tokens(profile.get("name"))
     raw = [t for t in tokens(profile.get("name")) if t not in LEGAL_FORMS]
-    name_compact = "".join(raw)
-    phrase_re = re.compile(r"\b" + r"\s+".join(re.escape(t) for t in raw) + r"\b") if len(raw) >= 2 else None
+    phrase_re = re.compile(r"\b" + NAME_JOIN.join(re.escape(t) for t in raw) + r"\b") if len(raw) >= 2 else None
     in_identity = bool(want) and all(t in set(tokens(identity_text)) for t in want)
     phrase_in_identity = bool(phrase_re and phrase_re.search(identity_folded))
     phrase_in_body = bool(phrase_re and phrase_re.search(folded_all))
@@ -423,54 +416,44 @@ def assess(profile: dict, page, extra_text: str = "") -> dict:
         return _finish(result)
 
     corr = _corroborators(profile, folded_all)
-    addr_strong = [c for c in corr if c.startswith(("postcode:", "street:"))]
-    strong = list(addr_strong)
-    norwegian = _norway_signal(folded_all, full_text, hostname)
+    addr_strong = [c for c in corr if c.startswith(("postcode_with_city:", "street_with_number:"))]
     host_sans_www = fold(hostname).removeprefix("www.")
     labels = [l for l in host_sans_www.split(".") if l]
-    label0 = re.sub(r"[^a-z0-9]", "", labels[0]) if labels else ""
-    # The registry's own e-mail address for the company names a domain the company uses (official source).
-    reg_email = str((profile.get("registry") or {}).get("epostadresse") or "").strip().lower()
-    email_domain = reg_email.rsplit("@", 1)[-1] if "@" in reg_email else ""
     cand_domain = ".".join(labels[-2:]) if len(labels) >= 2 else host_sans_www
+    # R12. A registry-linked domain: the e-mail domain or the website the company itself filed with the registry.
+    reg = profile.get("registry") or {}
+    reg_email = str(reg.get("epostadresse") or "").strip().lower()
+    email_domain = reg_email.rsplit("@", 1)[-1] if "@" in reg_email else ""
+    linked = []
     if email_domain and cand_domain and email_domain == cand_domain and email_domain not in CONSUMER_MAIL_DOMAINS:
-        corr = sorted(set(corr) | {f"registry_email_domain:{email_domain}"})
-        strong.append(f"registry_email_domain:{email_domain}")
-    # A domain that spells the whole multi-word name; or the name itself carries its .no ("MITTELVERUM.NO AS").
-    name_with_tld = ".".join(raw)
-    domain_match = None
-    if labels and norwegian:
-        if len(raw) >= 2 and len(name_compact) >= 7 and label0 == name_compact:
-            domain_match = f"domain_is_legal_name:{labels[0]}"
-        elif len(raw) >= 2 and host_sans_www == name_with_tld:
-            domain_match = f"domain_is_legal_name:{host_sans_www}"
-        elif len(raw) == 1 and len(name_compact) >= 6 and label0 == name_compact and addr_strong:
-            # a one-word name spelled by the domain counts only beside a registered postcode or street
-            domain_match = f"domain_is_legal_name:{labels[0]}"
-    if domain_match:
-        corr = sorted(set(corr) | {domain_match})
-        strong.append(domain_match)
-    host_has_token = any(len(t) >= 4 and t in host_compact for t in want)
-    names_others = [c for c in registered_company_names(identity_text) if not (set(name_tokens(c)) & set(want))]
+        linked.append(f"registry_email_domain:{email_domain}")
+    reg_site = str(reg.get("hjemmeside") or "").strip().lower()
+    reg_host = fold(urllib.parse.urlsplit(reg_site if "://" in reg_site else "http://" + reg_site).hostname or "").removeprefix("www.")
+    if reg_host and reg_host == host_sans_www:
+        linked.append(f"registry_website_domain:{reg_host}")
+    corr = sorted(set(corr) | set(linked))
+    # The exact legal name: the name minus its legal-form word as one contiguous phrase, or the full registered
+    # name including the form ("VIT AS"). Scattered tokens, a brand, or a domain name in the title do not count.
+    all_tokens = tokens(profile.get("name"))
+    full_re = re.compile(r"\b" + NAME_JOIN.join(re.escape(t) for t in all_tokens) + r"\b") if all_tokens else None
+    full_in_page = bool(full_re and full_re.search(folded_all))
+    # a one-word name has no phrase; it counts written out with its legal form, or as a distinctive word where
+    # the page names itself
+    one_word_named = len(raw) == 1 and self_identified and len(raw[0]) >= 6 and raw[0] not in GENERIC_TOKENS
+    name_exact = phrase_in_identity or phrase_in_body or full_in_page or one_word_named
 
-    # R2/R3. Exact needs two INDEPENDENT facts: the page naming itself as us, and a corroborator the page could
-    # not produce merely by carrying our name (a registered postcode or street, or a domain that spells the
-    # whole multi-word name). The full legal name written out as a phrase is stronger name evidence than
-    # scattered tokens, so on a Norwegian page it may stand in for an identity position when the domain also
-    # carries a name token — but never for a foreign page, and never when the page names somebody else.
-    if self_identified and strong:
-        result.update(score=0.95, reasons=["name_and_address", "self_identified", *corr], claim_span=span)
-    elif phrase_in_identity and norwegian and (strong or host_has_token) and len(name_compact) >= 7:
-        result.update(score=0.95, reasons=["legal_name_phrase_on_page", "in_identity_position", *corr,
-                                           *(["host_carries_name_token"] if not strong else [])], claim_span=span)
-    elif phrase_in_body and norwegian and len(name_compact) >= 7 and (strong or (host_has_token and not names_others)):
-        # the whole name written out, on a Norwegian page whose domain carries part of it and which names no
-        # other registered company anywhere it names itself
-        result.update(score=0.95, reasons=["legal_name_phrase_on_page", *corr,
-                                           *(["host_carries_name_token"] if not strong else [])], claim_span=span)
-    elif len(present_body) == len(want) and domain_match and addr_strong and norwegian:
-        # one-word name: the domain spells it, the registered postcode or street is on the page, the name is on the page
-        result.update(score=0.95, reasons=["name_and_address", "domain_and_address", *corr], claim_span=span)
+    # R12 (Builderr, revision 3): a website is published only on strong entity evidence. Three routes, and only
+    # three: the organisation number on the page (handled above); the exact legal name together with a
+    # registered address element (the postcode written with its town, or a street line with a house number);
+    # or a domain the company itself filed with the registry, with the name on the page. A name that is one
+    # generic word needs the page to carry it where a page names itself. Everything else is "review": the
+    # candidate is reported as ambiguous and no site fact is taken from it. Place names are never evidence:
+    # THE FJORDS DA is registered at "Flåm", and every travel page about the region says Flåm.
+    if name_exact and addr_strong:
+        result.update(score=0.95, reasons=["legal_name_and_registered_address", *corr], claim_span=span)
+    elif linked:
+        # every name token is on the page (checked above) and the registry itself names this domain
+        result.update(score=0.95, reasons=["registry_linked_domain", *corr], claim_span=span)
     elif self_identified or phrase_in_body:
         result.update(score=0.8, reasons=["name_only", *corr], claim_span=span)
     else:

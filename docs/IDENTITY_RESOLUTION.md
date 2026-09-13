@@ -28,10 +28,11 @@ requests (see CRAWLERS.md), so a company with four wrong guesses spends its budg
 
 | Test on the fetched homepage | Score | Status |
 |---|---|---|
-| the organisation number appears on the page, with or without spaces, with or without a `NO` prefix or `MVA` suffix | 1.0 | `exact` |
-| every legal-name token (folded, legal-form stopwords removed) appears in the title, `og:site_name`, JSON-LD name or footer, **and** one corroborator matches the registry: postcode, street, municipality or phone | 0.95 | `exact` |
-| every name token appears, but no corroborator | 0.8 | `review` |
-| the page is parked or for sale | 0.1 | `related_or_uncertain` |
+| the organisation number appears on the page, with or without spaces, with or without a `NO` prefix or `MVA` suffix, and the page does not state two or more other organisation numbers | 1.0 | `exact` |
+| the exact legal name is written on the page (the name minus its legal-form word as one phrase, or the full registered name; hyphens and "og"/"and"/"&" between words allowed) **and** a registered address element is on the page: the postcode written with its town (`5742 Flåm`) or a street line with a house number | 0.95 | `exact` |
+| the candidate domain is one the company itself filed with the registry (its `hjemmeside`, or the domain of its registered e-mail address, consumer mail providers excluded) and every name token is on the page | 0.95 | `exact` |
+| the page names the company but none of the above holds | 0.8 | `review` |
+| the page is parked, a hosting placeholder or a directory listing | 0.1 | `related_or_uncertain` |
 | anything else | below 0.8 | `related_or_uncertain` |
 
 Only `exact` (score ≥ 0.9) is published. `review` is not published. The threshold is frozen for the submission.
@@ -152,3 +153,30 @@ Measured offline over the 199 published-or-ambiguous companies of the previous s
 publications stand; the four withdrawn are a group site, a national chain's root page, a page carrying four other
 organisation numbers, and a one-word namesake; one previously withheld site is recovered through the registry's
 e-mail domain.
+
+## Rules added after the second evaluation report (2026-09-13, revision 3)
+
+Builderr's second report found one wrong-company publication: fjords.com for THE FJORDS DA. The registered street
+of that company is the village name "Flåm"; fjords.com is a travel guide for western Norway that names Flåm and
+Aurland because every page about the region does, and its title carries the domain "fjords.com", which the gate
+read as the page naming itself "fjords". Two weak signals looked like a name plus an address.
+
+The gate now publishes on exactly the evidence Builderr named, and nothing else:
+
+| Route | What must be on the page | Reason recorded |
+|---|---|---|
+| organisation number | our number, labelled or bare, and not two or more other labelled numbers | `org_number_on_page` |
+| exact legal name + registered address | the name as a phrase or the full registered name, **and** the postcode with its town or a street line with a house number | `legal_name_and_registered_address` |
+| registry-linked domain | the candidate host equals the registry's `hjemmeside` host or the registered e-mail domain; every name token on the page | `registry_linked_domain` |
+
+Removed as routes to `exact`: a domain that spells the legal name (`domain_is_legal_name`), the legal name as a
+phrase without an address (`legal_name_phrase_on_page`), the name in an identity position with a bare postcode or
+a street name without a number. Removed as address evidence: a four-digit postcode standing alone (a price or a
+year), and a street line without a house number (a village name). The page's own domain is stripped from the
+title and copyright line before the identity positions are read. A one-word name counts written out with its
+legal form, or as a distinctive word of six letters or more where the page names itself.
+
+Measured on the stored homepages of the revision-2 run: 116 of 144 verified websites keep their verdict (43 by
+organisation number, 48 by name and address, 26 by registry-linked domain, one gained through the registry's
+`hjemmeside`), and 28 move to `ambiguous`: pages that carry the name and nothing else. THE FJORDS DA's page is
+`review` under the new gate (`tests/test_core.py::test_r12_the_fjords_travel_guide_is_not_the_ferry_company`).

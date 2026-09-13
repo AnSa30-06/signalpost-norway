@@ -119,6 +119,16 @@ test per rule; the point-by-point response is in [docs/REMEDIATION.md](docs/REME
 - **More evidence and clearer answers**: up to three prior accounting periods, a trend, risk flags, a sentence saying why the website counts as verified, and eleven standard questions answered only from claims.
 - **Verbatim evidence (2026-09-13)**: every `claim_span` is now an excerpt of the bytes it cites, checked for every evidence record of the submission run by `eval/audit_artifact.py`; an audit of the earlier packaging had found 57% of registry spans were compact re-serialisations rather than excerpts (no value was wrong). A registry field the record does not carry is `not_available`, never `false` or borrowed from the seed file.
 
+## Revision 3 (2026-09-13): response to the second evaluation report
+
+The second report scored revision 2 at 69.57/100 with one wrong-company website: fjords.com for THE FJORDS DA, a
+travel-guide page that names the village the company is registered in. The identity gate now publishes a website
+on exactly three kinds of evidence and no others: the organisation number on the page; the exact legal name
+together with the postcode written with its town or a street line with a house number; or a domain the company
+itself filed with the registry. A domain that spells the name, a name without an address, a bare postcode or a
+bare place name never reach `exact`. Details and the measured cost are in
+[docs/IDENTITY_RESOLUTION.md](docs/IDENTITY_RESOLUTION.md) and [docs/REMEDIATION.md](docs/REMEDIATION.md).
+
 ## Measured
 
 Revision 2 submission run, 2026-09-13, clean tree at code commit `b1e87d7`, antivirus off

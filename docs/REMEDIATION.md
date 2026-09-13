@@ -81,6 +81,24 @@ yields one change. `changed_financials` remains per field for the same period.
   instead, and the schema says so. A registry field the record does not carry (`registrertIMvaregisteret`, the
   status flags) is now `not_available` rather than `false`.
 
+## Second report (2026-09-13): fjords.com published for THE FJORDS DA (R12)
+
+Builderr's second report scored revision 2 at 69.57/100 and blocked qualification on one website: fjords.com,
+published for THE FJORDS DA. The page carried neither the organisation number, nor the legal name, nor the
+registered address. It named Flåm and Aurland, and the company's registered street is the village name "Flåm".
+The report also confirmed the earlier BETONG-SAGING case fixed.
+
+Cause, reproduced locally on the same company: the title "… | fjords.com" put the token "fjords" where the gate
+looks for a page naming itself, and the registered street "Flåm", a village name, matched as a street. Two weak
+signals were read as name plus address.
+
+Fix: the gate publishes only on the evidence the report named. Organisation number on the page; or the exact
+legal name with the postcode written with its town or a street line with a house number; or a domain the
+company itself filed with the registry. A domain that merely spells the name, a name phrase without an address,
+a bare postcode and a bare place name no longer reach `exact`. The page's own domain is stripped from its title
+and copyright line before the identity positions are read. Full table in docs/IDENTITY_RESOLUTION.md. Measured
+cost on the stored revision-2 pages: 28 of 144 verified websites become `ambiguous`; 116 stay.
+
 ## Verification
 
 1. Regression tests for every rule (`tests/`).

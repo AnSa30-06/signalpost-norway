@@ -35,6 +35,9 @@ EMPTY = {"summary": "", "what_it_does": None, "size": None, "trend": None, "risk
 
 IDENTITY_REASON_TEXT = {
     "org_number_on_page": "the company's organisation number is printed on the page",
+    "legal_name_and_registered_address": "the page writes the company's exact legal name and its registered address",
+    "registry_linked_domain": "the domain is one the company itself filed with the registry",
+    # reason names used by earlier revisions, kept so older envelopes still read
     "name_and_address": "the page names the company and carries its registered address",
     "self_identified": "the page names the company in its title, heading, footer or structured data",
     "legal_name_phrase_on_page": "the page writes the company's full legal name out",
@@ -361,13 +364,17 @@ def _build(env: dict) -> dict:
     reasons = [str(r) for r in (wi.get("reasons") or [])]
     if site and reasons:
         texts = [IDENTITY_REASON_TEXT[r] for r in reasons if r in IDENTITY_REASON_TEXT]
-        extras = [r for r in reasons if r.startswith(("postcode:", "street:", "domain_is_legal_name:", "registry_email_domain:"))]
+        extras = [r for r in reasons if r.startswith(("postcode_with_city:", "street_with_number:", "registry_email_domain:",
+                                                      "registry_website_domain:", "postcode:", "street:", "domain_is_legal_name:"))]
         human_extras = []
         for r in extras:
             k, _, v = r.partition(":")
-            human_extras.append({"postcode": f"registered postcode {v}", "street": f"registered street {v}",
-                                 "domain_is_legal_name": f"the domain {v} spells the legal name",
-                                 "registry_email_domain": f"the e-mail domain the company filed with the registry, {v}"}[k])
+            human_extras.append({"postcode_with_city": f"the registered postcode and town, {v}",
+                                 "street_with_number": f"the registered street, {v}",
+                                 "registry_email_domain": f"the e-mail domain the company filed with the registry, {v}",
+                                 "registry_website_domain": f"the website the company filed with the registry, {v}",
+                                 "postcode": f"registered postcode {v}", "street": f"registered street {v}",
+                                 "domain_is_legal_name": f"the domain {v} spells the legal name"}[k])
         verification = "Website verified because " + _join(texts[:2] + human_extras[:2]) + "." if (texts or human_extras) else None
     elif not site:
         ow = next((c for c in claims if c.get("field") == "official_website"), None)

@@ -87,7 +87,7 @@ def test_name_and_postcode_is_exact():
             "<body><footer>Storgata 12, 4306 Sandnes</footer></body></html>")
     r = identity.assess(PROFILE, page(ORIGIN + "/", html))
     assert r["score"] == 0.95 and r["status"] == "exact"
-    assert r["reasons"][0] == "name_and_address" and "postcode:4306" in r["reasons"]
+    assert r["reasons"][0] == "legal_name_and_registered_address" and "postcode_with_city:4306 sandnes" in r["reasons"]
     assert r["claim_span"]
 
 
