@@ -1,4 +1,4 @@
-"""Website candidates for one organisation: registry hjemmeside, domain guesses, optional Brave search.
+"""Website candidates for one organisation: registry hjemmeside, registry e-mail domain, domain guesses, Brave search.
 
 Candidates are ordered and deduplicated by registered domain. Nothing here is evidence; the identity
 gate decides which candidate (if any) is the company's site.
@@ -7,17 +7,21 @@ from __future__ import annotations
 
 import os
 import re
+import threading
 import urllib.parse
 from typing import Optional
 
 import tldextract
 
-from .identity import name_tokens
+from .identity import fold, name_tokens, tokens
 
 BLOCKLIST = ("proff.no", "1881.no", "gulesider.no", "purehelp.no", "brreg.no", "regnskapstall.no", "linkedin.com",
              "facebook.com", "instagram.com", "youtube.com", "x.com", "twitter.com", "tiktok.com", "wikipedia.org",
              "finn.no", "nav.no", "allabolag", "northdata", "bizzy", "enin", "forvalt.no", "kompass", "cylex", "yelp",
-             "trustpilot", "google.com")
+             "trustpilot", "google.com",
+             # directories that reproduce the legal name and organisation number (Builderr starter kit's list)
+             "firmalisten.no", "companywall.no", "firmadatabasen.no", "sokfirma.no", "yra.no", "nor47business.com",
+             "opencorporates.com", "dnb.com", "infobel", "hitta", "bedriftsdatabasen", "regnskap.no", "kununu")
 GENERIC_SLUG_WORDS = {"eiendom", "invest", "holding", "bygg", "transport", "service", "consulting", "gruppen",
                       "industri", "handel", "drift", "utvikling", "partner", "partners", "solutions", "capital"}
 MAX_GUESSES = 4
@@ -65,45 +69,108 @@ def domain_guesses(name: str) -> list[str]:
     return urls[:MAX_GUESSES]
 
 
-def _brave(profile: dict, session) -> list[dict]:
-    key = os.environ.get("BRAVE_API_KEY")
-    if not key:
-        return []
-    q = " ".join(s for s in (profile.get("name"), profile.get("municipality")) if s)
-    url = BRAVE_URL + "?" + urllib.parse.urlencode({"q": q, "count": 5, "country": "NO"})
-    try:
-        r = session.get(url, company=str(profile.get("organisation_number")), kind="json", robots=False,
-                        headers={"X-Subscription-Token": key, "Accept": "application/json"})
-        data = r.json() or {}
-    except Exception:
-        return []
-    out = []
-    for hit in (data.get("web") or {}).get("results") or []:
-        u = normalise_url(hit.get("url") if isinstance(hit, dict) else None)
-        if u and not blocked_host(u):
-            out.append({"url": u, "origin": "brave", "note": "web search result; transient, never evidence"})
-    return out
+# ---- Brave Search API: candidate discovery only -------------------------------------------------------------
+# Builderr's source policy lists "search APIs used to discover candidates" and says "search results generate
+# candidates; they are not claim evidence". Brave's terms forbid storing results without a storage-rights plan,
+# so a search response is held in memory only (Session.get(store=False)): no snapshot, no query text in the
+# request log. A result URL is fetched again independently and must pass the same exact-entity gate as any
+# other candidate before anything from it is published.
+BRAVE_KEY_ENVS = ("BRAVE_SEARCH_API_KEY", "BRAVE_API_KEY")   # the first is the name Builderr's starter kit uses
+BRAVE_USD_PER_QUERY = float(os.environ.get("SIGNALPOST_BRAVE_USD_PER_QUERY") or 0.005)   # $5 per 1,000 (Search plan)
+MAX_SEARCH_DOMAINS = 3
+_search_lock = threading.Lock()
+_search = {"queries": 0, "max_queries": int(os.environ.get("SIGNALPOST_SEARCH_MAX_QUERIES") or 2500)}
+
+
+def brave_key() -> str:
+    return next((os.environ[k].strip() for k in BRAVE_KEY_ENVS if (os.environ.get(k) or "").strip()), "")
 
 
 def brave_enabled() -> bool:
-    return bool(os.environ.get("BRAVE_API_KEY"))
+    return bool(brave_key())
 
 
-def brave_candidates(profile: dict, session) -> list[dict]:
-    """Search candidates, queried only after the free routes have failed.
+def search_stats() -> dict:
+    with _search_lock:
+        return {"provider": "brave_search_api" if brave_enabled() else None, "queries": _search["queries"],
+                "max_queries": _search["max_queries"], "cost_usd": round(_search["queries"] * BRAVE_USD_PER_QUERY, 4)}
 
-    Brave's free tier allows one query per second, so asking for every company would add about seventeen minutes
-    to a thousand-company run and spend a query on the ~14% that the registry or a domain guess already answers.
-    The pipeline calls this only when no deterministic candidate proved the entity.
-    """
-    seen: set[str] = set()
-    out: list[dict] = []
-    for c in _brave(profile, session):
-        d = registered_domain(c["url"])
-        if d and d not in seen:
+
+def set_search_limit(max_queries: int) -> None:
+    with _search_lock:
+        _search["max_queries"] = max(0, int(max_queries))
+
+
+def _take_query() -> bool:
+    with _search_lock:
+        if _search["queries"] >= _search["max_queries"]:
+            return False
+        _search["queries"] += 1
+        return True
+
+
+def search_queries(profile: dict) -> list[str]:
+    """The exact legal name in quotes with the organisation number first: it surfaces pages that print the number,
+    which the gate verifies outright. Only if that returns no usable candidate, the name with its municipality."""
+    name = " ".join(str(profile.get("name") or "").split())
+    org = re.sub(r"\D", "", str(profile.get("organisation_number") or ""))
+    muni = " ".join(str(profile.get("municipality") or "").split())
+    if not name:
+        return []
+    qs = [f'"{name}" {org}'.strip()]
+    if muni:
+        qs.append(f'"{name}" {muni}')
+    return qs
+
+
+def _brave_query(q: str, org: str, session) -> tuple[list[str], bool]:
+    """Result URLs for one query (transient), and whether a query was actually spent."""
+    key = brave_key()
+    if not key or not _take_query():
+        return [], False
+    url = BRAVE_URL + "?" + urllib.parse.urlencode({"q": q, "count": 10, "country": "no", "search_lang": "nb",
+                                                    "safesearch": "moderate", "spellcheck": "0"})
+    r = session.get(url, company=org, kind="json", robots=False, store=False,
+                    headers={"X-Subscription-Token": key, "Accept": "application/json"})
+    try:
+        data = r.json() or {}
+    except Exception:
+        data = {}
+    return [hit.get("url") for hit in (data.get("web") or {}).get("results") or [] if isinstance(hit, dict)], True
+
+
+def brave_candidates(profile: dict, session, exclude: set[str] = frozenset()) -> tuple[list[dict], int]:
+    """Up to three distinct non-directory domains from search, and the number of queries spent.
+
+    Called only after the registry website, the registry e-mail domain and the domain guesses have all failed,
+    so no query is spent on a company the free routes already answer.
+
+    A result is kept only when its host carries a distinctive word of the legal name. A query with the
+    organisation number in it also returns news articles, supplier pages and tender notices that print the
+    number; the gate would read such a page's "org.nr 914 922 941" as proof and publish a stranger's site as the
+    company's own. Builderr's starter kit applies the same host rule to search candidates. The municipality
+    and generic words ("eiendom", "holding") do not count as distinctive."""
+    org = str(profile.get("organisation_number") or "")
+    muni = set(tokens(profile.get("municipality")))
+    want = [t for t in name_tokens(profile.get("name")) if len(t) >= 4 and t not in GENERIC_SLUG_WORDS and t not in muni]
+    spent = 0
+    for q in search_queries(profile):
+        urls, used = _brave_query(q, org, session)
+        spent += int(used)
+        if not used:
+            break
+        seen, out = set(exclude), []
+        for raw in urls:
+            u = normalise_url(raw)
+            d = registered_domain(u) if u else ""
+            if not u or not d or blocked_host(u) or d in seen:
+                continue
             seen.add(d)
-            out.append(c)
-    return out
+            if any(t in re.sub(r"[^a-z0-9]", "", fold(d)) for t in want):
+                out.append({"url": u, "origin": "brave", "note": "search result; transient, never evidence"})
+        if out:
+            return out[:MAX_SEARCH_DOMAINS], spent
+    return [], spent
 
 
 CONSUMER_MAIL_DOMAINS = {

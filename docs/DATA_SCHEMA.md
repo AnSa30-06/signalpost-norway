@@ -53,18 +53,28 @@ one claim with `value: null`, `availability: "not_available"` and a `note`. Zero
 ```json
 {"id":"c-12","section":"web","field":"official_website","value":"https://example.no/",
  "availability":"available","confidence":0.99,"evidence_ids":["ev-3"],
- "reporting_period":null,"effective_date":null,"note":null}
+ "reporting_period":null,"effective_date":null,"note":null,
+ "source_url":"https://example.no/","retrieved_at":"2026-09-28T06:00:04Z","content_sha256":"<hex>",
+ "claim_span":"Example AS, org.nr 987 654 321","source_class":"company_owned"}
 ```
 
 - `id` is unique inside the envelope. Prefixes tell the producer apart: `c-` registry and pipeline, `site-` site crawl,
   `job-` NAV, `upd-` registry updates.
 - `value` may be a string, number, object or `null`. Object values are used for structured fields:
-  `social_profile` `{platform,url}`, `site_leader` `{name,title}`, `site_location` `{name,address}`,
+  `social_profile` `{platform,url,url_as_published}` (`url` normalised, `url_as_published` exactly as the cited page writes it),
+  `careers_page_url` `{url,hiring_cue}` (web section; a careers page is not a hiring fact), `site_leader` `{name,title}`, `site_location` `{name,address}`,
   `job_posting` `{title,url,date_posted,valid_through,location,source}`, `news_item` `{title,url,date}`,
   `registry_update` `{date,change_type}`.
 - `confidence` is 0 to 1. Registry values are 1.0. Website identity confidence is the gate score (see IDENTITY_RESOLUTION.md).
 - `reporting_period` is set on financial claims (for example `"2025"`). `effective_date` is set on dated events.
 - An `available` claim must have at least one evidence id. The validator rejects an envelope where it does not.
+- `source_url`, `retrieved_at`, `content_sha256`, `claim_span` and `source_class` are copied onto every claim from
+  its first evidence record (revision 4), so a claim carries its own proof without a lookup. They are `null` on a
+  claim without evidence. `eval/audit_artifact.py` checks that they equal the evidence record.
+- A `note` starting `not checked this run` means the source was skipped to finish inside the run's time budget,
+  not that it was checked and found empty. The refresh diff does not report such a claim as a change.
+- Hiring facts (`hiring` section) are only `job_posting` claims from the NAV job feed or from a JSON-LD
+  `JobPosting` on the verified site, and the `active_job_count` from the feed.
 
 ## Evidence
 
@@ -108,7 +118,7 @@ See REFRESH.md for the stable claim keys and the materiality table.
 ## Operations
 
 `requests` counts every attempt for this company, including redirect hops and retries. `bytes` is the sum of
-response bodies. `third_party_cost_usd` is 0 unless Brave was called. `budget_exhausted` is `true` when the
+response bodies. `third_party_cost_usd` is 0 unless Brave was called, then $0.005 per query. `budget_exhausted` is `true` when the
 per-company cap or the global cap stopped a fetch.
 
 ## Synthesis

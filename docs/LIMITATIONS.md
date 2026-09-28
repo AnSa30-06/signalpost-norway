@@ -21,7 +21,7 @@ and is not published. Many small-company sites fall into this bucket, and a site
 reported as `ambiguous`. The share of companies left ambiguous: see `eval/report.json`.
 
 Domain guesses are limited to 4 and to `.no` and `.com`. A company whose brand differs from its legal name is found
-only through the registry website field or through Brave. Without `BRAVE_API_KEY`, such companies usually end as `not_available` or `ambiguous` on the web section.
+only through the registry website field or through Brave search. Without `BRAVE_SEARCH_API_KEY`, such companies usually end as `not_available` or `ambiguous` on the web section. With it, only a result whose host carries a word of the legal name is tried, so a brand domain unrelated to the legal name is still missed.
 
 ## No browser
 
@@ -77,7 +77,7 @@ it cannot map to a field gets "The evidence does not establish this".
 - NAV arbeidsplassen.no: public government site; robots.txt allows all; listed on data.norge.no as public access.
 - Company websites: fetched with an identified user agent, within robots.txt, at low volume. Raw snapshots are kept as private evidence for verification. The published site shows at most 300 characters of a page (`claim_span`), never a page copy.
 - People: leader names come from the official roles register and from the company's own pages. No other personal data is collected, and no third-party people profiles are fetched.
-- Brave Search API: used under Brave's API terms, for candidates only; results are not stored.
+- Brave Search API: used under Brave's API terms, for candidates only; results are held in memory and never stored. Builderr's rule is that a credential tied to the entrant's own account cannot be used for scoring, so the official runs need a key Builderr supplies through `BRAVE_SEARCH_API_KEY`.
 
 ## NAV rate limiting (measured 2026-09-09)
 

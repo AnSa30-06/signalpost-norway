@@ -285,7 +285,7 @@ def _build(env: dict) -> dict:
     if ads:
         shown = [f"{_s(j['title'])}" + (f" ({_place(j.get('location'))})" if _s(j.get("location")) else "") for j in ads[:3]]
         hire.append(f"Open roles include {_join(shown)}.")
-    careers = _s(first("careers_page"))
+    careers = _s(first("careers_page_url"))
     if careers:
         hire.append(f"Careers page: {careers}.")
     hiring = " ".join(hire) or None

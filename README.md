@@ -69,8 +69,14 @@ Environment variables that `run.sh` reads (all optional):
 |---|---|---|
 | `SIGNALPOST_UNIVERSE` | `signalpost-company-universe-2025.jsonl.gz` | path to the universe file |
 | `SIGNALPOST_RUN_ID` | the output directory name | run id written into every envelope |
-| `SIGNALPOST_WORKERS` | `8` | parallel companies |
-| `BRAVE_API_KEY` | unset | enables Brave Search for website-candidate discovery |
+| `SIGNALPOST_WORKERS` | `24` | parallel companies |
+| `SIGNALPOST_TIME_BUDGET_MIN` | `40` | the run finishes inside this many minutes (see Budget) |
+| `SIGNALPOST_MAX_REQUESTS` | 30 × input count | run-wide request cap |
+| `BRAVE_SEARCH_API_KEY` | unset | Brave Search API key: website discovery for companies the registry lists no website for (`BRAVE_API_KEY` also accepted) |
+| `SIGNALPOST_BRAVE_QPS` | `1` | Brave queries per second the plan allows |
+
+For a local run, copy `.env.example` to `.env` and put the key there. `.env` is git-ignored and read at start-up;
+a variable already set in the environment wins.
 
 Docker alternative:
 
@@ -96,16 +102,27 @@ All outputs go into the directory given by `--out`. Each run writes its own dire
 
 ## Budget
 
-Locked evaluator budget: 100 inputs, 45 minutes, 2,000 outbound requests, $10 declared third-party spend.
+Builderr's official batch is now 1,000 companies (it may grow to 1,100) with a fixed time and resource budget per
+run, and a run that times out is not scored. The published pages do not state the numbers, so the agent enforces
+its own:
 
-This agent runs 100 companies with at most 1,950 requests (`--max-requests 1950`) and at most 26 requests per
-company (`--per-company-cap 26`). Companies with no website stop at about 11 requests, so the batch average stays near 9-15. Redirect hops and retries count. Cache hits inside one run are free.
-When a company hits its cap, the remaining sources are marked `not_available` with a note, the envelope is still
-written, and `operations.budget_exhausted` is `true`.
+- **Time.** `--time-budget-min` (default 40 in `run.sh`). The registry's filing-years endpoint is paced at about 28
+  requests a minute for the whole process, which alone takes 35 minutes per 1,000 companies. In the last four
+  minutes no worker waits for a paced slot; in the last five minutes no search query is spent; in the last two and a
+  half minutes a verified site gets its homepage only; in the last minute no website is looked for. Each skipped
+  step says `not checked this run` in its note, and the refresh diff does not report it as a change. Every company
+  still gets a terminal envelope.
+- **Requests.** `run.sh` sets the run-wide cap to 30 per input company and the per-company cap to 30. Measured
+  average: 10.2 per company. When a company hits its cap, the remaining sources are marked `not_available` with a
+  note, the envelope is still written, and `operations.budget_exhausted` is `true`.
+- **Cost.** $0 without a search key. With `BRAVE_SEARCH_API_KEY` set, one query per company that the registry and
+  the domain guesses leave without a website, a second only if the first returns no usable candidate: at Brave's
+  list price of $5 per 1,000 queries, an estimated $4 to $7 per 1,000-company batch (about 880 of 1,000 companies
+  reach the search step). The estimate is replaced by a measurement once a run with a key has been made. `operations.third_party_cost_usd` on every
+  envelope and `third_party_cost_usd` plus `search` in `run-report.json` report the actual spend. A run-wide cap
+  (`--search-max-queries`, default 2,500) bounds it.
 
-Third-party cost is $0 without Brave. With `BRAVE_API_KEY` set, the cost is about $0.50 per 100 companies
-on Brave's paid plan (one search per company that has no registry website). The number is the plan's list price,
-not a measurement. See [docs/CRAWLERS.md](docs/CRAWLERS.md) for the per-company request plan.
+See [docs/CRAWLERS.md](docs/CRAWLERS.md) for the per-company request plan.
 
 ## Revision 2 (2026-09-12): response to the first evaluation report
 
@@ -182,19 +199,21 @@ holding companies and property entities with no website at all.
 
 ## Secrets
 ## Secrets
-## Secrets
-## Secrets
 
-Two optional environment variables. `NAV_FEED_TOKEN`: a private consumer token for NAV's job vacancy feed; without it
-the agent fetches NAV's public experimentation token once per run. `BRAVE_API_KEY`: without it the agent never calls Brave.
-Brave results are used only to propose website candidates. They are never stored as evidence.
+Two optional secrets, both read from environment variables only (or a git-ignored `.env` for local runs).
+`NAV_FEED_TOKEN`: a private consumer token for NAV's job vacancy feed; without it the agent fetches NAV's public
+experimentation token once per run. `BRAVE_SEARCH_API_KEY`: without it the agent never calls Brave. Brave results
+are held in memory only: no result, rank, title, snippet or query text is written to disk, and the request log
+records the endpoint without its query. A result URL is only a candidate: it is fetched again and must pass the
+exact-entity gate, and its host must carry a distinctive word of the legal name.
 No other key, token or account is used. Nothing is written outside `--out` and `--out/../site` (or the `--out` you give to `site`).
 
 ## Source rights
 
 - Brønnøysundregistrene open data (Enhetsregisteret, Regnskapsregisteret, roles, subunits, oppdateringer): Norwegian Licence for Open Government Data (NLOD) 2.0.
 - NAV job vacancy feed (pam-stilling-feed.nav.no): official API, bearer token, terms at arbeidsplassen.nav.no/vilkar-api (anyone may use it, free, republishing allowed, inactive ads must not be shown, contacts never published).
-- Company-owned websites: `robots.txt` respected (fail closed on 401/403), identified user agent, 12 s timeout, 2 MB per page, about 10 pages per site, registered domain only.
+- Company-owned websites: `robots.txt` respected per RFC 9309, identified user agent, 12 s timeout, 2 MB per page, about 10 pages per site, registered domain only.
+- Brave Search API: candidate discovery only, under Brave's API terms; results are not stored.
 - LinkedIn, Meta, Glassdoor, Indeed and Google are not crawled. A social profile URL is recorded only when the verified company site links to it.
 
 Details and endpoints: [docs/SOURCES.md](docs/SOURCES.md). Known gaps: [docs/LIMITATIONS.md](docs/LIMITATIONS.md).
@@ -225,13 +244,13 @@ uv run --extra test pytest -q
 ## Submission checklist
 
 - [x] `uv.lock` committed and `uv sync --frozen` succeeds
-- [ ] `./run.sh` completes on a 100-line batch within the budget (check `run-report.json`: `requests` ≤ 1950)
+- [ ] `./run.sh` completes a 100-company smoke test and a 1,000-company batch inside `SIGNALPOST_TIME_BUDGET_MIN`
 - [x] `python -m signalpost validate` reports zero problems and exactly `--expected-count` envelopes (1,000)
 - [x] a refresh run with `--previous` produces a `changes_by_type` block and leaves the earlier `--out` untouched
 - [x] at least 1,000 completed profiles rendered and copied, with `manifest-1000.txt`, `envelopes-1000.jsonl.gz`, `run-report-1000.json`, `requests-1000.jsonl.gz` and the rendered `site/`, into `submission/` and committed (`out/` and the top-level `site/` are git-ignored)
-- [x] `BRAVE_API_KEY` is not in the repository, and the run works without it
+- [x] no key is in the repository (`.env` is git-ignored), and the run works without one
 - [x] `eval/report.json` regenerated on the frozen commit (see [docs/EVAL.md](docs/EVAL.md))
-- [ ] email `submit@builderr.ai`: repository URL, exact commit hash, completed-profile count, manifest, the `run.sh` command, "no models; Brave Search API optional", expected cost per 100-company batch ($0, or about $0.50 with Brave), agent name and contact
+- [ ] email `submit@builderr.ai` in the current template: agent name, repository URL, exact commit hash, 100-company smoke-test result or report URL, the `run.sh` command, models / APIs / licences ("no models; Brave Search API for website discovery"), expected cost per official run (measured, see Budget), contact
 
 ## Documents
 

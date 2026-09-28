@@ -301,7 +301,8 @@ class _Crawl:
                 continue
             soc = normalise_social(absu)
             if soc:
-                self.socials.setdefault(soc["platform"], (soc, page, href, "anchor_href", 1.0))
+                # the link as the page writes it, so the published value is literally in the cited page
+                self.socials.setdefault(soc["platform"], ({**soc, "url_as_published": href.strip()}, page, href, "anchor_href", 1.0))
                 continue
             if registered_domain(absu) == self.domain and not absu.lower().split("?")[0].endswith(SKIP_EXT):
                 cu = _clean_url(absu)
@@ -353,7 +354,7 @@ class _Crawl:
                 for u in (same if isinstance(same, list) else [same]):
                     soc = normalise_social(str(u)) if isinstance(u, str) else None
                     if soc:
-                        self.socials.setdefault(soc["platform"], (soc, page, sp(u), "jsonld_sameAs", 1.0))
+                        self.socials.setdefault(soc["platform"], ({**soc, "url_as_published": u.strip()}, page, sp(u), "jsonld_sameAs", 1.0))
                 if isinstance(node.get("telephone"), str):
                     self.add_phone(node["telephone"], page, sp(node["telephone"]), 1.0)
                 if isinstance(node.get("email"), str):
@@ -488,17 +489,18 @@ class _Crawl:
                 self.news[url] = ({"title": ttl, "url": url, "date": d}, r, span_around(r.text, ttl, 160), "rss_item", 1.0)
 
     def careers_fallback(self):
-        """A careers page without JSON-LD JobPosting yields one `careers_page` claim, never guessed postings.
-        Anchor text on such pages ("Prosjekter", "Lærling", article teasers) is not a job ad; publishing it would
-        cost exact-claim precision. Individual ads come from JSON-LD or the NAV connector instead."""
+        """A careers page without JSON-LD JobPosting yields one `careers_page_url` claim in the web section, never
+        guessed postings, and never a hiring fact: Builderr counts a hiring fact only for a real role card, a
+        job-feed item or an apply action (2026-09-25). Anchor text on such pages ("Prosjekter", "Lærling", article
+        teasers) is not a job ad. Individual ads come from JSON-LD JobPosting or the NAV job feed."""
         for page, soup, text in self.careers_pages:
             purl = page.final_url or page.url
             if purl in self.job_pages:
                 continue
             folded = fold(text)
             cue = next((c for c in HIRING_CUES if c in folded), "")
-            self.claim("hiring", "careers_page", {"url": purl, "hiring_cue": cue or None}, page, literal_span(text, cue) or text[:200],
-                       "careers_page", 0.9, note="careers page exists; individual postings not machine-readable on the site")
+            self.claim("web", "careers_page_url", {"url": purl, "hiring_cue": cue or None}, page, literal_span(text, cue) or text[:200],
+                       "careers_page", 0.9, note="careers page exists; not a hiring fact: no individual posting is machine-readable on the site")
 
     # -- emission --
     def emit(self):

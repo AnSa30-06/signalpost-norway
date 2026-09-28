@@ -156,9 +156,16 @@ def main() -> int:
     for e in envs:
         org, name = e["organisation_number"], e["identity"].get("legal_name") or ""
         ev_ids = {v["id"] for v in e["evidence"]}
+        by_id = {v["id"]: v for v in e["evidence"]}
         for c in e["claims"]:
             if c["availability"] == "available" and (not c["evidence_ids"] or any(i not in ev_ids for i in c["evidence_ids"])):
                 failures.append(f"{org} {name[:30]}: available claim {c['field']} without evidence")
+            # revision 4: a claim carries its own proof; it must be the proof of its first evidence record
+            first = by_id.get((c.get("evidence_ids") or [None])[0])
+            if first and "source_url" in c and any(c.get(k) != first.get(k) for k in ("source_url", "retrieved_at", "content_sha256", "claim_span")):
+                failures.append(f"{org} {name[:30]}: claim {c['field']} provenance differs from its evidence {first['id']}")
+            if c["availability"] == "available" and "source_url" in c and not (c.get("source_url") and c.get("retrieved_at")):
+                failures.append(f"{org} {name[:30]}: available claim {c['field']} carries no source URL or time")
         if not isinstance(e.get("synthesis", {}).get("answers"), list) or len(e["synthesis"]["answers"]) < 10:
             failures.append(f"{org} {name[:30]}: answers block missing")
     ev = audit_evidence(envs, Snapshots(root), failures)

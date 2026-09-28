@@ -99,6 +99,34 @@ a bare postcode and a bare place name no longer reach `exact`. The page's own do
 and copyright line before the identity positions are read. Full table in docs/IDENTITY_RESOLUTION.md. Measured
 cost on the stored revision-2 pages: 28 of 144 verified websites become `ambiguous`; 116 stay.
 
+## Third diagnostic (2026-09-25): 700 companies, 50.68/100, no validated social, news or hiring facts (R13)
+
+Builderr extended the common evaluation to 700 companies and now scores from sources captured in the first run.
+Private diagnostic: 50.68/100; websites for 161 of the 360 companies with a validated site opportunity; UX coverage
+complete; "rich external fields did not land as canonical, evidence-linked claims, so the diagnostic recovered no
+validated social, news, or hiring facts". Asked for: canonical claims with source URL, time, hash and supporting
+span; a hiring fact only for a real role card, job-feed item or apply action. The public pages changed at the same
+time: scoring version 2 gives recall and coverage 50 of 100 points, qualification is 65/100 on an official run,
+the official batch is 1,000 companies (may grow to 1,100) with a fixed time and resource budget, and a run that
+times out is not scored.
+
+Changes in revision 4:
+
+- **Claim-level provenance.** Every claim carries `source_url`, `retrieved_at`, `content_sha256`, `claim_span` and
+  `source_class`, copied from its first evidence record (`pipeline.attach_provenance`). The audit checks the copy.
+- **Social value as published.** `social_profile.value.url_as_published` is the link exactly as the cited page
+  writes it; `url` stays normalised for deduplication and refresh keys.
+- **Hiring.** `careers_page` is gone from the hiring section; a careers page is now `careers_page_url` in the web
+  section, and hiring facts are NAV feed items and JSON-LD `JobPosting` only.
+- **Budget scaling.** `run.sh` capped the whole run at 1,950 requests, the budget of the old 100-company batch. On a
+  1,000-company batch that starves every company after roughly the first 190. The cap is now 30 per input company,
+  the per-company cap 30, and the default workers 24 (8 workers took about 95 minutes per 1,000 companies).
+- **Time budget.** `--time-budget-min` (40 in `run.sh`): near the end the paced filing-years slots, search and the
+  deeper site crawl are skipped, each claim marked `not checked this run`, and the refresh diff ignores those.
+- **Search.** Brave Search API candidate discovery when every free route has failed, as Builderr's starter kit does:
+  `BRAVE_SEARCH_API_KEY`, results transient, a result tried only when its host carries a distinctive word of the
+  legal name, then the unchanged exact-entity gate.
+
 ## Verification
 
 1. Regression tests for every rule (`tests/`).

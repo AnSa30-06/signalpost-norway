@@ -2,20 +2,23 @@
 
 All HTTP goes through `signalpost.net.Session`. There is no second HTTP path. The session charges every attempt
 (including each redirect hop and each retry) against a per-company cap and a global cap, writes every response
-body to `snapshots/<sha256>.<ext>`, and logs every attempt to `requests.jsonl`.
+body to `snapshots/<sha256>.<ext>`, and logs every attempt to `requests.jsonl`. The one exception is a transient
+fetch (`store=False`, used only for the Brave Search API, whose terms forbid keeping results): its body is never
+written and its log entry carries the endpoint without the query string.
 
 ## Session settings
 
 | Setting | Value | Where |
 |---|---|---|
-| global request cap | 1,950 (`--max-requests`) | 50 below the evaluator's 2,000 to leave room for counting differences |
-| per-company cap | 26 (`--per-company-cap`) | the global cap of 1,950 is the hard limit; companies without a website use about 11, so the batch average stays near 15 |
+| global request cap | 30 × input count in `run.sh` (`--max-requests`, `SIGNALPOST_MAX_REQUESTS`) | the official batch is now 1,000+ companies; the old fixed 1,950 would have starved every company after the first ~190 |
+| per-company cap | 30 (`--per-company-cap`) | measured average 10.2; search adds one or two queries and up to three probes for companies the free routes leave without a site |
+| time budget | 40 min in `run.sh` (`--time-budget-min`, `SIGNALPOST_TIME_BUDGET_MIN`) | near the end the paced filing-years slots, search and deeper crawls are skipped, each marked `not checked this run` |
 | timeout | 12 s per request | |
 | response cap | 2 MB per page (200 KB for robots.txt) | bytes beyond the cap are dropped |
 | redirects | at most 5 hops, each counted, each re-checked by the public-URL guard | |
 | retries | 429: up to 3 attempts with 3 s, 6 s waits, and after 3 consecutive 429s from one host that host is put on a 90 s cooldown during which it is not contacted (and nothing is charged); 500/502/503/504: one retry after 0.8 s; timeout or reset: one retry after 0.5 s; only if budget remains | |
 | cache | same URL inside one run is served from memory and costs nothing | |
-| concurrency | `--workers 8` companies in parallel; per host 4 connections (8 for data.brreg.no, 1 for arbeidsplassen.nav.no with at least 3 s between request starts) | |
+| concurrency | `--workers 24` in `run.sh`; per host 4 connections (8 for data.brreg.no, 1 for arbeidsplassen.nav.no with at least 3 s between request starts, 1 for api.search.brave.com at `--search-qps`, default 1) | throughput is set by the paced filing-years endpoint above ~20 workers |
 | user agent | `signalpost-norway-agent/1.0 (+https://github.com/AnSa30-06/signalpost-norway; research crawler; contact via repo)` | |
 | Accept-Language | `nb-NO,nb;q=0.9,no;q=0.8,en;q=0.6` | |
 
@@ -37,7 +40,7 @@ Official APIs (data.brreg.no, arbeidsplassen.nav.no) are fetched with the robots
 | roles | `registry.py` | 1 | `enhetsregisteret/api/enheter/{org}/roller` | json | `failed` |
 | subunits | `registry.py` | 1 | `enhetsregisteret/api/underenheter?overordnetEnhet={org}` | json | `failed`; zero subunits → `not_available` |
 | updates | `updates.py` | 1 | `enhetsregisteret/api/oppdateringer/enheter?organisasjonsnummer={org}&size=200` (the API returns oldest-first; the newest 20 events are kept) | json | `failed` |
-| website candidates | `discovery.py` | 0 (Brave: 1, optional) | registry field, domain guesses, Brave | json | Brave error → skip Brave, no cost |
+| website candidates | `discovery.py` | 0; Brave 1-2 when every free route failed and a key is set | registry field, registry e-mail domain, domain guesses, then Brave (`"<legal name>" <org nr>`, then `"<legal name>" <municipality>` only if the first gives no candidate) | json, transient | Brave error or cap reached → no search, no cost; a result is kept only if its host carries a distinctive word of the legal name, at most 3 domains |
 | candidate probes | `identity.py` | up to 3 pages, plus robots.txt per new host; a candidate whose TLS is broken is retried once over plain http | homepage of each candidate | html | probe error → next candidate |
 | site crawl | `site.py` | sitemap 1-2, targeted pages up to 7, RSS 1 | verified site only | html/xml | page error → that page's claims are skipped; section state from the pages that worked |
 | NAV feed scan (once per run) | `navfeed.py` | about 20-40 for the whole batch, charged to the shared key `_navfeed` (exempt from the per-company cap, counted in the global cap) | `pam-stilling-feed.nav.no/api/v1/feed` + `next_url` pages | json | scan failure → search-API fallback |

@@ -44,7 +44,7 @@ Every discovery or extraction route has a stable name and a version. A route ent
 |---|---|---|---|
 | `registry_site` | 1 | yes | registry `hjemmeside` as first candidate |
 | `domain_guess` | 1 | yes | at most 4 guesses, `.no` then `.com` |
-| `brave_candidates` | 1 | optional (`BRAVE_API_KEY`) | candidates only, never evidence |
+| `brave_candidates` | 2 | when `BRAVE_SEARCH_API_KEY` is set | candidates only, never evidence; name word required in host; transient |
 | `robots_sitemap` | 1 | yes | sitemap from robots.txt or `/sitemap.xml` |
 | `static_homepage` | 1 | yes | identity gate on the static homepage |
 | `targeted_paths` | 1 | yes | about, contact, team, careers, news, press |

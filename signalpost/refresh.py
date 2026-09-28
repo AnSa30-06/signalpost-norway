@@ -7,7 +7,7 @@ import urllib.parse
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .models import AVAILABLE
+from .models import AVAILABLE, NOT_CHECKED
 
 ADDED = {"job_posting": "new_job", "role": "new_role", "social_profile": "new_social_profile", "workplace": "new_location",
          "site_location": "new_location", "news_item": "new_news", "registry_update": "new_registry_update"}
@@ -148,6 +148,8 @@ def diff(previous: dict | None, current: dict) -> list[dict]:
         ps, cs = p_state.get(f), c_state.get(f)
         n_before = len(changes)
         if ps == AVAILABLE and cs is not None and cs != AVAILABLE:  # lost availability: no per-key removals
+            if str((c_first.get(f) or {}).get("note") or "").startswith(NOT_CHECKED):
+                continue   # skipped this run for time, not found missing: the last supported value stands
             record(f, "availability_changed", p_first.get(f), c_first.get(f), ps, cs, section=c_first[f].get("section"))
             continue
         if cs != AVAILABLE:

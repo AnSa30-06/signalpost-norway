@@ -10,7 +10,7 @@ import threading
 import time
 from typing import Optional
 
-from .models import (AMBIGUOUS, AVAILABLE, FAILED, NOT_APPLICABLE, NOT_AVAILABLE, IdGen, new_claim, new_error,
+from .models import (AMBIGUOUS, AVAILABLE, FAILED, NOT_APPLICABLE, NOT_AVAILABLE, NOT_CHECKED, IdGen, new_claim, new_error,
                      new_evidence, state_from_fetch)
 
 BRREG = "https://data.brreg.no"
@@ -24,15 +24,22 @@ NON_FILING_FORMS = {"ENK", "PERS", "UTLA", "PK", "KIRK"}
 HISTORY_INTERVAL = 2.1
 _HISTORY_LOCK = threading.Lock()
 _HISTORY_NEXT = [0.0]
+# Monotonic time after which no filing-years slot is handed out (set by the CLI from the run's time budget).
+# The paced queue is the one step whose wait grows with the batch: 1,000 companies need 35 minutes of slots.
+HISTORY_CUTOFF: list = [None]
 
 
-def _history_slot() -> None:
+def _history_slot() -> bool:
+    """Wait for this process's next filing-years slot; False, without waiting, when it would fall after the cutoff."""
     with _HISTORY_LOCK:
         now = time.monotonic()
-        wait = _HISTORY_NEXT[0] - now
-        _HISTORY_NEXT[0] = max(now, _HISTORY_NEXT[0]) + HISTORY_INTERVAL
-    if wait > 0:
-        time.sleep(wait)
+        start = max(now, _HISTORY_NEXT[0])
+        if HISTORY_CUTOFF[0] is not None and start >= HISTORY_CUTOFF[0]:
+            return False
+        _HISTORY_NEXT[0] = start + HISTORY_INTERVAL
+    if start > now:
+        time.sleep(start - now)
+    return True
 
 
 def _addr(a: Optional[dict]) -> Optional[dict]:
@@ -229,7 +236,10 @@ class Official:
         the latest period, so this is the only official view of the filing history without fetching PDFs."""
         if self.sections.get("accounts") == NOT_APPLICABLE:
             return
-        _history_slot()
+        if not _history_slot():
+            self._add("accounts", "accounts_filing_years", None, [], availability=NOT_AVAILABLE,
+                      note=f"{NOT_CHECKED}: the paced filing-years endpoint was skipped to finish within the run's time budget")
+            return
         r = self.s.get(f"{BRREG}/regnskapsregisteret/regnskap/aarsregnskap/kopi/{self.org}/aar", company=self.org, kind="json", robots=False)
         data = r.json() if r.ok else None
         if not r.ok or not isinstance(data, list):

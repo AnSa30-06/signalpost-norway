@@ -5,7 +5,7 @@ website candidates are made, how a candidate is scored, and what is published at
 
 ## Candidates (`signalpost/discovery.py`)
 
-Ordered list. Each entry is `{"url", "origin", "note"}` with origin `registry`, `domain_guess` or `brave`.
+Ordered list. Each entry is `{"url", "origin", "note"}` with origin `registry`, `registry_email`, `domain_guess` or `brave`.
 
 1. **Registry website field.** The `hjemmeside` value from Enhetsregisteret, normalised to a scheme and host.
 2. **Deterministic domain guesses from the legal name**, at most 4:
@@ -14,7 +14,13 @@ Ordered list. Each entry is `{"url", "origin", "note"}` with origin `registry`, 
    - join the remaining tokens with `""` and with `-`;
    - try `.no` first, then `.com`.
    Example: `NORDIC SKOG AS` → `nordicskog.no`, `nordic-skog.no`, `nordicskog.com`, `nordic-skog.com`.
-3. **Brave Search API**, only when `BRAVE_API_KEY` is set. One query per company. Results are transient: they order candidates and are never written to the envelope or the snapshots as evidence.
+3. **Brave Search API**, only when `BRAVE_SEARCH_API_KEY` (or `BRAVE_API_KEY`) is set and every free route above
+   failed. Query `"<legal name>" <org nr>`, then `"<legal name>" <municipality>` only if the first gives no
+   candidate. A result is kept only when its host carries a distinctive word of the legal name (not the
+   municipality, not a generic word such as `eiendom`), at most three domains: a query with the organisation
+   number also returns news articles, supplier pages and tender notices that print the number, and the gate would
+   read such a page's number as proof. Results are transient: never written to the envelope, the snapshots or
+   the request log.
 
 Never a candidate: proff.no, 1881.no, gulesider.no, purehelp.no and other directories; linkedin.com, facebook.com,
 instagram.com and other platforms. Such hosts are dropped from every origin, including Brave results.

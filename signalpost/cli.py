@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import gzip
 import json
+import os
 import re
 import statistics
 import sys
@@ -61,8 +62,28 @@ def load_universe(path: Path, wanted: set[str]) -> dict[str, dict]:
     return rows
 
 
+def load_dotenv(paths) -> list[str]:
+    """KEY=VALUE lines from a local, git-ignored .env file into the environment; an already-set variable wins.
+    This is how a search key reaches a local run without ever being typed into a command or committed."""
+    loaded = []
+    for path in paths:
+        p = Path(path)
+        if not p.is_file():
+            continue
+        for line in p.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            k, v = line.split("=", 1)
+            k, v = k.strip().removeprefix("export ").strip(), v.strip().strip("'\"")
+            if k and v and not os.environ.get(k):
+                os.environ[k] = v
+                loaded.append(k)
+    return loaded
+
+
 def cmd_run(a: argparse.Namespace) -> int:
-    from . import refresh
+    from . import discovery, net, pipeline, refresh, registry
     from .pipeline import failed_envelope, process_company
 
     out = Path(a.out)
@@ -76,6 +97,14 @@ def cmd_run(a: argparse.Namespace) -> int:
     session = Session(out, max_total_requests=a.max_requests, per_company_cap=a.per_company_cap, timeout=a.timeout)
     started = utc_now()
     t0 = time.monotonic()
+    if a.time_budget_min > 0:
+        budget_s = a.time_budget_min * 60
+        pipeline.DEADLINE[0] = t0 + budget_s
+        registry.HISTORY_CUTOFF[0] = t0 + budget_s - 240   # no worker waits for a paced slot in the last four minutes
+    discovery.set_search_limit(a.search_max_queries)
+    net.HOST_MIN_INTERVAL["api.search.brave.com"] = 1.05 / max(0.1, a.search_qps)
+    print(f"search: {'Brave Search API enabled' if discovery.brave_enabled() else 'disabled (no BRAVE_SEARCH_API_KEY)'}; "
+          f"time budget: {a.time_budget_min or 'none'} min", file=sys.stderr)
     nav_index = None
     if not a.no_nav_feed:
         from .navfeed import FeedIndex
@@ -123,6 +152,8 @@ def cmd_run(a: argparse.Namespace) -> int:
     session.dump_log()
     report = build_report(envelopes, session, a.run_id, started, previous, t0)
     report["nav_feed"] = nav_index.summary() if nav_index is not None else {"disabled": True}
+    report["search"] = discovery.search_stats()
+    report["time_budget_min"] = a.time_budget_min or None
     (out / "run-report.json").write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
     print(json.dumps({k: report[k] for k in ("inputs", "envelopes", "requests", "runtime_ms", "terminal_status_counts", "section_state_counts")}, ensure_ascii=False), file=sys.stderr)
     return 0 if report["envelopes"] == report["inputs"] else 1
@@ -141,7 +172,7 @@ def build_report(envelopes: list[dict], session: Session, run_id: str, started: 
     return {"run_id": run_id, "started_at": started, "completed_at": utc_now(), "agent_version": envelopes[0]["run"]["agent_version"] if envelopes else None,
             "inputs": len(envelopes), "envelopes": len(envelopes), "terminal_status_counts": dict(ts),
             "section_state_counts": {k: dict(v) for k, v in sec.items()}, "available_claims_by_field": dict(fields),
-            "requests": session.total_requests, "bytes": session.total_bytes, "third_party_cost_usd": 0.0,
+            "requests": session.total_requests, "bytes": session.total_bytes, "third_party_cost_usd": round(sum(e["operations"].get("third_party_cost_usd") or 0 for e in envelopes), 4),
             "runtime_ms": int((time.monotonic() - t0) * 1000), "p50_ms": int(statistics.median(lat)), "p95_ms": int(lat[max(0, int(len(lat) * 0.95) - 1)]),
             "budget_exhausted_companies": [e["organisation_number"] for e in envelopes if e["operations"].get("budget_exhausted")],
             "previous_run_id": next(iter(previous.values()))["run"]["run_id"] if previous else None,
@@ -182,6 +213,7 @@ def cmd_site(a: argparse.Namespace) -> int:
 
 def main(argv=None) -> None:
     p = argparse.ArgumentParser(prog="signalpost", description="Norwegian organisation number -> evidence-backed company profile")
+    load_dotenv([Path.cwd() / ".env", Path(__file__).resolve().parent.parent / ".env"])
     sub = p.add_subparsers(dest="cmd", required=True)
     r = sub.add_parser("run", help="process a batch of organisation numbers")
     r.add_argument("--input", required=True, help="JSONL/JSON-lines or text file with organisation numbers")
@@ -197,6 +229,10 @@ def main(argv=None) -> None:
     r.add_argument("--resume", action="store_true", help="reuse envelopes already in <out>/checkpoint.jsonl")
     r.add_argument("--nav-days", type=int, default=60, help="how many days of the NAV job feed to scan for active ads")
     r.add_argument("--no-nav-feed", action="store_true", help="skip the NAV feed scan and use the search-API fallback")
+    r.add_argument("--time-budget-min", type=float, default=0.0,
+                   help="finish within this many minutes: near the end, search and deeper crawls are skipped (0 = no limit)")
+    r.add_argument("--search-max-queries", type=int, default=2500, help="cap on Brave Search API queries for the whole run")
+    r.add_argument("--search-qps", type=float, default=float(os.environ.get("SIGNALPOST_BRAVE_QPS") or 1.0), help="Brave queries per second (free plan 1, Search plan up to 50)")
     r.set_defaults(fn=cmd_run)
     v = sub.add_parser("validate", help="validate an envelopes.jsonl against the contract")
     v.add_argument("--envelopes", required=True)

@@ -62,10 +62,15 @@ with the site page as evidence. The destination platform is never fetched.
 
 ## Search provider (candidates only)
 
-Brave Search API, used only when the environment variable `BRAVE_API_KEY` is set. One query per company that
-has no usable registry website. Results are labelled `search_candidate`. They propose website candidates and
-are never referenced by a published claim. The candidate site itself is then fetched and must pass the identity gate.
-Paid plan list price is about $0.50 per 100 companies. Without the key, the third-party cost is $0.
+Brave Search API (https://api.search.brave.com/res/v1/web/search), used only when `BRAVE_SEARCH_API_KEY` is set
+(the name Builderr's starter kit uses; `BRAVE_API_KEY` also works). Builderr's source policy lists "search APIs used
+to discover candidates" and rules that "search results generate candidates; they are not claim evidence". One query
+per company that the registry website, the registry e-mail domain and the domain guesses leave without a verified
+site; a second query only when the first returns no usable candidate. Brave's terms forbid storing results without a
+storage-rights plan, so responses are held in memory only: no result, rank, title, snippet or query text reaches the
+envelope, the snapshots or the request log. A result URL is fetched again independently and must pass the identity
+gate before any fact from it is published. Cost is reported per envelope (`operations.third_party_cost_usd`) and per
+run (`run-report.json` → `search`), at the list price of $5 per 1,000 queries. Without the key the cost is $0.
 
 ## URL safety
 

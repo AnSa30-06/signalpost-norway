@@ -21,7 +21,7 @@ FAMILIES = {
     "contact": ["contact_email", "contact_phone", "registry_email", "registry_phone"],
     "site_leadership": ["site_leader"],
     "site_locations": ["site_location"],
-    "jobs": ["job_posting", "careers_page"],
+    "jobs": ["job_posting"],
     "dated_activity": ["news_item", "sitemap_lastmod", "registry_update"],
     "accounts": ["revenue", "annual_result"],
     "roles": ["role"],

@@ -232,10 +232,11 @@ def test_careers_page_without_postings():
     s = FakeSession({ORIGIN + "/": home_html, ORIGIN + "/jobb/": jobb})
     home = page(ORIGIN + "/", home_html)
     res = site.crawl(PROFILE, s, home, identity.assess(PROFILE, home), page_budget=3)
-    cp = by_field(res, "careers_page")
-    assert cp and cp[0]["section"] == "hiring"
+    cp = by_field(res, "careers_page_url")
+    assert cp and cp[0]["section"] == "web"          # a careers page is not a hiring fact (Builderr, 2026-09-25)
+    assert not by_field(res, "careers_page")
     assert cp[0]["value"] == {"url": ORIGIN + "/jobb/", "hiring_cue": "ledige stillinger"}
-    assert cp[0]["availability"] == "available" and "not machine-readable" in cp[0]["note"]
+    assert cp[0]["availability"] == "available" and "not a hiring fact" in cp[0]["note"]
     assert by_field(res, "job_posting")[0]["availability"] == "not_available"
 
 

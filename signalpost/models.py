@@ -15,6 +15,9 @@ NOT_APPLICABLE = "not_applicable"
 AMBIGUOUS = "ambiguous"
 FAILED = "failed"
 STATES = (AVAILABLE, NOT_AVAILABLE, BLOCKED, NOT_APPLICABLE, AMBIGUOUS, FAILED)
+# A claim note starting with this says the source was skipped this run (the run's time budget), not that it was
+# checked and found empty. The refresh diff does not report such a claim as a change.
+NOT_CHECKED = "not checked this run"
 
 SOURCE_CLASSES = ("official_registry", "official_accounts", "official_roles", "official_subunits", "official_updates",
                   "company_owned", "official_job_board", "search_candidate")

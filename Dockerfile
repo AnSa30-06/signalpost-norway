@@ -18,6 +18,6 @@ COPY . .
 #   docker run --rm -v "$PWD:/data" signalpost --input /data/batch.jsonl \
 #     --universe /data/signalpost-company-universe-2025.jsonl.gz --out /data/out/run-001 \
 #     --run-id run-001 --expected-count 100
-# Add -e BRAVE_API_KEY=... to enable Brave candidate discovery.
+# Add -e BRAVE_SEARCH_API_KEY=... to enable Brave candidate discovery.
 ENTRYPOINT ["uv", "run", "--frozen", "python", "-m", "signalpost", "run"]
 CMD ["--help"]

@@ -11,7 +11,7 @@ import traceback
 from typing import Optional
 
 from . import __version__
-from .models import (AMBIGUOUS, AVAILABLE, BLOCKED, FAILED, NOT_AVAILABLE, STATES, IdGen, new_claim, new_error,
+from .models import (AMBIGUOUS, AVAILABLE, BLOCKED, FAILED, NOT_AVAILABLE, NOT_CHECKED, STATES, IdGen, new_claim, new_error,
                      new_evidence, state_from_fetch, validate_envelope)
 from .net import Session, utc_now
 from .registry import Official
@@ -20,6 +20,28 @@ SCHEMA_VERSION = "1.0"
 SECTION_ORDER = ("identity", "accounts", "leadership", "workplaces", "web", "hiring", "activity")
 MAX_SITE_CANDIDATES = 4   # registry site, registry e-mail domain, and two name-derived guesses
 SITE_PAGE_BUDGET = 7
+# Run deadline (monotonic seconds), set by the CLI from --time-budget-min. An official run that times out is not
+# scored, so near the deadline the optional, slow steps give way: search first, then the deeper site crawl. The
+# registry anchor always runs, so every company still gets a terminal envelope.
+DEADLINE: list = [None]
+SEARCH_RESERVE_S = 300
+PROBE_RESERVE_S = 60
+CRAWL_RESERVE_S = 150
+# Copied from a claim's first evidence record onto the claim itself, so a claim carries its own proof
+# (Builderr, 2026-09-25: "emit canonical claims with source URL, time, hash, and supporting span").
+PROVENANCE_KEYS = ("source_url", "retrieved_at", "content_sha256", "claim_span", "source_class")
+
+
+def time_left() -> float:
+    return float("inf") if DEADLINE[0] is None else DEADLINE[0] - time.monotonic()
+
+
+def attach_provenance(claims: list[dict], evidence: list[dict]) -> None:
+    by_id = {e["id"]: e for e in evidence}
+    for c in claims:
+        ev = next((by_id[i] for i in c.get("evidence_ids") or [] if i in by_id), None)
+        for k in PROVENANCE_KEYS:
+            c[k] = ev.get(k) if ev else None
 
 
 def agent_version() -> str:
@@ -113,8 +135,9 @@ def process_company(org: str, row: Optional[dict], session: Session, run_id: str
     best_review = None
     probed: list[dict] = []
     identity_result = None
+    out_of_time = time_left() <= PROBE_RESERVE_S
     try:
-        cands = discovery.candidates(profile, session) if legal_name else []
+        cands = discovery.candidates(profile, session) if legal_name and not out_of_time else []
     except Exception as exc:
         cands = []
         errors.append(new_error("discovery", f"{type(exc).__name__}: {exc}", FAILED))
@@ -150,7 +173,8 @@ def process_company(org: str, row: Optional[dict], session: Session, run_id: str
             if ident.get("status") == "exact":
                 identity_result = ident
                 try:
-                    _merge(claims, evidence, errors, site.crawl(profile, session, page, ident, page_budget=SITE_PAGE_BUDGET))
+                    budget = SITE_PAGE_BUDGET if time_left() > CRAWL_RESERVE_S else 0   # near the run deadline: homepage only
+                    _merge(claims, evidence, errors, site.crawl(profile, session, page, ident, page_budget=budget))
                 except Exception as exc:
                     errors.append(new_error("site", f"{type(exc).__name__}: {exc}", FAILED, cand["url"]))
                     ev = new_evidence(ids, page, "company_owned", ident.get("claim_span") or "", "identity_gate")
@@ -163,12 +187,17 @@ def process_company(org: str, row: Optional[dict], session: Session, run_id: str
                 best_review = (cand, page, ident)
         return False
 
-    if not probe_candidates(cands) and legal_name and discovery.brave_enabled() and session.remaining(org) >= 4:
-        # Only now is a paid search query worth spending: the registry field and the domain guesses have failed.
+    search_spent = 0
+    free_routes_failed = not probe_candidates(cands)
+    search_skipped_for_time = free_routes_failed and discovery.brave_enabled() and time_left() <= SEARCH_RESERVE_S
+    if (free_routes_failed and legal_name and discovery.brave_enabled() and session.remaining(org) >= 5
+            and time_left() > SEARCH_RESERVE_S):
+        # Only now is a paid search query worth spending: the registry field, the registry e-mail domain and the
+        # domain guesses have all failed. A search result is a candidate; the gate below decides.
         try:
-            extra = discovery.brave_candidates(profile, session)
-            known = {p["url"] for p in probed}
-            probe_candidates([c for c in extra if c["url"] not in known])
+            known = {discovery.registered_domain(p["url"]) for p in probed}
+            extra, search_spent = discovery.brave_candidates(profile, session, exclude=known)
+            probe_candidates(extra)
         except Exception as exc:
             errors.append(new_error("discovery_search", f"{type(exc).__name__}: {exc}", FAILED))
 
@@ -184,7 +213,9 @@ def process_company(org: str, row: Optional[dict], session: Session, run_id: str
         else:
             registry_probe = next((p for p in probed if p["origin"] == "registry"), None)
             tried = "; ".join(f"{p['url']} ({p.get('verdict')}{': ' + str(p.get('error') or p.get('status')) if p.get('verdict') != 'no_site' else ''})" for p in probed)
-            if not cands:
+            if out_of_time:
+                web_note = f"{NOT_CHECKED}: the website was not looked for, to finish within the run's time budget"
+            elif not cands:
                 web_note = "no website candidates: the registry lists no site and the legal name yields no distinctive domain guess" if legal_name else "no legal name"
             elif registry_probe and registry_probe.get("verdict") == "blocked":
                 web_state, web_note = BLOCKED, f"the registry-listed website refused the crawler ({registry_probe.get('error')}); tried: {tried}"
@@ -197,6 +228,8 @@ def process_company(org: str, row: Optional[dict], session: Session, run_id: str
                 web_state, web_note = FAILED, f"every website candidate resolved but could not be fetched; tried: {tried}"
             else:
                 web_note = f"no website found: registry lists none and no domain guess proved the exact entity; tried: {tried}"
+            if search_skipped_for_time:
+                web_note = f"{NOT_CHECKED} by search (time budget); " + web_note
             claims.append(new_claim(ids, "web", "official_website", None, web_state, [], note=web_note[:600]))
 
     # 5. sections ----------------------------------------------------------------------------------------------
@@ -210,6 +243,7 @@ def process_company(org: str, row: Optional[dict], session: Session, run_id: str
     sections = {k: sections[k] for k in SECTION_ORDER}
 
     # 6. envelope, diff, synthesis --------------------------------------------------------------------------------
+    attach_provenance(claims, evidence)
     completed = utc_now()
     official_site = next((c["value"] for c in claims if c["field"] == "official_website" and c["availability"] == AVAILABLE), None)
     brand = next((c["value"] for c in claims if c["field"] == "public_brand" and c["availability"] == AVAILABLE), None)
@@ -231,10 +265,14 @@ def process_company(org: str, row: Optional[dict], session: Session, run_id: str
         "changes": [],
         "errors": errors,
         "operations": {"requests": session.requests_used(org), "runtime_ms": int((time.monotonic() - t0) * 1000),
-                       "third_party_cost_usd": 0.0, "bytes": sum(r.get("bytes", 0) for r in session.log if r.get("company") == org),
+                       "third_party_cost_usd": round(search_spent * discovery.BRAVE_USD_PER_QUERY, 4),
+                       "bytes": sum(r.get("bytes", 0) for r in session.log if r.get("company") == org),
                        "budget_exhausted": session.remaining(org) <= 0 or any("budget" in (e.get("message") or "") for e in errors)},
         "synthesis": {},
-        "diagnostics": {"website_candidates_probed": probed},
+        "diagnostics": {"website_candidates_probed": probed,
+                        "search": {"provider": "brave_search_api", "queries": search_spent,
+                                   "retention": "results held in memory only; no result, rank, title, snippet or query text stored"}
+                                  if search_spent else None},
     }
     try:
         envelope["changes"] = refresh.diff(previous, envelope)

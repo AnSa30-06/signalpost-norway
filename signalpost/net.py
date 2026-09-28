@@ -291,7 +291,9 @@ class Session:
     # ---- fetch ------------------------------------------------------------------------------------------
     def get(self, url: str, company: str, kind: str = "html", max_bytes: int = 2_000_000,
             robots: bool = True, headers: Optional[dict] = None, max_redirects: int = 5,
-            timeout: Optional[float] = None) -> FetchResult:
+            timeout: Optional[float] = None, store: bool = True) -> FetchResult:
+        """store=False: a transient response (a search API whose terms forbid keeping results). Its body is never
+        written to snapshots/ and the request log records the endpoint without the query string."""
         url = url.strip()
         with self._lock:
             cached = self._cache.get(url)
@@ -423,6 +425,11 @@ class Session:
                 res.error = f"unexpected: {type(exc).__name__}: {str(exc)[:150]}"
                 break
         res.elapsed_ms = int((time.monotonic() - started) * 1000)
+        if res.body and not store:
+            res.text = _decode(res.body, res.content_type)
+            with self._lock:
+                self.total_bytes += len(res.body)
+            return self._finish(res, company, log_url=url.split("?", 1)[0])
         if res.body:
             res.sha256 = hashlib.sha256(res.body).hexdigest()
             ext = EXT_FOR_KIND.get(kind, "bin")
@@ -441,10 +448,10 @@ class Session:
                 self.total_bytes += len(res.body)
         return self._finish(res, company)
 
-    def _finish(self, res: FetchResult, company: str) -> FetchResult:
+    def _finish(self, res: FetchResult, company: str, log_url: Optional[str] = None) -> FetchResult:
         with self._lock:
             self._cache[res.url] = res
-            self.log.append({"company": company, "url": res.url, "final_url": res.final_url, "status": res.status,
+            self.log.append({"company": company, "url": log_url or res.url, "final_url": log_url or res.final_url, "status": res.status,
                              "attempts": res.attempts, "redirects": len(res.redirects), "error": res.error,
                              "sha256": res.sha256, "retrieved_at": res.retrieved_at, "elapsed_ms": res.elapsed_ms,
                              "bytes": len(res.body)})

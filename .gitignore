@@ -13,3 +13,6 @@ work/
 
 # the 12 MB public universe file is downloaded, not committed
 signalpost-company-universe-2025.jsonl.gz
+
+# local secrets: the Brave key lives here and nowhere else
+.env
