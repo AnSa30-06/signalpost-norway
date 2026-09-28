@@ -1,0 +1,120 @@
+{
+  "run_id": "smoke-100-r4",
+  "started_at": "2026-09-28T03:14:17Z",
+  "completed_at": "2026-09-28T03:19:50Z",
+  "agent_version": "1.0.0+781b8a8",
+  "inputs": 100,
+  "envelopes": 100,
+  "terminal_status_counts": {
+    "completed": 96,
+    "completed_with_errors": 4
+  },
+  "section_state_counts": {
+    "identity": {
+      "available": 100
+    },
+    "accounts": {
+      "available": 99,
+      "failed": 1
+    },
+    "leadership": {
+      "available": 100
+    },
+    "workplaces": {
+      "available": 100
+    },
+    "web": {
+      "not_available": 74,
+      "ambiguous": 16,
+      "available": 6,
+      "failed": 3,
+      "blocked": 1
+    },
+    "hiring": {
+      "available": 100
+    },
+    "activity": {
+      "available": 100
+    }
+  },
+  "available_claims_by_field": {
+    "legal_name": 100,
+    "legal_form": 100,
+    "business_address": 99,
+    "registered_address": 19,
+    "municipality": 100,
+    "industry_code": 100,
+    "industry_label": 100,
+    "registration_date": 100,
+    "founded": 99,
+    "vat_registered": 100,
+    "status_flags": 100,
+    "latest_submitted_accounts_year": 100,
+    "stated_purpose": 96,
+    "registry_email": 21,
+    "registry_mobile": 20,
+    "former_names": 24,
+    "revenue": 67,
+    "operating_result": 98,
+    "profit_before_tax": 98,
+    "annual_result": 99,
+    "total_assets": 99,
+    "equity": 99,
+    "total_debt": 96,
+    "currency": 99,
+    "reporting_period": 99,
+    "accounts_type": 99,
+    "accounts_history": 99,
+    "accounts_filing_years": 100,
+    "first_filing_year": 100,
+    "filings_on_file": 100,
+    "role": 364,
+    "role_count": 100,
+    "workplace_count": 100,
+    "registry_update": 1349,
+    "active_job_count": 100,
+    "registry_employees": 9,
+    "workplace": 78,
+    "job_posting": 2,
+    "registry_phone": 14,
+    "official_website": 6,
+    "public_brand": 6,
+    "website_title": 6,
+    "website_description": 4,
+    "sitemap_lastmod": 5,
+    "contact_phone": 12,
+    "site_location": 1,
+    "registry_website": 7,
+    "contact_email": 8,
+    "careers_page_url": 2,
+    "social_profile": 8
+  },
+  "requests": 1153,
+  "bytes": 70430769,
+  "third_party_cost_usd": 0,
+  "runtime_ms": 332599,
+  "p50_ms": 46421,
+  "p95_ms": 69539,
+  "budget_exhausted_companies": [
+    "921155182"
+  ],
+  "previous_run_id": "2026-09-28-revision-4-nokey",
+  "changes_by_type": {},
+  "validation_problems": 0,
+  "nav_feed": {
+    "pages": 119,
+    "ads_seen": 36486,
+    "active_ads": 9505,
+    "days": 60,
+    "built_at": "2026-09-28T03:15:56Z",
+    "token_source": "public",
+    "errors": []
+  },
+  "search": {
+    "provider": null,
+    "queries": 0,
+    "max_queries": 2500,
+    "cost_usd": 0.0
+  },
+  "time_budget_min": 40.0
+}

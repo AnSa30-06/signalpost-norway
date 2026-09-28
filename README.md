@@ -148,23 +148,25 @@ bare place name never reach `exact`. Details and the measured cost are in
 
 ## Measured
 
-Revision 3 submission run, 2026-09-13, clean tree at code commit `a6b044a`, antivirus off
-(`submission/run-report-1000.json`, `eval/report.json`):
+Revision 4 run, 2026-09-28, code commit `781b8a8`, **without a search key** (`submission/run-report-1000.json`,
+`submission/smoke-100/`, `eval/report.json`). The numbers with Brave search are added when a key-backed run exists.
 
 | Measure | Value |
 |---|---|
 | envelopes / inputs | 1,000 / 1,000, zero validation problems |
-| requests | 10,217 total: 104 for the once-per-run NAV feed scan, then 10.1 per company |
-| wall clock | 37.3 min for 1,000 companies at 24 workers, set by the registry's filing-years endpoint paced at 30 requests a minute; p50 40.9 s, p95 117.8 s per company |
-| third-party cost | $0 |
+| wall clock | 36.2 min at 24 workers with `--time-budget-min 40`; the time guard skipped the paced filing-years step for the last 20 companies, each marked `not checked this run` |
+| requests | 9,877 (120 for the once-per-run NAV feed scan, then 9.8 per company) |
+| third-party cost | $0 (no search key) |
 | identity / accounts / leadership / workplaces / activity / hiring | 1,000 / 999 / 999 / 1,000 / 1,000 / 1,000 sections available |
-| filing history | 1,000 of 1,000 companies carry `accounts_filing_years` from the registry |
-| web | 118 verified exact (42 organisation number on page, 48 exact legal name with the registered address, 28 registry-linked domain), 133 ambiguous, 726 no site found, 21 unreachable, 2 blocked |
-| NAV job feed | active national ads scanned once per run; every published ad confirmed by an organisation number in NAV's own record |
-| evidence | `eval/audit_artifact.py`: 43,919 evidence records checked, 0 spans not verbatim in their snapshot; all 118 published websites re-checked from the stored page for another organisation number, another entity in the title, a many-company listing and a foreign brand, and re-gated with the current code: 0 failures |
-| synthesis | an `answers` block on all 1,000 profiles; a verification sentence on every profile with a website candidate |
-| gold set (46 hand-labelled rows) | precision 1.000, recall 0.643, zero wrong-company publications; recall fell from 0.964 in revision 2 because the stricter gate withholds sites the labels call right but that carry no address, number or registry link |
-| refresh against the revision-2 run | 28 websites `available` to `ambiguous` and 1 to `not_available`, each recorded as `availability_changed` (the rule change); 3 `new_website` through the registry's own `hjemmeside`; 1 `new_news`, 3 `new_social_profile` |
+| web | 110 verified exact, 132 ambiguous, 731 no site found, 21 unreachable, 6 blocked |
+| evidence | 43,811 evidence records, 0 spans not verbatim; all 49,766 available claims carry `source_url`, `retrieved_at`, `content_sha256` and `claim_span` on the claim itself; all 110 published websites clean on the four wrong-company traps and re-gated `exact` |
+| hiring | 4 job postings (NAV feed items confirmed by organisation number); careers pages are no longer hiring facts |
+| gold set (46 hand-labelled rows) | precision 1.000, recall 0.679, zero wrong-company publications |
+| refresh against revision 3 (15 days earlier) | real registry movement (59 employee counts, 27 new and 25 removed roles, 111 registry updates, 21 industry codes); 10 websites lost verification, every one to the site itself (403s, robots, resets, a redirect loop, one page now stating another organisation number) |
+
+**100-company smoke test, measured** (`./run.sh work/judge-100.jsonl out/smoke-100-r4 <revision-4 envelopes>`):
+100 of 100 envelopes, zero validation problems, 1,153 requests, 5.7 minutes including `uv sync`, $0; **zero change
+records** against the previous day. Report: `submission/smoke-100/run-report.json`, audit: `submission/smoke-100/audit.txt`.
 
 **Judge-shaped run, revision 2, measured** (2026-09-13, `./run.sh` on a fixed random 100 with the packaged
 envelopes as the previous day, from a fresh clone with no seed file): 100 of 100 envelopes, zero validation
