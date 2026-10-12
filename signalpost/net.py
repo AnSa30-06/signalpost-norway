@@ -291,12 +291,12 @@ class Session:
     # ---- fetch ------------------------------------------------------------------------------------------
     def get(self, url: str, company: str, kind: str = "html", max_bytes: int = 2_000_000,
             robots: bool = True, headers: Optional[dict] = None, max_redirects: int = 5,
-            timeout: Optional[float] = None, store: bool = True) -> FetchResult:
+            timeout: Optional[float] = None, store: bool = True, cache: bool = True) -> FetchResult:
         """store=False: a transient response (a search API whose terms forbid keeping results). Its body is never
         written to snapshots/ and the request log records the endpoint without the query string."""
         url = url.strip()
         with self._lock:
-            cached = self._cache.get(url)
+            cached = self._cache.get(url) if cache else None
         if cached is not None:
             c = FetchResult(**{**cached.__dict__, "cached": True})
             return c
@@ -415,7 +415,10 @@ class Session:
             except (urllib.error.URLError, socket.timeout, TimeoutError, ConnectionError, OSError, ValueError) as exc:
                 msg = str(getattr(exc, "reason", exc))[:200]
                 res.status = None   # a status from an earlier redirect hop must not describe this failed hop
-                if res.attempts < 2 and self.remaining(company) > 0 and ("timed out" in msg.lower() or "reset" in msg.lower()):
+                # One retry for a connection that dropped mid-way (timeout, reset, TLS EOF, aborted): such a drop
+                # is transient, and without the retry two runs on the same input disagree about the same site.
+                if res.attempts < 2 and self.remaining(company) > 0 and any(
+                        k in msg.lower() for k in ("timed out", "reset", "eof", "aborted", "closed", "forcibly")):
                     time.sleep(0.5)
                     continue
                 tls = classify_tls_error(msg)

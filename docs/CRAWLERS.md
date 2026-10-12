@@ -12,7 +12,8 @@ written and its log entry carries the endpoint without the query string.
 |---|---|---|
 | global request cap | 30 × input count in `run.sh` (`--max-requests`, `SIGNALPOST_MAX_REQUESTS`) | the official batch is now 1,000+ companies; the old fixed 1,950 would have starved every company after the first ~190 |
 | per-company cap | 30 (`--per-company-cap`) | measured average 10.2; search adds one or two queries and up to three probes for companies the free routes leave without a site |
-| time budget | 40 min in `run.sh` (`--time-budget-min`, `SIGNALPOST_TIME_BUDGET_MIN`) | near the end the paced filing-years slots, search and deeper crawls are skipped, each marked `not checked this run` |
+| time budget | 40 min in `run.sh` (`--time-budget-min`, `SIGNALPOST_TIME_BUDGET_MIN`), an emergency guard; measured 15 min per 1,000 companies | near the end search and deeper crawls are skipped, each marked `not checked this run` |
+| filing-years endpoint | read only for batches of ≤ 300 companies (`--filing-years-max-batch`) | paced at ~28 a minute; a batch-size rule keeps two runs of the same input identical |
 | timeout | 12 s per request | |
 | response cap | 2 MB per page (200 KB for robots.txt) | bytes beyond the cap are dropped |
 | redirects | at most 5 hops, each counted, each re-checked by the public-URL guard | |

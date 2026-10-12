@@ -121,8 +121,15 @@ def process_company(org: str, row: Optional[dict], session: Session, run_id: str
                             for c in claims if c["field"] == "workplace" and c["availability"] == AVAILABLE
                             and isinstance(c.get("value"), dict) and c["value"].get("organisation_number")}
                 _merge(claims, evidence, errors, navfeed.fetch(profile, session, nav_index, subunits=subunits))
+            elif nav_index is not None:
+                # The feed could not be read this run. The search API is NOT used as a fallback in a batch: it
+                # blocks bursts at random, so two runs on the same input would disagree company by company
+                # (Builderr, 2026-10-02: make the output deterministic). Every company gets the same answer.
+                claims.append(new_claim(ids, "hiring", "active_job_count", None, FAILED, [],
+                                        note="NAV job feed unavailable this run (" + "; ".join(nav_index.errors[:2])[:200] + "); hiring not checked"))
+                errors.append(new_error("jobs", "NAV job feed unavailable this run", FAILED))
             else:
-                _merge(claims, evidence, errors, jobs.fetch(profile, session))                 # search-API fallback, exact-name gate
+                _merge(claims, evidence, errors, jobs.fetch(profile, session))                 # --no-nav-feed only: search API, exact-name gate
         except Exception as exc:
             errors.append(new_error("jobs", f"{type(exc).__name__}: {exc}", FAILED))
             claims.append(new_claim(ids, "hiring", "active_job_count", None, FAILED, [], note=f"job connector crashed: {exc}"))

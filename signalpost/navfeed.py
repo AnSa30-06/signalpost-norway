@@ -74,7 +74,7 @@ class FeedIndex:
     def _fetch_token(self) -> bool:
         if self.token:
             return True
-        r = self.s.get(TOKEN_URL, company=SHARED_KEY, kind="text", robots=False, timeout=FEED_TIMEOUT)
+        r = self.s.get(TOKEN_URL, company=SHARED_KEY, kind="text", robots=False, timeout=FEED_TIMEOUT, cache=False)
         if not r.ok:
             self.errors.append(f"public token fetch failed: {r.error or r.status}")
             return False
@@ -92,7 +92,7 @@ class FeedIndex:
         pages = 0
         while url and pages < MAX_PAGES:
             r = self.s.get(url, company=SHARED_KEY, kind="json", robots=False, headers=headers, max_bytes=4_000_000,
-                           timeout=FEED_TIMEOUT)
+                           timeout=FEED_TIMEOUT, cache=False)
             headers = self._headers()
             if r.status == 304 or (r.ok and not r.body):
                 break
@@ -174,7 +174,9 @@ class FeedIndex:
                         if u not in seen:
                             seen.add(u)
                             out.append(self.ads[u])
-        out.sort(key=lambda a: a["seen"], reverse=True)
+        # newest first, ties broken by uuid: the index is filled by parallel page chains, so insertion order
+        # differs between two runs on the same input and a timestamp-only sort kept that difference
+        out.sort(key=lambda a: (a.get("seen") or "", a.get("uuid") or a.get("id") or ""), reverse=True)
         return out[:MAX_CANDIDATES]
 
     def summary(self) -> dict:

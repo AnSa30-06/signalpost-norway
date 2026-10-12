@@ -188,3 +188,72 @@ def test_the_real_key_file_is_git_ignored():
     root = Path(__file__).resolve().parent.parent
     assert ".env" in (root / ".gitignore").read_text(encoding="utf-8").split()
     assert "BRAVE_SEARCH_API_KEY=\n" in (root / ".env.example").read_text(encoding="utf-8")
+
+
+# ---- determinism (Builderr, 2026-10-02: the same input must give the same factual output) ----------------------
+def test_filing_years_depend_on_batch_size_not_the_clock(monkeypatch):
+    monkeypatch.setattr(registry, "FILING_YEARS_MAX_BATCH", [300])
+    monkeypatch.setattr(registry, "BATCH_SIZE", [1500])
+
+    class NoCall:
+        def get(self, *a, **k):
+            raise AssertionError("not called for a batch over the limit")
+
+    o = Official(NoCall(), IdGen(), "914922941", {"legal_form": "AS"})
+    o.filing_years()
+    c = next(c for c in o.claims if c["field"] == "accounts_filing_years")
+    assert c["availability"] == "not_available" and c["note"].startswith(NOT_CHECKED) and "1500" in c["note"]
+
+
+def test_job_feed_candidates_have_a_total_order():
+    from signalpost import navfeed
+    ix = navfeed.FeedIndex.__new__(navfeed.FeedIndex)
+    ads = {u: {"uuid": u, "businessName": "Sandnes Elektriske AS", "seen": "2026-10-01T10:00:00", "status": "ACTIVE"} for u in ("b", "a", "c")}
+    orders = []
+    for keys in (["b", "a", "c"], ["c", "b", "a"]):          # two runs fill the index in different orders
+        ix.ads = {k: ads[k] for k in keys}
+        ix.by_name = {"sandnes elektriske as": keys}
+        orders.append([x["uuid"] for x in ix.candidates("SANDNES ELEKTRISKE AS")])
+    assert orders[0] == orders[1]
+
+
+def test_a_dropped_connection_is_retried_once(tmp_path, monkeypatch):
+    calls = {"n": 0}
+
+    class Flaky:
+        def open(self, req, timeout=None):
+            calls["n"] += 1
+            raise OSError("[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol")
+
+    monkeypatch.setattr(net, "assert_public_url", lambda u: None)
+    monkeypatch.setattr(net.urllib.request, "build_opener", lambda *a, **k: Flaky())
+    monkeypatch.setattr(net.time, "sleep", lambda s: None)
+    r = Session(tmp_path).get("https://webla.no/", company="823162812", robots=False)
+    assert calls["n"] == 2 and not r.ok
+
+
+def test_a_feed_outage_gives_every_company_the_same_answer_without_the_search_api(monkeypatch):
+    from signalpost import jobs, navfeed
+    monkeypatch.setattr(jobs, "fetch", lambda *a, **k: (_ for _ in ()).throw(AssertionError("search API must not be used")))
+
+    class DownIndex:
+        built = False
+        errors = ["public token fetch failed: http_500"]
+
+    class Sess:
+        def get(self, url, company, kind="html", **kw):
+            return FetchResult(url=url, final_url=url, status=503, error="http_503", retrieved_at="2026-10-13T00:00:00Z")
+
+        def remaining(self, company):
+            return 30
+
+        def requests_used(self, company):
+            return 0
+
+        log = []
+
+    monkeypatch.setattr(pipeline, "agent_version", lambda: "test")
+    env = pipeline.process_company("914922941", {"organisation_number": "914922941", "name": "SANDNES ELEKTRISKE AS"},
+                                   Sess(), "r", None, "2026-10-13T00:00:00Z", nav_index=DownIndex())
+    c = next(c for c in env["claims"] if c["field"] == "active_job_count")
+    assert c["availability"] == "failed" and "feed unavailable" in c["note"]

@@ -71,8 +71,8 @@ one claim with `value: null`, `availability: "not_available"` and a `note`. Zero
 - `source_url`, `retrieved_at`, `content_sha256`, `claim_span` and `source_class` are copied onto every claim from
   its first evidence record (revision 4), so a claim carries its own proof without a lookup. They are `null` on a
   claim without evidence. `eval/audit_artifact.py` checks that they equal the evidence record.
-- A `note` starting `not checked this run` means the source was skipped to finish inside the run's time budget,
-  not that it was checked and found empty. The refresh diff does not report such a claim as a change.
+- A `note` starting `not checked this run` means the source was skipped (the run's time budget, or the filing-years
+  endpoint in a batch over 300 companies), not that it was checked and found empty. The refresh diff does not report such a claim as a change.
 - Hiring facts (`hiring` section) are only `job_posting` claims from the NAV job feed or from a JSON-LD
   `JobPosting` on the verified site, and the `active_job_count` from the feed.
 

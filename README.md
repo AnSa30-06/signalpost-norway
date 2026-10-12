@@ -106,12 +106,19 @@ Builderr's official batch is now 1,000 companies (it may grow to 1,100) with a f
 run, and a run that times out is not scored. The published pages do not state the numbers, so the agent enforces
 its own:
 
-- **Time.** `--time-budget-min` (default 40 in `run.sh`). The registry's filing-years endpoint is paced at about 28
-  requests a minute for the whole process, which alone takes 35 minutes per 1,000 companies. In the last four
-  minutes no worker waits for a paced slot; in the last five minutes no search query is spent; in the last two and a
-  half minutes a verified site gets its homepage only; in the last minute no website is looked for. Each skipped
-  step says `not checked this run` in its note, and the refresh diff does not report it as a change. Every company
-  still gets a terminal envelope.
+- **Determinism.** Builderr runs every entry twice on the same input and refuses a score when the facts differ
+  (2026-10-02: 125 of 1,200 companies differed for revision 2). Nothing the agent publishes depends on the clock or
+  on thread timing: the paced filing-years endpoint is read only for batches of 300 companies or fewer
+  (`--filing-years-max-batch`), a decision made from the batch, not from elapsed time; job-feed candidates have a
+  total order; a connection that drops mid-way is retried once; and when NAV's job feed cannot be read after about
+  five minutes of retries, every company gets the same `failed` hiring answer instead of falling back to NAV's
+  search API, which blocks bursts at random. `python eval/determinism.py A/envelopes.jsonl B/envelopes.jsonl`
+  compares two runs fact by fact.
+- **Time.** About 15 minutes per 1,000 companies at 24 workers (measured 2026-10-13). `--time-budget-min` (40 in
+  `run.sh`) is an emergency guard only: in the last five minutes no search query is spent, in the last two and a half
+  a verified site gets its homepage only, in the last minute no website is looked for. Each skipped step says
+  `not checked this run` in its note, and the refresh diff does not report it as a change. Every company still gets
+  a terminal envelope.
 - **Requests.** `run.sh` sets the run-wide cap to 30 per input company and the per-company cap to 30. Measured
   average: 10.2 per company. When a company hits its cap, the remaining sources are marked `not_available` with a
   note, the envelope is still written, and `operations.budget_exhausted` is `true`.

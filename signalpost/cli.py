@@ -102,6 +102,8 @@ def cmd_run(a: argparse.Namespace) -> int:
         pipeline.DEADLINE[0] = t0 + budget_s
         registry.HISTORY_CUTOFF[0] = t0 + budget_s - 240   # no worker waits for a paced slot in the last four minutes
     discovery.set_search_limit(a.search_max_queries)
+    registry.BATCH_SIZE[0] = len(orgs)
+    registry.FILING_YEARS_MAX_BATCH[0] = a.filing_years_max_batch if a.filing_years_max_batch >= 0 else None
     net.HOST_MIN_INTERVAL["api.search.brave.com"] = 1.05 / max(0.1, a.search_qps)
     print(f"search: {'Brave Search API enabled' if discovery.brave_enabled() else 'disabled (no BRAVE_SEARCH_API_KEY)'}; "
           f"time budget: {a.time_budget_min or 'none'} min", file=sys.stderr)
@@ -110,6 +112,14 @@ def cmd_run(a: argparse.Namespace) -> int:
         from .navfeed import FeedIndex
         nav_index = FeedIndex(session, days=a.nav_days)
         ok = nav_index.build()
+        # NAV's feed answered 500/503 or timed out for several minutes at a time on 2026-10-13; wait up to five
+        # minutes before giving up, so one run is not the only one that loses the hiring section
+        for wait in (20, 60, 90, 120):
+            if ok:
+                break
+            print(f"nav feed index not built; retrying in {wait}s", file=sys.stderr)
+            time.sleep(wait)
+            ok = nav_index.build()
         print(f"nav feed index: built={ok} {json.dumps(nav_index.summary())} requests={session.total_requests} elapsed={int(time.monotonic() - t0)}s", file=sys.stderr)
     checkpoint = out / "checkpoint.jsonl"
     done: dict[str, dict] = {}
@@ -231,6 +241,8 @@ def main(argv=None) -> None:
     r.add_argument("--no-nav-feed", action="store_true", help="skip the NAV feed scan and use the search-API fallback")
     r.add_argument("--time-budget-min", type=float, default=0.0,
                    help="finish within this many minutes: near the end, search and deeper crawls are skipped (0 = no limit)")
+    r.add_argument("--filing-years-max-batch", type=int, default=300,
+                   help="read the paced filing-years endpoint only for batches up to this size (-1 = always)")
     r.add_argument("--search-max-queries", type=int, default=2500, help="cap on Brave Search API queries for the whole run")
     r.add_argument("--search-qps", type=float, default=float(os.environ.get("SIGNALPOST_BRAVE_QPS") or 1.0), help="Brave queries per second (free plan 1, Search plan up to 50)")
     r.set_defaults(fn=cmd_run)

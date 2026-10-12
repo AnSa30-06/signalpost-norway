@@ -127,6 +127,31 @@ Changes in revision 4:
   `BRAVE_SEARCH_API_KEY`, results transient, a result tried only when its host carries a distinctive word of the
   legal name, then the unchanged exact-entity gate.
 
+## Fourth report (2026-10-02): same input, different facts for 125 of 1,200 companies (R14)
+
+Revision 2 qualified on 16 September (76.71 on a fresh hidden 100-company set). On 2 October Builderr could not score
+it on the 1,200-company set: two checks of the same input gave materially different results for 125 companies. The
+5 October board (1,500-company locked set, each entry run twice) shows revision 2 at 48.64 (recall 7.96/50,
+evidence 20.68/30). Causes found by running the same input twice locally (`eval/determinism.py`):
+
+1. **The 1,950-request cap** in `run.sh` (the old 100-company budget). On 1,200 or 1,500 companies it is spent after
+   roughly 200, and which companies are starved depends on thread timing. Fixed in revision 4 (R13): 30 per input.
+2. **NAV search fallback.** When the job feed could not be read, every company fell back to NAV's search API, which
+   blocks bursts at random. Measured: the feed returned 500/503 and timed out twice on 2026-10-13; 9 of 10 differing
+   companies in a 100-company pair came from the fallback. Now: up to five minutes of retries, then the same
+   `failed` answer for every company; the search API is used only with `--no-nav-feed`.
+3. **Clock-dependent step.** The paced filing-years endpoint (about 28 a minute) was skipped near a wall-clock
+   deadline, so which companies kept their filing history depended on run speed. Now decided by batch size: read
+   for batches of 300 or fewer, skipped for all companies in larger batches.
+4. **Unstable order.** Job-feed candidates with equal timestamps kept the order in which parallel page chains filled
+   the index; they now sort by (timestamp, uuid).
+5. **Dropped connections.** A TLS EOF or a reset during a page fetch is now retried once.
+
+Measured after the fixes, the same 1,000 companies twice, 15 minutes apart: outside the hiring section 8 of 1,000
+companies differ (0.8%); 5 of them are workplace employee counts the registry itself changed between the runs, 3
+are sites that dropped the connection twice. The hiring section differed for every company because NAV's feed was
+down for the whole of the second run; both runs report that honestly and identically per run.
+
 ## Verification
 
 1. Regression tests for every rule (`tests/`).

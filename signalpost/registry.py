@@ -27,6 +27,11 @@ _HISTORY_NEXT = [0.0]
 # Monotonic time after which no filing-years slot is handed out (set by the CLI from the run's time budget).
 # The paced queue is the one step whose wait grows with the batch: 1,000 companies need 35 minutes of slots.
 HISTORY_CUTOFF: list = [None]
+# Fetched only for batches up to this size (set by the CLI). The decision depends on the batch, not on the clock,
+# so two runs of the same input make the same choice (Builderr, 2026-10-02: no conditional source choices).
+# 300 companies take 10.5 minutes of paced slots; 1,500 would take 52.
+FILING_YEARS_MAX_BATCH: list = [None]
+BATCH_SIZE: list = [0]
 
 
 def _history_slot() -> bool:
@@ -235,6 +240,11 @@ class Official:
         """Every year for which an annual-account copy is on file. The normalised accounts endpoint returns only
         the latest period, so this is the only official view of the filing history without fetching PDFs."""
         if self.sections.get("accounts") == NOT_APPLICABLE:
+            return
+        if FILING_YEARS_MAX_BATCH[0] is not None and BATCH_SIZE[0] > FILING_YEARS_MAX_BATCH[0]:
+            self._add("accounts", "accounts_filing_years", None, [], availability=NOT_AVAILABLE,
+                      note=f"{NOT_CHECKED}: the filing-years endpoint is paced at about 28 requests a minute, so it is read "
+                           f"only for batches of {FILING_YEARS_MAX_BATCH[0]} companies or fewer; this batch has {BATCH_SIZE[0]}")
             return
         if not _history_slot():
             self._add("accounts", "accounts_filing_years", None, [], availability=NOT_AVAILABLE,
