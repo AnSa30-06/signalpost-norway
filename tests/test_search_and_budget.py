@@ -257,3 +257,5 @@ def test_a_feed_outage_gives_every_company_the_same_answer_without_the_search_ap
                                    Sess(), "r", None, "2026-10-13T00:00:00Z", nav_index=DownIndex())
     c = next(c for c in env["claims"] if c["field"] == "active_job_count")
     assert c["availability"] == "failed" and "feed unavailable" in c["note"]
+    assert env["sections"]["hiring"] == "failed"
+

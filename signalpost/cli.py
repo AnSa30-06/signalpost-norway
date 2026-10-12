@@ -112,9 +112,9 @@ def cmd_run(a: argparse.Namespace) -> int:
         from .navfeed import FeedIndex
         nav_index = FeedIndex(session, days=a.nav_days)
         ok = nav_index.build()
-        # NAV's feed answered 500/503 or timed out for several minutes at a time on 2026-10-13; wait up to five
-        # minutes before giving up, so one run is not the only one that loses the hiring section
-        for wait in (20, 60, 90, 120):
+        # NAV's feed answered 500/503 or timed out for minutes at a time on 2026-10-13 (around 01:00 Oslo time).
+        # Two more attempts, about six minutes in all at worst, before every company gets the same failed answer.
+        for wait in (30, 90):
             if ok:
                 break
             print(f"nav feed index not built; retrying in {wait}s", file=sys.stderr)

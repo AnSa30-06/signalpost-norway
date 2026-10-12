@@ -246,6 +246,8 @@ def process_company(org: str, row: Optional[dict], session: Session, run_id: str
     sections.setdefault("workplaces", _section_state(claims, "workplaces", FAILED))
     sections["web"] = web_state
     sections["hiring"] = _section_state(claims, "hiring", FAILED)
+    if sections["hiring"] == NOT_AVAILABLE and any(c["field"] == "active_job_count" and c["availability"] == FAILED for c in claims):
+        sections["hiring"] = FAILED   # the job feed was not read: "nothing there" would claim a check that never happened
     sections["activity"] = _section_state(claims, "activity", NOT_AVAILABLE)
     sections = {k: sections[k] for k in SECTION_ORDER}
 
