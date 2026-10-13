@@ -155,25 +155,24 @@ bare place name never reach `exact`. Details and the measured cost are in
 
 ## Measured
 
-Revision 4 run, 2026-09-28, code commit `781b8a8`, **without a search key** (`submission/run-report-1000.json`,
-`submission/smoke-100/`, `eval/report.json`). The numbers with Brave search are added when a key-backed run exists.
+Submission run, 2026-10-13, code commit `09d2a86`; see `submission/run-report-1000.json`, `submission/smoke-100/`,
+`eval/report.json`. **No search key** (Brave runs only when `BRAVE_SEARCH_API_KEY` is set).
 
-| Measure | Value |
-|---|---|
-| envelopes / inputs | 1,000 / 1,000, zero validation problems |
-| wall clock | 36.2 min at 24 workers with `--time-budget-min 40`; the time guard skipped the paced filing-years step for the last 20 companies, each marked `not checked this run` |
-| requests | 9,877 (120 for the once-per-run NAV feed scan, then 9.8 per company) |
-| third-party cost | $0 (no search key) |
-| identity / accounts / leadership / workplaces / activity / hiring | 1,000 / 999 / 999 / 1,000 / 1,000 / 1,000 sections available |
-| web | 110 verified exact, 132 ambiguous, 731 no site found, 21 unreachable, 6 blocked |
-| evidence | 43,811 evidence records, 0 spans not verbatim; all 49,766 available claims carry `source_url`, `retrieved_at`, `content_sha256` and `claim_span` on the claim itself; all 110 published websites clean on the four wrong-company traps and re-gated `exact` |
-| hiring | 4 job postings (NAV feed items confirmed by organisation number); careers pages are no longer hiring facts |
-| gold set (46 hand-labelled rows) | precision 1.000, recall 0.679, zero wrong-company publications |
-| refresh against revision 3 (15 days earlier) | real registry movement (59 employee counts, 27 new and 25 removed roles, 111 registry updates, 21 industry codes); 10 websites lost verification, every one to the site itself (403s, robots, resets, a redirect loop, one page now stating another organisation number) |
+| Measure | Full run, 1,000 companies | `./run.sh` smoke test, 100 companies |
+|---|---|---|
+| envelopes / validation | 1,000 / 0 problems | 100 / 0 problems |
+| wall clock | 19.1 min, 6 of them waiting on NAV's job feed, which did not answer | 7.8 min including `uv sync` |
+| requests | 9,361 | 1,319 |
+| third-party cost | $0 | $0 |
+| identity / accounts | 1,000 / 999 available | 100 / 99 available |
+| web | 108 verified, 128 ambiguous, 737 none, 21 unreachable, 6 blocked | 7 verified, 15 ambiguous, 74 none |
+| hiring | `failed` for all 1,000: NAV's feed timed out and returned 500/503 for hours on 2026-10-13; every company got the same answer | available for all 100 (the feed was back); 2 new job ads |
+| evidence audit | 44,608 records, 0 spans not verbatim, 108 sites clean | 4,400 records, 0 not verbatim, 7 sites clean |
+| gold set (46 rows) | precision 1.000, recall 0.607, 0 wrong-company | |
 
-**100-company smoke test, measured** (`./run.sh work/judge-100.jsonl out/smoke-100-r4 <revision-4 envelopes>`):
-100 of 100 envelopes, zero validation problems, 1,153 requests, 5.7 minutes including `uv sync`, $0; **zero change
-records** against the previous day. Report: `submission/smoke-100/run-report.json`, audit: `submission/smoke-100/audit.txt`.
+**Determinism, measured** (`eval/determinism.py`, the same 1,000 companies twice, 15 minutes apart, 2026-10-13):
+outside the hiring section 8 of 1,000 companies differ; 5 are workplace employee counts the registry changed between
+the runs, 3 are sites that dropped the connection twice. Revision 2 had 125 of 1,200 differing in Builderr's check.
 
 **Judge-shaped run, revision 2, measured** (2026-09-13, `./run.sh` on a fixed random 100 with the packaged
 envelopes as the previous day, from a fresh clone with no seed file): 100 of 100 envelopes, zero validation
