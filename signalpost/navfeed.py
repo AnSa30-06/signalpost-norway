@@ -33,7 +33,9 @@ TOKEN_URL = BASE + "/api/publicToken"
 SHARED_KEY = "_navfeed"          # session budget key: exempt from the per-company cap, counted in the global cap
 MAX_PAGES = 150                  # hard stop per chain
 MAX_CANDIDATES = 8               # ad records fetched per company at most
-FEED_TIMEOUT = 40.0              # a feed page carries 1,000 events and can exceed a site-crawl timeout
+# A feed page carries 1,000 events. On 2026-10-13 around 01:00-02:00 Oslo time one page took 24 s from a plain client and
+# every If-Modified-Since page of the scan timed out at 40 s, so the whole run lost its hiring section to a slow, working feed.
+FEED_TIMEOUT = 90.0
 LEGAL_FORMS = {"as", "asa", "ans", "da", "enk", "nuf", "sa", "ba", "ks", "sti", "brl", "iks", "kf", "fli", "esek", "sam", "spa"}
 GENERIC = {"og", "and", "the", "group", "gruppen", "norge", "norway", "as", "avd", "avdeling", "enhet", "for"}
 
