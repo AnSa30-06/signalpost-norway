@@ -65,6 +65,10 @@ def classify_tls_error(message: str) -> Optional[str]:
 EXT_FOR_KIND = {"html": "html", "json": "json", "xml": "xml", "text": "txt", "pdf": "pdf"}
 PRIVATE_HOST_SUFFIXES = (".local", ".internal", ".localhost", ".lan", ".home")
 HOST_CONCURRENCY = {"data.brreg.no": 8, "arbeidsplassen.nav.no": 1, "api.search.brave.com": 1}
+# The official registry is the anchor of every profile. On 2026-10-13 every request to it failed for 2.5 minutes
+# (a certificate for another host was served), the failures were instant, and 950 of 1,000 companies finished
+# in that window with empty profiles. A failed registry request now waits and asks again before giving up.
+ANCHOR_RETRY_WAITS = {"data.brreg.no": (5.0, 15.0, 40.0)}
 HOST_MIN_INTERVAL = {"arbeidsplassen.nav.no": 3.0, "api.search.brave.com": 1.1}   # seconds between request starts on that host (NAV blocks bursts for a long time)
 RATE_LIMIT_TRIP = 3                                   # consecutive 429s before a host is put on cooldown
 RATE_LIMIT_COOLDOWN = 90.0                            # seconds; requests during cooldown are not sent (and not charged)
@@ -403,6 +407,8 @@ class Session:
                         continue
                     res.error = "http_429"
                     break
+                if status in (500, 502, 503, 504) and self._anchor_wait(host, res, company):
+                    continue
                 if status in (500, 502, 503, 504) and res.attempts < 2 and self.remaining(company) > 0:
                     time.sleep(0.8)
                     continue
@@ -420,6 +426,8 @@ class Session:
                 if res.attempts < 2 and self.remaining(company) > 0 and any(
                         k in msg.lower() for k in ("timed out", "reset", "eof", "aborted", "closed", "forcibly")):
                     time.sleep(0.5)
+                    continue
+                if self._anchor_wait(host, res, company):
                     continue
                 tls = classify_tls_error(msg)
                 res.error = tls if tls else f"network: {msg}"
@@ -450,6 +458,14 @@ class Session:
             with self._lock:
                 self.total_bytes += len(res.body)
         return self._finish(res, company)
+
+    def _anchor_wait(self, host: str, res: FetchResult, company: str) -> bool:
+        """For an anchor host, sleep before the next attempt; False once the waits are used up or the budget is gone."""
+        waits = ANCHOR_RETRY_WAITS.get(host.lower())
+        if not waits or res.attempts > len(waits) or self.remaining(company) <= 0:
+            return False
+        time.sleep(waits[res.attempts - 1])
+        return True
 
     def _finish(self, res: FetchResult, company: str, log_url: Optional[str] = None) -> FetchResult:
         with self._lock:

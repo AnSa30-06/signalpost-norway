@@ -259,3 +259,34 @@ def test_a_feed_outage_gives_every_company_the_same_answer_without_the_search_ap
     assert c["availability"] == "failed" and "feed unavailable" in c["note"]
     assert env["sections"]["hiring"] == "failed"
 
+
+
+def test_a_failing_registry_request_waits_and_asks_again(tmp_path, monkeypatch):
+    """data.brreg.no served a certificate for another host for 2.5 minutes; the anchor must survive that."""
+    calls, slept = {"n": 0}, []
+
+    class Resp:
+        status = 200
+        headers = {"Content-Type": "application/json"}
+
+        def read(self, n=-1):
+            return b'{"organisasjonsnummer": "914922941"}'
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+    class Blip:
+        def open(self, req, timeout=None):
+            calls["n"] += 1
+            if calls["n"] <= 3:
+                raise OSError("[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch")
+            return Resp()
+
+    monkeypatch.setattr(net, "assert_public_url", lambda u: None)
+    monkeypatch.setattr(net.urllib.request, "build_opener", lambda *a, **k: Blip())
+    monkeypatch.setattr(net.time, "sleep", lambda s: slept.append(s))
+    r = Session(tmp_path).get("https://data.brreg.no/enhetsregisteret/api/enheter/914922941", company="914922941", kind="json", robots=False)
+    assert r.ok and calls["n"] == 4 and slept == [5.0, 15.0, 40.0]
